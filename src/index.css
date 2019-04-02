@@ -1,0 +1,242 @@
+@import url(../../Cesium/lib/Cesium/Widgets/widgets.css);
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: sans-serif;
+    background: #000;
+}
+
+/* Style de la barre de menu */
+ #menu {
+    position: absolute;
+    top: 0;
+    left: 0px;
+    width: 425px;
+    height: 88%;
+    background-color: rgba(57, 71, 75, 0.90);
+    padding: 5px 5px 0px 5px;
+}
+
+/* Style du bouton menu */
+#left-pane{
+    position: absolute;
+    top: 00px;
+    left: 425px;
+    width: 200px;
+    color: white;
+    padding: 5px 5px 0 5px;
+    bottom: 120px;
+    overflow-y: auto;
+}
+
+/* Style du contour du bouton menu */
+#left-pane #toggle-menu {
+    display: inline-block;
+    margin-bottom: 25px;
+    background-color: rgba(57, 71, 75, 0.90);
+    border: 1px solid #000;
+    border-radius: 5px;
+}
+
+/* Style de la partie Cesium*/
+#cesiumContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+
+/* Style des panels contenus dans le menu */
+ .panel{
+   display: inline-block;
+   border: 1px solid #000;
+   border-radius: 5px;
+   color: white;
+   margin-bottom: 5px;
+	 width: 415px;
+	 position: fixed;
+   z-index: 1;
+   top: 0;
+   left: 0;
+ }
+
+.panel .panel-title{
+  display: block;
+  width: 100%;
+  background-color: #7f8c8d;
+  font-size: large;
+  padding: 5px;
+  border-radius: 5px 5px 0 0;
+  text-align: center;
+  color: white;
+  cursor: pointer;
+
+ }
+
+/* Style du titre lorsqu'on passe la souris dessus */
+ .panel-title:hover {
+   color: #1a1a1a;
+ }
+
+  .active {
+
+  }
+
+ .panel .panel-content{
+   width: 100%;
+   padding: 5px;
+   position: absolute;
+   display: none;
+ }
+
+ .panel .panel-content-open {
+	 display: block;
+ }
+
+/* Style des panels */
+ .time{
+     display: block;
+     border: 1px solid #000;
+     border-radius: 5px;
+     color: white;
+     margin-bottom: 5px;
+	 margin-right: 5px;
+	 width: 415px;
+	 position: absolute;
+	 bottom: 0;
+ }
+
+ .time .time-title{
+     display: block;
+     width: 100%;
+     background-color: #7f8c8d;
+     font-size: large;
+     padding: 5px;
+     border-radius: 5px 5px 0 0;
+     text-align: center;
+ }
+
+ .time .time-content{
+     display: block;
+     width: 100%;
+     padding: 5px;
+ }
+
+/* Style des menus */
+.legend {
+    position: relative;
+    display: block;
+    background: rgba(42, 42, 42, 0.7);
+    border-radius: 5px;
+    border: 1px solid #444;
+    width: 100%;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+    color: #fff;
+    line-height: 150%;
+    font-size: small;
+}
+
+.legend a:link, .legend a:visited, .legend a:hover {
+    color: #fff
+}
+
+
+/* Style de la legende */
+.legend .legend-color, .legend .legend-text{
+    display: block;
+    height: 25px;
+    line-height: 25px;
+    width: 50%;
+    float: left;
+    margin-bottom: 5px;
+}
+
+.legend .legend-text{
+    padding-left: 5px;
+}
+
+.legend .legend-element:first-child{
+    margin-top: 5px;
+}
+
+.legend .legend-element:after{
+    content: '';
+    display: table;
+    clear: both;
+}
+
+
+/* Style du loader */
+ /*.cover {
+    display: block;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.75);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}*/
+
+/*.loadingIcon {
+    display: inherit;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -33px;
+    margin-left: -33px;
+    width: 66px;
+    height: 66px;
+    background: url(img/ajax-loader.gif) center no-repeat;
+}*/
+
+
+
+/* Classes utilitaire */
+ .nowrap {
+    white-space: nowrap;
+	  list-style: none;
+	  display: block;
+}
+
+ .hidden {
+    display: none;
+}
+
+.hamburger-icon {
+    position: relative;
+    padding: 5px 5px 5px calc(5px + 1.25em);
+    cursor: pointer;
+}
+
+.hamburger-icon:before {
+    content: "";
+    position: absolute;
+    top: calc(5px + 0.25em);
+    left: 5px;
+    width: 1em;
+    height: 0.125em;
+    border-top: 0.375em double #FFF;
+    border-bottom: 0.125em solid #FFF;
+}
+
+/* Style de la flèche */
+i {
+  border: solid black;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+  position: left;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}

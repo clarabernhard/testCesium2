@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+
+        <title>Cesium2</title>
+        <link rel="stylesheet" href="../Cesium/lib/jQuery/jquery-ui.min.css" />
+        <link rel="stylesheet" href="src/index.css" media="screen" />
+        <script src="../Cesium/lib/Cesium/Cesium.js"></script>
+    </head>
+    <body>
+        <!-- Conteneur pour le globe cesium -->
+        <div id="cesiumContainer"></div>
+
+        <div id=left-pane>
+            <div id="toggle-menu" class="hamburger-icon">Menu</div>
+
+            <div class="legend hidden" id="coordsList">
+                <h2>Coordonnées</h2>
+                <p>Longitude : <span id="longitude"></span></p>
+                <p>Latitude : <span id="latitude"></span></p>
+                <p>Hauteur ellipsoïdale : <span id="height"></span></p>
+
+                <h2>Proj4</h2>
+                <p>X : <span id="coordX"></span></p>
+                <p>Y : <span id="coordY"></span></p>
+                <p>Z : <span id="coordZ"></span></p>
+            </div>
+        </div>
+
+        <div id="menu">
+            <div class="panel">
+              <button class="panel-title">ECOLOGIE
+              <i class="arrow"></i>
+              </button>
+                <div class="panel-content">
+                  <div class="nowrap">
+                      <input id="photoMaillage" type="checkbox" checked/>
+                      <label for="photoMaillage">Afficher le photo mailage</label>
+                    </div>
+
+                    <div class="nowrap">
+                      <input id="shadows" type="checkbox"/>
+                      <label for="shadows">Afficher les ombres</label>
+                    </div>
+
+                    <div class="nowrap">
+                      <input id="coords" type="checkbox"/>
+                      <label for="coords">Afficher les coordonnées</label>
+                    </div>
+
+                    <div class="nowrap">
+                      <input id="terrain" type="checkbox"/>
+                      <label for="terrain">Afficher le terrain</label>
+                    </div>
+                  </div>
+                  <button class="panel-title">PLU
+                  <i class="arrow"></i>
+                  </button>
+                  <button class="panel-title">HABITAT
+                  <i class="arrow"></i>
+                </button>
+                </div>
+
+            <div class="time">
+                <div class="time-title">Choix du jour de la timeline</div>
+                <div class="time-content">
+                    <p>Date: <input type="text" id="date"></p>
+                </div>
+            </div>
+        </div>
+        <div id="loadingIndicator" class="cover hidden">
+            <div id="loadingIcon" class="loadingIcon"></div>
+        </div>
+
+        <!-- Our app code. -->
+        <script src="../Cesium/lib/jQuery/jquery-3.3.1.min.js"></script>
+        <script src="../Cesium/lib/jQuery/jquery-ui.min.js"></script>
+        <script src="../Cesium/lib/proj4.js"></script>
+
+        <script src="src/globe.js"></script>
+        <script src="src/ui.js"></script>
+        <script src="src/raf09.js"></script>
+        <script src="src/main.js"></script>
+    </body>
+</html>
