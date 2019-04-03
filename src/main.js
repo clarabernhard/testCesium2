@@ -19,6 +19,7 @@ let globe = new Globe('cesiumContainer', new Geocoder("http://adict.strasbourg.e
 // Charger le photo mailage --> appelle la fonction créée dans la classe globe
 let terrain = globe.load3DTiles('../Cesium/data/photoMaillage/EXPORT_Cesium_130.json');
 
+
 // Zoomer sur le photo mailage et configurer le bouton "home" pour qu'il vole au même endroit
 globe.setHome(terrain);
 

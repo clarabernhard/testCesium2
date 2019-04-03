@@ -89,13 +89,12 @@ html, body {
  }
 
   .active {
-
+    color: black;
   }
 
  .panel .panel-content{
    width: 100%;
    padding: 5px;
-   position: absolute;
    display: none;
  }
 
@@ -236,7 +235,26 @@ i {
   border-width: 0 3px 3px 0;
   display: inline-block;
   padding: 3px;
-  position: left;
+  left: 400px;
   transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
+}
+
+/* style du bouton de la boîte à outils*/
+.outils {
+  position: absolute;
+  top: 70px;
+  right: 10px;
+  height: auto;
+  width: auto;
+  overflow: auto;
+
+}
+
+.outil-bouton {
+  background-color: #2B2F33;
+  border-color: #2B2F33;
+  border-radius: 5px;
+  cursor: pointer;
+  /* lien à insérer pour l'image: <a href="https://icons8.com/icon/11151/entretien">Entretien icon by Icons8</a> */
 }
