@@ -8,6 +8,9 @@
         <title>Cesium2</title>
         <link rel="stylesheet" href="../Cesium/lib/jQuery/jquery-ui.min.css" />
         <link rel="stylesheet" href="src/index.css" media="screen" />
+        <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
         <script src="../Cesium/lib/Cesium/Cesium.js"></script>
     </head>
     <body>
@@ -42,11 +45,6 @@
                     </div>
 
                     <div class="nowrap">
-                      <input id="shadows" type="checkbox"/>
-                      <label for="shadows">Afficher les ombres</label>
-                    </div>
-
-                    <div class="nowrap">
                       <input id="coords" type="checkbox"/>
                       <label for="coords">Afficher les coordonnées</label>
                     </div>
@@ -68,8 +66,29 @@
             </div>
         </div>
 
-        <div class="outils">
-          <button class="outil-bouton"><img src="img/icones/icons8-entretien-filled-50.png"></button>
+        <div id="outils">
+          <button id="outil-bouton"><img src="src/img/icones/icons8-entretien-filled-50.png"></button>
+          <div id="outil-contenu">
+                <div class="nowrap">
+                <input id="shadows" type="checkbox"/>
+                <label for="shadows">Afficher les ombres</label>
+              </div>
+
+              <div class="nowrap">
+                <input id="mesures" type="checkbox"/>
+                <label for="mesures">Outils de mesure</label>
+              </div>
+
+              <div class="nowrap">
+                <input id="construction" type="checkbox"/>
+                <label for="construction">Outils de construction</label>
+              </div>
+
+              <div class="nowrap">
+                <input id="coupe" type="checkbox"/>
+                <label for="coupe">Plan de coupe</label>
+              </div>
+          </div>
         </div>
 
         <div id="loadingIndicator" class="cover hidden">

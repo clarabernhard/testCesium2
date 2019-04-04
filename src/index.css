@@ -177,7 +177,7 @@ html, body {
 
 
 /* Style du loader */
- /*.cover {
+ .cover {
     display: block;
     position: absolute;
     background-color: rgba(0, 0, 0, 0.75);
@@ -185,9 +185,9 @@ html, body {
     left: 0;
     right: 0;
     bottom: 0;
-}*/
+}
 
-/*.loadingIcon {
+.loadingIcon {
     display: inherit;
     position: absolute;
     top: 50%;
@@ -197,7 +197,7 @@ html, body {
     width: 66px;
     height: 66px;
     background: url(img/ajax-loader.gif) center no-repeat;
-}*/
+}
 
 
 
@@ -206,6 +206,7 @@ html, body {
     white-space: nowrap;
 	  list-style: none;
 	  display: block;
+    cursor: pointer;
 }
 
  .hidden {
@@ -241,20 +242,37 @@ i {
 }
 
 /* style du bouton de la boîte à outils*/
-.outils {
+#outils {
   position: absolute;
-  top: 70px;
-  right: 10px;
+  top: 8px;
+  right: 415px;
   height: auto;
   width: auto;
   overflow: auto;
+  display: inline-block;
 
 }
 
-.outil-bouton {
+#outil-bouton {
   background-color: #2B2F33;
   border-color: #2B2F33;
   border-radius: 5px;
   cursor: pointer;
   /* lien à insérer pour l'image: <a href="https://icons8.com/icon/11151/entretien">Entretien icon by Icons8</a> */
+}
+
+/* Boite à outils */
+#outil-contenu {
+  position: relative;
+  display: none;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  align-content: right;
+  overflow: auto;
+}
+
+.outil-open {
+  display: block;
 }

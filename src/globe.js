@@ -24,7 +24,7 @@ class Globe {
         this.hoverHandler = undefined;
         this.clickHandler = undefined;
 
-        var elevation = new Cesium.CesiumTerrainProvider({
+        /*var elevation = new Cesium.CesiumTerrainProvider({
             url : 'https://www.geograndest.fr/geoserver/ems/wms?service=WMS&version=1.1.0&request=GetMap&layers=ems:2050000_7275000_LIDAR15-16_ELEVATION',
             layer : 'ems:2050000_7275000_LIDAR15-16_ELEVATION',
             parameters : {
@@ -32,7 +32,7 @@ class Globe {
             }
         });
         this.viewer.imageryLayers.addImageryProvider(elevation);
-        // voir https://gis.stackexchange.com/questions/152310/unable-to-serve-cesium-terrain-files
+        // voir https://gis.stackexchange.com/questions/152310/unable-to-serve-cesium-terrain-files*/
 
         /*var elevation = new Cesium.WebMapServiceImageryProvider({
             url : 'http://wxs.ign.fr/pvwmk1wgxoei8orp7rd1re78/geoportail/r/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap',
