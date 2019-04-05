@@ -156,117 +156,10 @@ class Globe {
         }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
     }
 
-    handleBatimentClick(enabled, tileset){
-        // Supprimer les anciens évènemnts
-        if(this.hoverHandler !== undefined){
-            this.hoverHandler.destroy();
-        }
-
-        if(this.clickHandler !== undefined){
-            this.clickHandler.destroy();
-        }
-
-        // Quitter la fonction pour desactiver la selection de batiments
-        if(!enabled){
-            return;
-        }
-
-        // Informations sur le batiment séléctionné
-        let selected = {
-            feature: undefined,
-            originalColor: new Cesium.Color(),
-            selectedEntity: new Cesium.Entity() // Une entité qui contient les attributs du batiments selectionné
-        };
-
-        // Recuperer la fonction par defaut lors q'un click gauche
-        let defaultClickHandler = this.viewer.screenSpaceEventHandler.getInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
-        if (Cesium.PostProcessStageLibrary.isSilhouetteSupported(this.viewer.scene)) {
-            // Créer la bordure bleue
-            let silhouetteBlue = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
-            silhouetteBlue.uniforms.color = Cesium.Color.BLUE;
-            silhouetteBlue.uniforms.length = 0.01;
-            silhouetteBlue.selected = [];
-
-            // Créer la bordure verte
-            let silhouetteGreen = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
-            silhouetteGreen.uniforms.color = Cesium.Color.LIME;
-            silhouetteGreen.uniforms.length = 0.01;
-            silhouetteGreen.selected = [];
-
-            // Enregistrer les bordures dans cesium
-            this.viewer.scene.postProcessStages.add(Cesium.PostProcessStageLibrary.createSilhouetteStage([silhouetteBlue, silhouetteGreen]));
-
-            // Evenement déclenché au survol
-            this.hoverHandler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
-            this.hoverHandler.setInputAction((movement) => {
-                // Supprimer toutes les bordures bleue
-                silhouetteBlue.selected = [];
-
-                // Récuperer la forme sur laquelle on a la souris
-                let pickedFeature = this.viewer.scene.pick(movement.endPosition);
-
-                // Si on passe sur un element qui n'appartient pas à tileset on ne met pas de bordure bleue
-                if (!Cesium.defined(pickedFeature) || !Cesium.defined(pickedFeature.content) || pickedFeature.content._tileset != tileset) {
-                    return;
-                }
-
-                // Si on a la souris sur une forme et qu'elle n'est pas encore entouré en vert
-                if (Cesium.defined(pickedFeature) && pickedFeature != selected.feature) {
-                    silhouetteBlue.selected = [pickedFeature];
-                }
-            }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-
-            // Evenement déclenché au clique
-            this.clickHandler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
-            this.clickHandler.setInputAction((movement) => {
-                // Supprimer toutes les bordures verte
-                silhouetteGreen.selected = [];
-
-                // Récuperer la forme sur laquelle on a cliqué
-                let pickedFeature = this.viewer.scene.pick(movement.position);
-
-                // Si on clique sur un element qui n'appartient pas à tileset on ne met pas de bordure verte
-                if (!Cesium.defined(pickedFeature) || !Cesium.defined(pickedFeature.content) || pickedFeature.content._tileset != tileset) {
-                    selected.feature = undefined;
-                    defaultClickHandler(movement);
-                    return;
-                }
-
-                // Ajouter le bord vert sur la forme selectionnée
-                if (pickedFeature !== silhouetteGreen.selected[0]) {
-                    silhouetteGreen.selected = [pickedFeature];
-
-                    // On supprime sa bordure bleue si elle en avait une
-                    if (pickedFeature === silhouetteBlue.selected[0]) {
-                        silhouetteBlue.selected = [];
-                    }
-
-                    selected.feature = pickedFeature;
-                    selected.selectedEntity.name = pickedFeature.getProperty('name');
-                    selected.selectedEntity.description = '<table class="cesium-infoBox-defaultTable"><tbody>';
-
-                    // Générer les lignes du tableau
-                    let propertyNames = pickedFeature.getPropertyNames();
-                    for(let i = 0; i < propertyNames.length; i++){
-                        selected.selectedEntity.description += '<tr><th>' + propertyNames[i] + '</th><td>' + pickedFeature.getProperty(propertyNames[i]) + '</td></tr>';
-                    }
-                    selected.selectedEntity.description += '</tbody></table>';
-
-                    // Afficher le tableau en haut à droite
-                    this.viewer.selectedEntity = selected.selectedEntity;
-                }
-            }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-        }
-    }
 }
 
 
-/*
- *
- * Créer un geocoder pour cesium qui uilise adict.strasbourg.eu
- *
- */
+/* Créé un geocoder pour cesium qui uilise adict.strasbourg.eu */
 class Geocoder {
 
     constructor(url){
@@ -294,12 +187,8 @@ class Geocoder {
 
 }
 
-/*
- *
- * Class permettant de gerer les légendes
- * Prend un paramètre : l'élément HTML dans lequel mettre les légendes
- *
- */
+/* Classe permettant de gérer les légendes
+ * Prend un paramètre : l'élément HTML dans lequel mettre les légendes */
 class LegendManager {
 
     constructor(legendContainer){

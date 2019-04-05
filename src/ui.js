@@ -1,6 +1,6 @@
 "use strict";
-// Fonctions pour controler le loader
 
+// Fonctions pour controler le loader
 let showLoader = function(){
   document.querySelector('#loadingIndicator').classList.remove('hidden');
 }
@@ -8,6 +8,26 @@ let showLoader = function(){
 let hideLoader = function(){
   document.querySelector('#loadingIndicator').classList.add('hidden');
 }
+
+// Menu déroulant de la boite à outils
+function outilDeroulant(){
+  document.getElementById('test').classList.toggle('outil-open');
+}
+
+  // Close the dropdown menu if the user clicks outside of it
+  window.onclick = function(event) {
+    if (!event.target.matches('.outil-bouton')) {
+      var dropdowns = document.getElementsByClassName('outil-contenu');
+      var i;
+      for (i = 0; i < dropdowns.length; i++) {
+        var openDropdown = dropdowns[i];
+        if (openDropdown.classList.contains('outil-open')) {
+          openDropdown.classList.remove('outil-open');
+        }
+      }
+    }
+  }
+
 
 // Gérer les interactions avec l'utilisateur (évènement sur le menu)
 class Menu {
@@ -35,6 +55,9 @@ class Menu {
     this.photoMaillageCheckbox = document.querySelector('#photoMaillage');
     this.shadowCheckbox = document.querySelector('#shadows');
     this.coordsCheckbox = document.querySelector('#coords');
+    this.mesureCheckbox = document.querySelector('#mesures');
+    this.constructionCheckbox = document.querySelector('#construction');
+    this.coupeCheckbox = document.querySelector('#coupe');
 
     // show coords
     this.coordsList = document.querySelector('#coordsList');
@@ -58,8 +81,7 @@ class Menu {
 
     this.registerMenuEvent();
     this.menuDeroulant();
-    this.outilDeroulant();
-    this.outilDeroulant2();
+
   }
 
   registerMenuEvent(){
@@ -87,30 +109,6 @@ class Menu {
     }
   }
 
-  // Menu déroulant de la boite à outils
-  outilDeroulant(){
-    document.getElementById('outil-contenu').addEventListener('click', function() {
-      this.outil.classList.toggle('outil-open');
-    });
-  }
-
-    /*outilDeroulant2(){
-    // Close the dropdown menu if the user clicks outside of it
-    window.onclick = function(event) {
-      if (!event.target.matches('outil-bouton')) {
-        var dropdowns = document.getElementById('outil-contenu');
-        var i;
-        for (i = 0; i < dropdowns.length; i++) {
-          var openDropdown = dropdowns[i];
-          if (openDropdown.classList.contains('outil-open')) {
-            openDropdown.classList.remove('outil-open');
-          }
-        }
-      }
-    }
-  }*/
-
-
   // Ajouter une source de données a la liste en donnant son nom "name" et la datasource "value"
   addDataSource(name, value){
     this.dataSources[name] = value;
@@ -134,6 +132,11 @@ class Menu {
     this.coordsCheckbox.addEventListener('change', (e) => {
       this.showCoords(e.target.checked);
     });
+
+    this.mesureCheckbox.addEventListener('change', (e) => {
+      
+    });
+
   }
 
   /*

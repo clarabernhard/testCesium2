@@ -203,10 +203,11 @@ html, body {
 
 /* Classes utilitaire */
  .nowrap {
-    white-space: nowrap;
-	  list-style: none;
-	  display: block;
-    cursor: pointer;
+   white-space: nowrap;
+   list-style: none;
+   display: block;
+   padding: 12px 16px;
+   text-decoration: none;
 }
 
  .hidden {
@@ -242,37 +243,49 @@ i {
 }
 
 /* style du bouton de la boîte à outils*/
-#outils {
+.outils {
   position: absolute;
-  top: 8px;
+  top: 9px;
   right: 415px;
   height: auto;
   width: auto;
-  overflow: auto;
   display: inline-block;
 
 }
 
-#outil-bouton {
+.outil-bouton {
   background-color: #2B2F33;
-  border-color: #2B2F33;
-  border-radius: 5px;
+  border: none;
   cursor: pointer;
   /* lien à insérer pour l'image: <a href="https://icons8.com/icon/11151/entretien">Entretien icon by Icons8</a> */
 }
 
+.outil-bouton:hover {
+  color: white;
+}
+
 /* Boite à outils */
-#outil-contenu {
+.outil-contenu {
   position: relative;
   display: none;
   background-color: #f1f1f1;
   min-width: 160px;
+  overflow: auto;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
-  align-content: right;
-  overflow: auto;
+
 }
 
 .outil-open {
   display: block;
 }
+
+/*#measureContainer {
+  position: absolute;
+  bottom: 20px;
+  right: 70px;
+  height: 200px;
+  width: 200px;
+  display: block;
+  background-color: red;
+}*/
