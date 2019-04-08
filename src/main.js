@@ -26,7 +26,7 @@ globe.setHome(terrain);
 // Créer le menu de gauche et definir tous les évènements
 let cesiumEvent = new Menu(globe);
 cesiumEvent.registerEvents();
-//cesiumEvent.registerMenuEvent();
+
 
 // Une fois le photo maillage chargé, l'enregister dans la liste des dataSource pour pouvoir interagir avec lui dans les évènements
 terrain.then(function(dataSource){

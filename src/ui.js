@@ -9,26 +9,6 @@ let hideLoader = function(){
   document.querySelector('#loadingIndicator').classList.add('hidden');
 }
 
-// Menu déroulant de la boite à outils
-function outilDeroulant(){
-  document.getElementById('test').classList.toggle('outil-open');
-}
-
-  // Close the dropdown menu if the user clicks outside of it
-  window.onclick = function(event) {
-    if (!event.target.matches('.outil-bouton')) {
-      var dropdowns = document.getElementsByClassName('outil-contenu');
-      var i;
-      for (i = 0; i < dropdowns.length; i++) {
-        var openDropdown = dropdowns[i];
-        if (openDropdown.classList.contains('outil-open')) {
-          openDropdown.classList.remove('outil-open');
-        }
-      }
-    }
-  }
-
-
 // Gérer les interactions avec l'utilisateur (évènement sur le menu)
 class Menu {
 
@@ -46,7 +26,6 @@ class Menu {
     this.leftPane = document.querySelector('#left-pane');
     this.menu = document.querySelector('#menu');
     this.dropdown = document.getElementsByClassName("panel-title");
-    this.outil = document.getElementById("outil-contenu");
 
     // Créer un gestionnaire pour les légendes
     this.legendManager = new LegendManager(this.leftPane);
@@ -55,17 +34,24 @@ class Menu {
     this.photoMaillageCheckbox = document.querySelector('#photoMaillage');
     this.shadowCheckbox = document.querySelector('#shadows');
     this.coordsCheckbox = document.querySelector('#coords');
-    this.mesureCheckbox = document.querySelector('#mesures');
-    this.constructionCheckbox = document.querySelector('#construction');
-    this.coupeCheckbox = document.querySelector('#coupe');
+
+    this.pointCheckbox = document.querySelector('#point');
+    this.ligneCheckbox = document.querySelector('#ligne');
+    this.surfaceCheckbox = document.querySelector('#surface');
+
+    this.cligneCheckbox = document.querySelector('#cligne');
+    this.csurfaceCheckbox = document.querySelector('#csurface');
+    this.volumeCheckbox = document.querySelector('#volume');
+
+    this.coupeCheckbox = document.querySelector('#plancoupe');
 
     // show coords
     this.coordsList = document.querySelector('#coordsList');
 
     // Mouse over the globe to see the cartographic position
-    this.longitude = document.querySelector('#longitude');
-    this.latitude = document.querySelector('#latitude');
-    this.height = document.querySelector('#height');
+    this.longitude = undefined;
+    this.latitude = undefined;
+    this.height = undefined;
     this.coordX = document.querySelector('#coordX');
     this.coordY = document.querySelector('#coordY');
     this.coordZ = document.querySelector('#coordZ');
@@ -133,10 +119,6 @@ class Menu {
       this.showCoords(e.target.checked);
     });
 
-    this.mesureCheckbox.addEventListener('change', (e) => {
-      
-    });
-
   }
 
   /*
@@ -183,9 +165,9 @@ class Menu {
   showCoords(show){
     if(show){
       this.globe.setCoordsCallback((longitude, latitude, hauteur) => { // Fonction éxécuté a chaque mouvement de souris qui recoit les coordonnées
-        this.longitude.innerHTML = longitude;
-        this.latitude.innerHTML = latitude;
-        this.height.innerHTML = hauteur;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.height = hauteur;
 
         var coords = proj4('EPSG:4326', 'EPSG:3948', [longitude, latitude]);
         this.coordX.innerHTML = coords[0];

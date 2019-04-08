@@ -1,111 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
 
-        <title>Cesium2</title>
-        <link rel="stylesheet" href="../Cesium/lib/jQuery/jquery-ui.min.css" />
-        <link rel="stylesheet" href="src/index.css" media="screen" />
-        <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
-        <script src="../Cesium/lib/Cesium/Cesium.js"></script>
-    </head>
-    <body>
-        <!-- Conteneur pour le globe cesium -->
-        <div id="cesiumContainer"></div>
+  <title>Cesium2</title>
+  <link rel="stylesheet" href="../Cesium/lib/jQuery/jquery-ui.min.css" />
+  <link rel="stylesheet" href="src/index.css" media="screen" />
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <script src="../Cesium/lib/Cesium/Cesium.js"></script>
+</head>
+<body>
+  <!-- Conteneur pour le globe cesium -->
+  <div id="cesiumContainer"></div>
 
-        <div id=left-pane>
-            <div id="toggle-menu" class="hamburger-icon">Menu</div>
+  <div id=left-pane>
+    <div id="toggle-menu" class="hamburger-icon">Menu</div>
 
-            <div class="legend hidden" id="coordsList">
-                <h2>Coordonnées</h2>
-                <p>Longitude : <span id="longitude"></span></p>
-                <p>Latitude : <span id="latitude"></span></p>
-                <p>Hauteur ellipsoïdale : <span id="height"></span></p>
+    <div class="legend hidden" id="coordsList">
+      <h2>Coordonnées</h2>
+      <p>X : <span id="coordX"></span></p>
+      <p>Y : <span id="coordY"></span></p>
+      <p>Z : <span id="coordZ"></span></p>
+    </div>
+  </div>
 
-                <h2>Proj4</h2>
-                <p>X : <span id="coordX"></span></p>
-                <p>Y : <span id="coordY"></span></p>
-                <p>Z : <span id="coordZ"></span></p>
-            </div>
+  <div id="menu">
+    <div class="panel">
+      <button class="panel-title">ECOLOGIE
+        <i class="arrow"></i>
+      </button>
+      <div class="panel-content">
+        <div class="nowrap">
+          <input id="photoMaillage" type="checkbox" checked/>
+          <label for="photoMaillage">Afficher le photo mailage</label>
         </div>
 
-        <div id="menu">
-            <div class="panel">
-              <button class="panel-title">ECOLOGIE
-              <i class="arrow"></i>
-              </button>
-                <div class="panel-content">
-                  <div class="nowrap">
-                      <input id="photoMaillage" type="checkbox" checked/>
-                      <label for="photoMaillage">Afficher le photo mailage</label>
-                    </div>
-
-                    <div class="nowrap">
-                      <input id="coords" type="checkbox"/>
-                      <label for="coords">Afficher les coordonnées</label>
-                    </div>
-
-                  </div>
-                  <button class="panel-title">PLU
-                  <i class="arrow"></i>
-                  </button>
-                  <button class="panel-title">HABITAT
-                  <i class="arrow"></i>
-                </button>
-                </div>
-
-            <div class="time">
-                <div class="time-title">Choix du jour de la timeline</div>
-                <div class="time-content">
-                    <p>Date: <input type="text" id="date"></p>
-                </div>
-            </div>
+        <div class="nowrap">
+          <input id="coords" type="checkbox"/>
+          <label for="coords">Afficher les coordonnées</label>
         </div>
+      </div>
 
-        <div class="outils">
-          <button onclick= "outilDeroulant()" class="outil-bouton"><img src="src/img/icons8-entretien-filled-50.png"></button>
-          <div class="outil-contenu" id="test">
-              <div class="nowrap">
-                <input id="shadows" type="checkbox"/>
-                <label for="shadows">Afficher les ombres</label>
-              </div>
+      <button class="panel-title">PLU
+        <i class="arrow"></i>
+      </button>
 
-              <div class="nowrap">
-                <input id="mesures" type="checkbox"/>
-                <label for="mesures">Outils de mesure</label>
-              </div>
+      <button class="panel-title">HABITAT
+        <i class="arrow"></i>
+      </button>
 
-              <div class="nowrap">
-                <input id="construction" type="checkbox"/>
-                <label for="construction">Outils de construction</label>
-              </div>
+    </div>
+  </div>
 
-              <div class="nowrap">
-                <input id="coupe" type="checkbox"/>
-                <label for="coupe">Plan de coupe</label>
-              </div>
-          </div>
-        </div>
+  <div class= "w3-dropdown-hover w3-right" id="mesures">
+    <button class="w3-button"><img src="src/img/icons8-length-filled-50.png"></button>
+    <div class="w3-dropdown-content">
 
-        <div id="loadingIndicator" class="cover hidden">
-            <div id="loadingIcon" class="loadingIcon"></div>
-        </div>
+      <div class="nowrap">
+        <input id="point" type="checkbox"/>
+        <label for="point">Point (coordonnées)</label>
+      </div>
 
-        <div id="measureContainer"></div>
+      <div class="nowrap">
+        <input id="ligne" type="checkbox"/>
+        <label for="ligne">Ligne</label>
+      </div>
 
-        <!-- Our app code. -->
-        <script src="../Cesium/lib/jQuery/jquery-3.3.1.min.js"></script>
-        <script src="../Cesium/lib/jQuery/jquery-ui.min.js"></script>
-        <script src="../Cesium/lib/proj4.js"></script>
+      <div class="nowrap">
+        <input id="surface" type="checkbox"/>
+        <label for="surface">Surface</label>
+      </div>
+    </div>
+  </div>
 
-        <script src="src/globe.js"></script>
-        <script src="src/ui.js"></script>
-        <script src="src/raf09.js"></script>
-        <script src="src/main.js"></script>
+  <div class= "w3-dropdown-hover w3-right" id="construction">
+    <button class="w3-button"><img src="src/img/icons8-maintenance-filled-50.png"></button>
+    <div class="w3-dropdown-content">
 
-    </body>
+      <div class="nowrap">
+        <input id="cligne" type="checkbox"/>
+        <label for="cligne">Construction ligne</label>
+      </div>
+
+      <div class="nowrap">
+        <input id="csurface" type="checkbox"/>
+        <label for="csurface">Construction surface</label>
+      </div>
+
+      <div class="nowrap">
+        <input id="volume" type="checkbox"/>
+        <label for="volume">Construction volume</label>
+      </div>
+    </div>
+  </div>
+
+  <div class= "w3-dropdown-hover w3-right" id="coupe">
+    <button class="w3-button"><img src="src/img/icons8-scissors-26.png"></button>
+    <div class="w3-dropdown-content">
+
+      <div class="nowrap">
+        <input id="plancoupe" type="checkbox"/>
+        <label for="plancoupe">Plan de coupe</label>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="w3-dropdown-hover w3-right" id="time">
+    <button class="w3-button"><img src="src/img/icons8-partly-cloudy-day-filled-50.png"></button>
+    <div class="w3-dropdown-content">
+      <div class="nowrap">
+        <input id="shadows" type="checkbox"/>
+        <label for="shadows">Afficher les ombres</label>
+      </div>
+      <p>Date: <input type="text" id="date"></p>
+    </div>
+  </div>
+
+  <div id="loadingIndicator" class="cover hidden">
+    <div id="loadingIcon" class="loadingIcon"></div>
+  </div>
+
+  <div id="measureContainer"></div>
+
+  <!-- Our app code. -->
+  <script src="../Cesium/lib/jQuery/jquery-3.3.1.min.js"></script>
+  <script src="../Cesium/lib/jQuery/jquery-ui.min.js"></script>
+  <script src="../Cesium/lib/proj4.js"></script>
+
+  <script src="src/globe.js"></script>
+  <script src="src/ui.js"></script>
+  <script src="src/raf09.js"></script>
+  <script src="src/main.js"></script>
+
+</body>
 </html>

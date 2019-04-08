@@ -23,6 +23,8 @@ html, body {
     height: 88%;
     background-color: rgba(57, 71, 75, 0.90);
     padding: 5px 5px 0px 5px;
+    border: 1px solid #000;
+    border-radius: 5px;
 }
 
 /* Style du bouton menu */
@@ -55,7 +57,6 @@ html, body {
     height: 100%;
 }
 
-
 /* Style des panels contenus dans le menu */
  .panel{
    display: inline-block;
@@ -68,6 +69,8 @@ html, body {
    z-index: 1;
    top: 0;
    left: 0;
+   overflow: auto;
+
  }
 
 .panel .panel-title{
@@ -80,6 +83,7 @@ html, body {
   text-align: center;
   color: white;
   cursor: pointer;
+  overflow: auto;
 
  }
 
@@ -96,40 +100,13 @@ html, body {
    width: 100%;
    padding: 5px;
    display: none;
+   overflow: auto;
  }
 
  .panel .panel-content-open {
 	 display: block;
  }
 
-/* Style des panels */
- .time{
-     display: block;
-     border: 1px solid #000;
-     border-radius: 5px;
-     color: white;
-     margin-bottom: 5px;
-	 margin-right: 5px;
-	 width: 415px;
-	 position: absolute;
-	 bottom: 0;
- }
-
- .time .time-title{
-     display: block;
-     width: 100%;
-     background-color: #7f8c8d;
-     font-size: large;
-     padding: 5px;
-     border-radius: 5px 5px 0 0;
-     text-align: center;
- }
-
- .time .time-content{
-     display: block;
-     width: 100%;
-     padding: 5px;
- }
 
 /* Style des menus */
 .legend {
@@ -242,50 +219,57 @@ i {
   -webkit-transform: rotate(45deg);
 }
 
-/* style du bouton de la boîte à outils*/
-.outils {
-  position: absolute;
-  top: 9px;
-  right: 415px;
-  height: auto;
-  width: auto;
-  display: inline-block;
-
-}
-
-.outil-bouton {
-  background-color: #2B2F33;
-  border: none;
-  cursor: pointer;
-  /* lien à insérer pour l'image: <a href="https://icons8.com/icon/11151/entretien">Entretien icon by Icons8</a> */
-}
-
-.outil-bouton:hover {
-  color: white;
-}
-
 /* Boite à outils */
-.outil-contenu {
+
+/* style des boutons de la boîte à outils*/
+.w3-dropdown-hover {
+  display: inline-block;
+  background-color: #2B2F33;
+  border-radius: 3px;
+}
+
+/* changement de couleur au survol des boutons */
+.w3-button:hover {
+  color: rgba(42, 143, 231, 0.5);
+}
+
+/* alignement à droite du menu déroulant */
+.w3-dropdown-content {
   position: relative;
+  right: 0;
   display: none;
-  background-color: #f1f1f1;
-  min-width: 160px;
-  overflow: auto;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-
+  background-color: #969DA4;
+  border: 1px solid #000;
+  border-radius: 3px;
 }
 
-.outil-open {
-  display: block;
-}
-
-/*#measureContainer {
+/* position du premier bouton */
+#mesures {
   position: absolute;
-  bottom: 20px;
-  right: 70px;
-  height: 200px;
-  width: 200px;
-  display: block;
-  background-color: red;
-}*/
+  top: 75px;
+  right: 10px;
+  /* lien à insérer pour l'image: <a href="https://icons8.com/icon/1408/length">Length icon by Icons8</a> */
+}
+
+/* position du deuxième bouton */
+#construction {
+  position: absolute;
+  top: 120px;
+  right: 10px;
+  /* lien à insérer pour l'image: <a href="https://icons8.com/icon/11219/maintenance-filled">Maintenance Filled icon by Icons8</a> */
+}
+
+/* position du troisième bouton */
+#coupe {
+  position: absolute;
+  top: 165px;
+  right: 10px;
+  /* lien à insérer pour l'image: <a href="https://icons8.com/icon/9247/partly-cloudy-day-filled">Partly Cloudy Day Filled icon by Icons8</a></a> */
+}
+
+#time {
+  position: absolute;
+  top: 210px;
+  right: 10px;
+  /* lien à insérer pour l'image: <a href="https://icons8.com/icon/713/scissors">Scissors icon by Icons8</a> */
+}
