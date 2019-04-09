@@ -119,6 +119,11 @@ class Menu {
       this.showCoords(e.target.checked);
     });
 
+    this.coupeCheckbox.addEventListener('change', function(e){
+      globe.addClippingPlanes(terrain);
+
+    });
+
   }
 
   /*
@@ -161,7 +166,6 @@ class Menu {
 
 
   // Fonction qui permet d'afficher ou de masquer les coordonnées au survol de la souris
-
   showCoords(show){
     if(show){
       this.globe.setCoordsCallback((longitude, latitude, hauteur) => { // Fonction éxécuté a chaque mouvement de souris qui recoit les coordonnées

@@ -1,3 +1,5 @@
+"use strict";
+
 /* Créé un geocoder pour cesium qui uilise adict.strasbourg.eu */
 class Geocoder {
 

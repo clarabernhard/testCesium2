@@ -1,3 +1,5 @@
+"use strict";
+
 /* Classe permettant de gérer les légendes
  * Prend un paramètre : l'élément HTML dans lequel mettre les légendes */
 class LegendManager {

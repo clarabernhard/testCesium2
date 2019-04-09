@@ -1,10 +1,6 @@
 "use strict";
 
-/*
-*
-* Créer un object globe qui pertmet de manipuler cesium plus simplement
-*
-*/
+// Créer un object globe qui pertmet de manipuler cesium plus simplement
 class Globe {
 
   constructor(elementId, geocoder, link){
@@ -146,58 +142,39 @@ setCoordsCallback(callback){
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 }
 
+planeUpdate(plane) {
 
-// Création du plan de coupe
-/*addClippingPlane(link, tileset){
-  var clippingPlanes = new Cesium.ClippingPlaneCollection({
-    planes : [
-      new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 1.0, 0.0), 5.0)
-    ],
-  });
-  // Create an entity and attach the ClippingPlaneCollection to the model.
-  var entity = this.viewer.entities.add({
-    position : Cesium.Cartesian3(2050318.3886735758, 7275642.009895859, 155.018),
-    model : {
-      uri : link,
-      minimumPixelSize : 128,
-      maximumScale : 20000,
-      clippingPlanes : clippingPlanes
-    }
-  });
-
-  var scene = this.viewer.scene;
   var targetY = 0.0;
-  var planeEntities = [];
   var selectedPlane;
+  var scene = this.viewer.scene;
 
   // Select plane when mouse down
-  var downHandler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+  var downHandler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
   downHandler.setInputAction(function(movement) {
     var pickedObject = scene.pick(movement.position);
     if (Cesium.defined(pickedObject) &&
     Cesium.defined(pickedObject.id) &&
     Cesium.defined(pickedObject.id.plane)) {
       selectedPlane = pickedObject.id.plane;
-      selectedPlane.material = Cesium.Color.WHITE.withAlpha(0.05);
+      selectedPlane.material = Cesium.Color.WHITE.withAlpha(0.4);
       selectedPlane.outlineColor = Cesium.Color.WHITE;
       scene.screenSpaceCameraController.enableInputs = false;
     }
   }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 
   // Release plane on mouse up
-  var upHandler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+  var upHandler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
   upHandler.setInputAction(function() {
     if (Cesium.defined(selectedPlane)) {
-      selectedPlane.material = Cesium.Color.WHITE.withAlpha(0.1);
+      selectedPlane.material = Cesium.Color.WHITE.withAlpha(0.4);
       selectedPlane.outlineColor = Cesium.Color.WHITE;
       selectedPlane = undefined;
     }
-
     scene.screenSpaceCameraController.enableInputs = true;
   }, Cesium.ScreenSpaceEventType.LEFT_UP);
 
   // Update plane on mouse move
-  var moveHandler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+  var moveHandler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
   moveHandler.setInputAction(function(movement) {
     if (Cesium.defined(selectedPlane)) {
       var deltaY = movement.startPosition.y - movement.endPosition.y;
@@ -205,46 +182,52 @@ setCoordsCallback(callback){
     }
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
-  tileset.debugShowBoundingVolume = viewModel.debugBoundingVolumesEnabled;
-  return tileset.readyPromise.then(function() {
-    var boundingSphere = tileset.boundingSphere;
-    var radius = boundingSphere.radius;
+  return function () {
+    plane.distance = targetY;
+    return plane;
+  };
+}
 
-    if (!Cesium.Matrix4.equals(tileset.root.transform, Cesium.Matrix4.IDENTITY)) {
-      // The clipping plane is initially positioned at the tileset's root transform.
-      // Apply an additional matrix to center the clipping plane on the bounding sphere center.
-      var transformCenter = Cesium.Matrix4.getTranslation(tileset.root.transform, new Cesium.Cartesian3());
-      var height = Cesium.Cartesian3.distance(transformCenter, tileset.boundingSphere.center);
-      clippingPlanes.modelMatrix = Cesium.Matrix4.fromTranslation(new Cesium.Cartesian3(0.0, 0.0, height));
-    }
+addClippingPlanes(tileset) {
 
-    for (var i = 0; i < clippingPlanes.length; ++i) {
-      var plane = clippingPlanes.get(i);
-      var planeEntity = viewer.entities.add({
-        position : boundingSphere.center,
-        plane : {
-          dimensions : new Cesium.Cartesian2(radius * 2.5, radius * 2.5),
-          material : Cesium.Color.WHITE.withAlpha(0.1),
-          plane : new Cesium.CallbackProperty(createPlaneUpdateFunction(plane), false),
-          outline : true,
-          outlineColor : Cesium.Color.WHITE
-        }
-      });
+  var clipObjects;
+  var viewModel = {
+    debugBoundingVolumesEnabled : false,
+    edgeStylingEnabled : true,
+    currentExampleType : clipObjects
+  };
+  var planeEntities = [];
 
-      planeEntities.push(planeEntity);
-    }
-    return tileset;
-  }).otherwise(function(error) {
-    console.log(error);
+  var clippingPlanes = new Cesium.ClippingPlaneCollection({
+    planes : [
+      new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 0.0, -1.0), 0.0)
+    ],
+    edgeWidth : viewModel.edgeStylingEnabled ? 1.0 : 0.0
   });
+
+  for (var i = 0; i < clippingPlanes.length; ++i) {
+    var plane = clippingPlanes.get(i);
+    var planeEntity = this.viewer.entities.add({
+      position : Cesium.Cartesian3.fromDegrees(7.754114, 48.584783, 260),
+      plane : {
+        dimensions : new Cesium.Cartesian2(2800, 1800),
+        material : Cesium.Color.WHITE.withAlpha(0.4),
+        plane : new Cesium.CallbackProperty(this.planeUpdate(plane), false),
+        outline : true,
+        outlineColor : Cesium.Color.WHITE
+      }
+    });
+
+    planeEntities.push(planeEntity);
+  }
 
 }
 
-reset() {
-  this.viewer.entities.removeAll();
-  this.viewer.scene.primitives.remove(clippingPlane);
-  planeEntities = [];
-  targetY = 0.0;
-}*/
+removeClippingPlanes(tileset) {
+    viewer.entities.removeAll();
+    viewer.scene.primitives.remove(tileset);
+    planeEntities = [];
+    targetY = 0.0;
+}
 
 }
