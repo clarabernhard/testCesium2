@@ -30,6 +30,7 @@ class Globe {
 this.viewer.imageryLayers.addImageryProvider(elevation);*/
 }
 
+// définit le zoom par défaut
 setHome(tileset){
   this.viewer.zoomTo(tileset, new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-35), 1750));
 
@@ -103,6 +104,7 @@ loadGeoJson(link, options = {}){
   return promisse;
 }
 
+// Fonction pour afficher les ombres
 shadow(enabled){
   this.viewer.shadows = enabled;
 }
@@ -142,6 +144,7 @@ setCoordsCallback(callback){
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 }
 
+// Fonction qui permet de gérer les mouvements du plan de coupe
 planeUpdate(plane) {
 
   var targetY = 0.0;
@@ -188,46 +191,121 @@ planeUpdate(plane) {
   };
 }
 
-addClippingPlanes(tileset) {
+// Afficher ou enlever le plan de coupe
+addClippingPlanes(tileset, show) {
 
-  var clipObjects;
-  var viewModel = {
-    debugBoundingVolumesEnabled : false,
-    edgeStylingEnabled : true,
-    currentExampleType : clipObjects
-  };
   var planeEntities = [];
-
   var clippingPlanes = new Cesium.ClippingPlaneCollection({
     planes : [
       new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 0.0, -1.0), 0.0)
     ],
-    edgeWidth : viewModel.edgeStylingEnabled ? 1.0 : 0.0
   });
 
-  for (var i = 0; i < clippingPlanes.length; ++i) {
-    var plane = clippingPlanes.get(i);
-    var planeEntity = this.viewer.entities.add({
-      position : Cesium.Cartesian3.fromDegrees(7.754114, 48.584783, 260),
-      plane : {
-        dimensions : new Cesium.Cartesian2(2800, 1800),
-        material : Cesium.Color.WHITE.withAlpha(0.4),
-        plane : new Cesium.CallbackProperty(this.planeUpdate(plane), false),
-        outline : true,
-        outlineColor : Cesium.Color.WHITE
-      }
-    });
+  if(show) {
+    for (var i = 0; i < clippingPlanes.length; ++i) {
+      var plane = clippingPlanes.get(i);
+      var planeEntity = this.viewer.entities.add({
+        position : Cesium.Cartesian3.fromDegrees(7.754114, 48.584783, 260),
+        plane : {
+          dimensions : new Cesium.Cartesian2(2800, 1800),
+          material : Cesium.Color.WHITE.withAlpha(0.4),
+          plane : new Cesium.CallbackProperty(this.planeUpdate(plane), false),
+          outline : true,
+          outlineColor : Cesium.Color.WHITE
+        }
+      });
 
-    planeEntities.push(planeEntity);
+      planeEntities.push(planeEntity);
+    }
+  } else {
+    this.viewer.entities.removeAll();
+    planeEntities = [];
   }
 
 }
 
-removeClippingPlanes(tileset) {
-    viewer.entities.removeAll();
-    viewer.scene.primitives.remove(tileset);
-    planeEntities = [];
-    targetY = 0.0;
+//outil construction
+createPoint(worldPosition) {
+    var point = this.viewer.entities.add({
+        position : worldPosition,
+        point : {
+            color : Cesium.Color.WHITE,
+            pixelSize : 5,
+            heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+        }
+    });
+    return point;
 }
+
+drawLine(positionData) {
+  var shape = this.viewer.entities.add({
+    polyline : {
+      positions : positionData,
+      clampToGround : true,
+      width : 3
+    }
+  });
+}
+
+drawPolygon(positionData) {
+  var shape = this.viewer.entities.add({
+    polygon: {
+      hierarchy: positionData,
+      material: new Cesium.ColorMaterialProperty(Cesium.Color.WHITE.withAlpha(0.7))
+    }
+  });
+}
+
+updateLine() {
+var activeShapePoints = [];
+var activeShape;
+var floatingPoint;
+var scene = this.viewer.scene;
+
+var handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
+handler.setInputAction(function(event) {
+
+    // We use `viewer.scene.pickPosition` here instead of `viewer.camera.pickEllipsoid` so that
+    // we get the correct point when mousing over terrain.
+    var earthPosition = scene.pickPosition(event.position);
+    // `earthPosition` will be undefined if our mouse is not over the globe.
+    if (Cesium.defined(earthPosition)) {
+        if (activeShapePoints.length === 0) {
+            floatingPoint = this.createPoint(earthPosition);
+            activeShapePoints.push(earthPosition);
+            var dynamicPositions = new Cesium.CallbackProperty(function () {
+                return activeShapePoints;
+            }, false);
+            activeShape = this.drawLine(dynamicPositions);
+        }
+        activeShapePoints.push(earthPosition);
+        this.createPoint(earthPosition);
+    }
+}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+handler.setInputAction(function(event) {
+    if (Cesium.defined(floatingPoint)) {
+        var newPosition = scene.pickPosition(event.endPosition);
+        if (Cesium.defined(newPosition)) {
+            floatingPoint.position.setValue(newPosition);
+            activeShapePoints.pop();
+            activeShapePoints.push(newPosition);
+        }
+    }
+}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+handler.setInputAction(function(event) {
+  activeShapePoints.pop();
+  this.drawLine(activeShapePoints);
+  this.viewer.entities.remove(floatingPoint);
+  this.viewer.entities.remove(activeShape);
+  floatingPoint = undefined;
+  activeShape = undefined;
+  activeShapePoints = [];
+}, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+
+
+}
+
 
 }

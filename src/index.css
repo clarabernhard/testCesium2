@@ -9,25 +9,38 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    overflow: auto;
     font-family: sans-serif;
     background: #000;
 }
 
 /* Style de la barre de menu */
  #menu {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0px;
     width: 425px;
     height: 88%;
-    background-color: rgba(57, 71, 75, 0.90);
+    background-color: rgba(9, 12, 16, 0.60);
     padding: 5px 5px 0px 5px;
     border: 1px solid #000;
     border-radius: 5px;
+    overflow: auto;
 }
 
-/* Style du bouton menu */
+#menu-content {
+  display: block;
+  width: 100%;
+  background-color: #B7C3D3;
+  font-family: Arial, Gadget, sans-serif;
+  font-size: 1.6em;
+  padding: 1px;
+  border-radius: 5px 5px 0 0;
+  text-align: center;
+  color: black;
+}
+
+/* Style de la légende des coordonnées */
 #left-pane{
     position: absolute;
     top: 00px;
@@ -39,14 +52,11 @@ html, body {
     overflow-y: auto;
 }
 
-/* Style du contour du bouton menu */
-#left-pane #toggle-menu {
-    display: inline-block;
-    margin-bottom: 25px;
-    background-color: rgba(57, 71, 75, 0.90);
-    border: 1px solid #000;
-    border-radius: 5px;
+#left-pane h2 {
+  font-size: 1.7em;
+  text-align: center;
 }
+
 
 /* Style de la partie Cesium*/
 #cesiumContainer {
@@ -60,7 +70,7 @@ html, body {
 /* Style des panels contenus dans le menu */
  .panel{
    display: inline-block;
-   border: 1px solid #000;
+   border: 1px solid #4E535A;
    border-radius: 5px;
    color: white;
    margin-bottom: 5px;
@@ -69,21 +79,22 @@ html, body {
    z-index: 1;
    top: 0;
    left: 0;
+   white-space: nowrap;
    overflow: auto;
 
  }
 
 .panel .panel-title{
+
   display: block;
   width: 100%;
-  background-color: #7f8c8d;
+  background-color: #909499;
   font-size: large;
   padding: 5px;
   border-radius: 5px 5px 0 0;
   text-align: center;
   color: white;
   cursor: pointer;
-  overflow: auto;
 
  }
 
@@ -100,15 +111,14 @@ html, body {
    width: 100%;
    padding: 5px;
    display: none;
-   overflow: auto;
  }
 
  .panel .panel-content-open {
-	 display: block;
+	 display: inline-block;
  }
 
 
-/* Style des menus */
+/* Style des légendes */
 .legend {
     position: relative;
     display: block;
@@ -153,7 +163,7 @@ html, body {
 }
 
 
-/* Style du loader */
+/* Style du loader = icône qui affiche le chargement de la page */
  .cover {
     display: block;
     position: absolute;
@@ -191,22 +201,6 @@ html, body {
     display: none;
 }
 
-.hamburger-icon {
-    position: relative;
-    padding: 5px 5px 5px calc(5px + 1.25em);
-    cursor: pointer;
-}
-
-.hamburger-icon:before {
-    content: "";
-    position: absolute;
-    top: calc(5px + 0.25em);
-    left: 5px;
-    width: 1em;
-    height: 0.125em;
-    border-top: 0.375em double #FFF;
-    border-bottom: 0.125em solid #FFF;
-}
 
 /* Style de la flèche */
 i {
@@ -219,8 +213,8 @@ i {
   -webkit-transform: rotate(45deg);
 }
 
-/* Boite à outils */
 
+/* Boite à outils */
 /* style des boutons de la boîte à outils*/
 .w3-dropdown-hover {
   display: inline-block;

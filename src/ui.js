@@ -33,9 +33,8 @@ class Menu {
     // Récuperer les checkboxes
     this.photoMaillageCheckbox = document.querySelector('#photoMaillage');
     this.shadowCheckbox = document.querySelector('#shadows');
-    this.coordsCheckbox = document.querySelector('#coords');
 
-    this.pointCheckbox = document.querySelector('#point');
+    this.coordsCheckbox = document.querySelector('#point');
     this.ligneCheckbox = document.querySelector('#ligne');
     this.surfaceCheckbox = document.querySelector('#surface');
 
@@ -65,21 +64,11 @@ class Menu {
     // Avec le nom de la source comme clé et la dataSource comme valeur
     this.dataSources = {};
 
-    this.registerMenuEvent();
     this.menuDeroulant();
 
   }
 
-  registerMenuEvent(){
-    // Crée l'évènement qui permet d'ouvrir le menu
-    document.querySelector("#left-pane #toggle-menu").addEventListener('click', (e) => {
-      this.leftPane.classList.toggle('menu-open');
-      this.menu.classList.toggle('menu-open');
-    });
-  }
-
   // Evenement pour les menus déroulants
-
   menuDeroulant(){
     var i;
     for (i = 0; i < this.dropdown.length; i++) {
@@ -119,8 +108,19 @@ class Menu {
       this.showCoords(e.target.checked);
     });
 
-    this.coupeCheckbox.addEventListener('change', function(e){
-      globe.addClippingPlanes(terrain);
+    this.coupeCheckbox.addEventListener('change', (e) => {
+      globe.addClippingPlanes(terrain, e.target.checked);
+
+    });
+
+    this.cligneCheckbox.addEventListener('change', (e) => {
+        globe.updateLine();
+
+
+    });
+
+    this.csurfaceCheckbox.addEventListener('change', (e) => {
+      globe.terminateShape(polygon);
 
     });
 
