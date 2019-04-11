@@ -44,6 +44,8 @@ class Menu {
 
     this.coupeCheckbox = document.querySelector('#plancoupe');
 
+    this.monumentCheckbox = document.querySelector('#monument');
+
     // show coords
     this.coordsList = document.querySelector('#coordsList');
 
@@ -108,23 +110,55 @@ class Menu {
       this.showCoords(e.target.checked);
     });
 
+    this.ligneCheckbox.addEventListener('change', (e) => {
+      var choice = 'line';
+      var choice2 = 'dessin';
+        globe.updateShape(choice, choice2, e.target.checked);
+    });
+
+    this.surfaceCheckbox.addEventListener('change', (e) => {
+      var choice = 'polygon';
+      var choice2 = 'dessin';
+        globe.updateShape(choice, choice2, e.target.checked);
+    });
+
     this.coupeCheckbox.addEventListener('change', (e) => {
       globe.addClippingPlanes(terrain, e.target.checked);
-
     });
 
     this.cligneCheckbox.addEventListener('change', (e) => {
-        globe.updateLine();
-
-
+      var choice = 'line';
+      var choice2 = 'construction';
+        globe.updateShape(choice, choice2, e.target.checked);
     });
 
     this.csurfaceCheckbox.addEventListener('change', (e) => {
-      globe.terminateShape(polygon);
-
+      var choice = 'polygon';
+      var choice2 = 'construction';
+        globe.updateShape(choice, choice2, e.target.checked);
     });
 
-  }
+    this.monumentCheckbox.addEventListener('change', (e) => {
+			let colors = {
+				'classé': '#D1D716',
+				'inscrit': '#F07200'
+			}
+
+			if(e.target.checked){
+                this.legendManager.addLegend('monuments_historiques', colors);
+            } else{
+                this.legendManager.removeLegend('monuments_historiques');
+            }
+
+			this.show('monuments_historiques', '../Cesium/data/geojson/monumentsS.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+				classification: true,
+                classificationField: 'type_entite',
+				colors: colors,
+				alpha: 0.4
+			});
+
+  });
+}
 
   /*
   * Afficher ou masquer la source de données "name" en fonction de la valeur de "show"
