@@ -27,6 +27,7 @@ class Menu {
     this.menu = document.querySelector('#menu');
     this.dropdown = document.getElementsByClassName("panel-title");
 
+
     // Créer un gestionnaire pour les légendes
     this.legendManager = new LegendManager(this.leftPane);
 
@@ -38,6 +39,7 @@ class Menu {
     this.ligneCheckbox = document.querySelector('#ligne');
     this.surfaceCheckbox = document.querySelector('#surface');
 
+    this.cpointCheckbox = document.querySelector('#cpoint');
     this.cligneCheckbox = document.querySelector('#cligne');
     this.csurfaceCheckbox = document.querySelector('#csurface');
     this.volumeCheckbox = document.querySelector('#volume');
@@ -48,6 +50,7 @@ class Menu {
 
     // show coords
     this.coordsList = document.querySelector('#coordsList');
+
 
     // Mouse over the globe to see the cartographic position
     this.longitude = undefined;
@@ -107,6 +110,9 @@ class Menu {
     });
 
     this.coordsCheckbox.addEventListener('change', (e) => {
+      var choice = 'point';
+      var choice2 = 'dessin';
+      globe.updateShape(choice, choice2, e.target.checked);
       this.showCoords(e.target.checked);
     });
 
@@ -126,16 +132,26 @@ class Menu {
       globe.addClippingPlanes(terrain, e.target.checked);
     });
 
+    this.cpointCheckbox.addEventListener('change', (e) => {
+      var choice = 'point';
+      var choice2 = 'construction';
+        globe.updateShape(choice, choice2, e.target.checked);
+        this.showCoords(e.target.checked);
+
+    });
+
     this.cligneCheckbox.addEventListener('change', (e) => {
       var choice = 'line';
       var choice2 = 'construction';
         globe.updateShape(choice, choice2, e.target.checked);
+
     });
 
     this.csurfaceCheckbox.addEventListener('change', (e) => {
       var choice = 'polygon';
       var choice2 = 'construction';
         globe.updateShape(choice, choice2, e.target.checked);
+
     });
 
     this.monumentCheckbox.addEventListener('change', (e) => {

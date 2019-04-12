@@ -16,7 +16,6 @@
   <div id="cesiumContainer"></div>
 
   <div id=left-pane>
-
     <div class="legend hidden" id="coordsList">
       <h2>Coordonnées (CC48 / IGN69)</h2>
       <p>X (m): <span id="coordX"></span></p>
@@ -25,10 +24,17 @@
     </div>
   </div>
 
-  <div id="menu">
+  <div id=right-pane>
+    <div class="annotation hidden" id="aide">
+      <p>Clic gauche pour ajouter un point</p>
+      <p>Clic droit pour terminer la figure</p>
+    </div>
+  </div>
 
+  <div id="menu">
     <div class="panel">
       <div id="menu-content"> MENU </div>
+
       <div class="nowrap">
         <input id="photoMaillage" type="checkbox" checked/>
         <label for="photoMaillage">Afficher le photomaillage</label>
@@ -52,17 +58,14 @@
           <input id="placebo2" type="checkbox"/>
           <label for="placebo2">Un bouton qui ne sert à rien</label>
         </div>
-
         <div class="nowrap">
           <input id="placebo2" type="checkbox"/>
           <label for="placebo2">Un bouton qui ne sert à rien</label>
         </div>
-
         <div class="nowrap">
           <input id="placebo2" type="checkbox"/>
           <label for="placebo2">Un bouton qui ne sert à rien</label>
         </div>
-
         <div class="nowrap">
           <input id="placebo2" type="checkbox"/>
           <label for="placebo2">Un bouton qui ne sert à rien</label>
@@ -146,6 +149,10 @@
   <div class= "w3-dropdown-hover w3-right" id="construction">
     <button class="w3-button"><img src="src/img/icons8-maintenance-filled-50.png"></button>
     <div class="w3-dropdown-content">
+      <div class="nowrap">
+        <input id="cpoint" type="checkbox"/>
+        <label for="cpoint">Construction point</label>
+      </div>
 
       <div class="nowrap">
         <input id="cligne" type="checkbox"/>

@@ -15,11 +15,12 @@ class Globe {
     <img src="src/img/logo/europe-sengage.jpg" alt="Logo strasbourg" />\
     <img src="src/img/logo/logo-ue.jpg" alt="Logo strasbourg" />';
 
-    this.coordsMouseMoveEvent = undefined;
+    this.coordsClic = undefined;
 
     this.hoverHandler = undefined;
     this.clickHandler = undefined;
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
+    this.aideCheckbox = document.querySelector('#aide');
 
     /*var elevation = new Cesium.WebMapServiceImageryProvider({
     url : 'http://wxs.ign.fr/pvwmk1wgxoei8orp7rd1re78/geoportail/r/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap',
@@ -111,26 +112,14 @@ shadow(enabled){
 }
 
 setCoordsCallback(callback){
-  if(callback === undefined && this.coordsMouseMoveEvent !== undefined){
-    this.coordsMouseMoveEvent.destroy();
-    this.coordsMouseMoveEvent = undefined;
+  let scene = this.viewer.scene;
 
-    return;
-  }
+  this.handler.setInputAction(function(event) {
 
-  if(callback !== undefined && this.coordsMouseMoveEvent !== undefined){
-    this.coordsMouseMoveEvent.destroy();
-  }
-
-  this.coordsMouseMoveEvent = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
-
-  this.coordsMouseMoveEvent.setInputAction((movement) => {
-    let scene = this.viewer.scene;
-    if (scene.mode !== Cesium.SceneMode.MORPHING) {
-      let pickedObject = scene.pick(movement.endPosition);
+      let pickedObject = scene.pick(event.position);
 
       if (scene.pickPositionSupported && Cesium.defined(pickedObject)) {
-        let cartesian = this.viewer.scene.pickPosition(movement.endPosition);
+        let cartesian = scene.pickPosition(event.position);
 
         if (Cesium.defined(cartesian)) {
           let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
@@ -141,8 +130,8 @@ setCoordsCallback(callback){
           callback(longitudeString, latitudeString, heightString);
         }
       }
-    }
-  }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
 
 // Fonction qui permet de gérer les mouvements du plan de coupe
@@ -216,7 +205,7 @@ addClippingPlanes(tileset, show) {
         },
         label :{
           show: true,
-          text: plane.plane,
+          text: 'test',
           showBackground : true,
           font : '14px monospace',
           horizontalOrigin : Cesium.HorizontalOrigin.LEFT,
@@ -247,24 +236,27 @@ createPoint(worldPosition) {
   return point;
 }
 
+drawPoint(positionData) {
+  shape = viewer.entities.add({
+      point : {
+          positions : positionData,
+          color : Cesium.Color.BLACK,
+          pixelSize : 10,
+          heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+      }
+  });
+  return shape;
+}
+
 drawLine(positionData) {
   var shape = this.viewer.entities.add({
     polyline : {
       positions : positionData,
       clampToGround : true,
       width : 3
-    },
-    label : {
-      show: true,
-      text: 'test',
-      showBackground : true,
-      font : '14px monospace',
-      horizontalOrigin : Cesium.HorizontalOrigin.LEFT,
-      verticalOrigin : Cesium.VerticalOrigin.TOP,
-      pixelOffset : new Cesium.Cartesian2(15, 0)
     }
   });
-
+  return shape;
 }
 
 drawPolygon(positionData) {
@@ -274,6 +266,7 @@ drawPolygon(positionData) {
       material: new Cesium.ColorMaterialProperty(Cesium.Color.WHITE.withAlpha(0.7))
     }
   });
+  return shape;
 }
 
 updateShape(choice, choice2, show) {
@@ -281,7 +274,7 @@ updateShape(choice, choice2, show) {
   var activeShape;
   var floatingPoint;
   var scene = this.viewer.scene;
-  //this.handler.globe = this;
+  this.handler.globe = this;
 
   if(show) {
     //this.viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
@@ -297,7 +290,9 @@ updateShape(choice, choice2, show) {
           var dynamicPositions = new Cesium.CallbackProperty(function () {
             return activeShapePoints;
           }, false);
-          if(choice === 'line') {
+          if(choice === 'point') {
+            activeShape = globe.drawPoint(dynamicPositions);
+          } else if(choice === 'line') {
             activeShape = globe.drawLine(dynamicPositions);
           } else if(choice === 'polygon') {
             activeShape = globe.drawPolygon(dynamicPositions);
@@ -322,9 +317,11 @@ updateShape(choice, choice2, show) {
 
     this.handler.setInputAction(function(event) {
       activeShapePoints.pop();
-      if(choice === 'line') {
+      if(choice === 'point') {
+        globe.drawPoint(activeShapePoints);
+      } else if(choice === 'line') {
         globe.drawLine(activeShapePoints);
-      } else if( choice === 'polygon'){
+      } else if( choice === 'polygon') {
         globe.drawPolygon(activeShapePoints);
       }
       globe.viewer.entities.remove(floatingPoint);
@@ -334,20 +331,25 @@ updateShape(choice, choice2, show) {
       activeShapePoints = [];
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
-  } else {
+    this.aideCheckbox.classList.remove('hidden');
 
+  } else {
     if(choice2 === 'dessin'){
+
     this.handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
     this.handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
     this.handler.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
     this.viewer.entities.removeAll();
+    this.aideCheckbox.classList.add('hidden');
+
   }
   else if(choice2 === 'construction'){
 
     this.handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
     this.handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
     this.handler.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+    this.aideCheckbox.classList.add('hidden');
 
   }
 }
