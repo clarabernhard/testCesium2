@@ -123,16 +123,16 @@ setCoordsCallback(callback){
 
         if (Cesium.defined(cartesian)) {
           let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-          let longitudeString = Cesium.Math.toDegrees(cartographic.longitude).toFixed(5);
-          let latitudeString = Cesium.Math.toDegrees(cartographic.latitude).toFixed(5);
-          let heightString = cartographic.height.toFixed(2);
-
+          let longitudeString = Cesium.Math.toDegrees(cartographic.longitude).toFixed(7);
+          let latitudeString = Cesium.Math.toDegrees(cartographic.latitude).toFixed(7);
+          let heightString = cartographic.height.toFixed(3);
           callback(longitudeString, latitudeString, heightString);
         }
       }
 
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
+
 
 // Fonction qui permet de gérer les mouvements du plan de coupe
 planeUpdate(plane) {
@@ -195,7 +195,7 @@ addClippingPlanes(tileset, show) {
     for (var i = 0; i < clippingPlanes.length; ++i) {
       var plane = clippingPlanes.get(i);
       var planeEntity = this.viewer.entities.add({
-        position : Cesium.Cartesian3.fromDegrees(7.754114, 48.584783, 260),
+        position : Cesium.Cartesian3.fromDegrees(7.754114, 48.584783, 140),
         plane : {
           dimensions : new Cesium.Cartesian2(2800, 1800),
           material : Cesium.Color.WHITE.withAlpha(0.4),
@@ -230,22 +230,10 @@ createPoint(worldPosition) {
     point : {
       color : Cesium.Color.WHITE,
       pixelSize : 5,
-      heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+      heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
     }
   });
   return point;
-}
-
-drawPoint(positionData) {
-  shape = viewer.entities.add({
-      point : {
-          positions : positionData,
-          color : Cesium.Color.BLACK,
-          pixelSize : 10,
-          heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
-      }
-  });
-  return shape;
 }
 
 drawLine(positionData) {
@@ -291,7 +279,7 @@ updateShape(choice, choice2, show) {
             return activeShapePoints;
           }, false);
           if(choice === 'point') {
-            activeShape = globe.drawPoint(dynamicPositions);
+            activeShape = globe.createPoint(dynamicPositions);
           } else if(choice === 'line') {
             activeShape = globe.drawLine(dynamicPositions);
           } else if(choice === 'polygon') {
@@ -318,7 +306,7 @@ updateShape(choice, choice2, show) {
     this.handler.setInputAction(function(event) {
       activeShapePoints.pop();
       if(choice === 'point') {
-        globe.drawPoint(activeShapePoints);
+        globe.createPoint(activeShapePoints);
       } else if(choice === 'line') {
         globe.drawLine(activeShapePoints);
       } else if( choice === 'polygon') {
@@ -354,6 +342,5 @@ updateShape(choice, choice2, show) {
   }
 }
 }
-
 
 }

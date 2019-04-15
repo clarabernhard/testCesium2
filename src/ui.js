@@ -50,6 +50,7 @@ class Menu {
 
     // show coords
     this.coordsList = document.querySelector('#coordsList');
+    this.distanceList = document.querySelector('#distanceList');
 
 
     // Mouse over the globe to see the cartographic position
@@ -59,6 +60,7 @@ class Menu {
     this.coordX = document.querySelector('#coordX');
     this.coordY = document.querySelector('#coordY');
     this.coordZ = document.querySelector('#coordZ');
+    this.distance = document.querySelector('#distance');
 
     // Créer le datepicker
     this.datepicker = $("#date")
@@ -111,8 +113,7 @@ class Menu {
 
     this.coordsCheckbox.addEventListener('change', (e) => {
       var choice = 'point';
-      var choice2 = 'dessin';
-      globe.updateShape(choice, choice2, e.target.checked);
+      globe.updateShape(choice, e.target.checked);
       this.showCoords(e.target.checked);
     });
 
@@ -134,9 +135,7 @@ class Menu {
 
     this.cpointCheckbox.addEventListener('change', (e) => {
       var choice = 'point';
-      var choice2 = 'construction';
-        globe.updateShape(choice, choice2, e.target.checked);
-        this.showCoords(e.target.checked);
+        globe.updateShape(choice, e.target.checked);
 
     });
 
@@ -223,16 +222,35 @@ class Menu {
         this.latitude = latitude;
         this.height = hauteur;
 
-        var coords = proj4('EPSG:4326', 'EPSG:3948', [longitude, latitude]);
-        this.coordX.innerHTML = coords[0];
-        this.coordY.innerHTML = coords[1];
-        this.coordZ.innerHTML = (Number(hauteur) - Number(this.raf09.getGeoide(latitude, longitude))).toFixed(4);
+        var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
+        this.coordX.innerHTML = coords[0].toFixed(4);
+        this.coordY.innerHTML = coords[1].toFixed(4);
+        this.coordZ.innerHTML = (Number(hauteur) - Number(this.raf09.getGeoide(latitude, longitude))).toFixed(3);
+
       });
       this.coordsList.classList.remove('hidden');
+
     } else{
+
       this.coordsList.classList.add('hidden');
       this.globe.setCoordsCallback(undefined);
     }
+  }
+
+  getCoord() {
+      var points = [];
+      this.globe.setCoordsCallback((longitude, latitude, hauteur) => { // Fonction éxécuté a chaque mouvement de souris qui recoit les coordonnées
+      this.longitude = longitude;
+      this.latitude = latitude;
+      this.height = hauteur;
+
+      var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
+      X = coords[0].toFixed(4);
+      Y = coords[1].toFixed(4);
+      Z = (Number(hauteur) - Number(this.raf09.getGeoide(latitude, longitude))).toFixed(3);
+
+      return points;
+    });
   }
 
 }
