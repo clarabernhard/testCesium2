@@ -43,6 +43,7 @@ class Menu {
     this.cligneCheckbox = document.querySelector('#cligne');
     this.csurfaceCheckbox = document.querySelector('#csurface');
     this.volumeCheckbox = document.querySelector('#volume');
+    this.supprCheckbox = document.querySelector("#suppr");
 
     this.coupeCheckbox = document.querySelector('#plancoupe');
 
@@ -54,9 +55,6 @@ class Menu {
 
 
     // Mouse over the globe to see the cartographic position
-    this.longitude = undefined;
-    this.latitude = undefined;
-    this.height = undefined;
     this.coordX = document.querySelector('#coordX');
     this.coordY = document.querySelector('#coordY');
     this.coordZ = document.querySelector('#coordZ');
@@ -112,15 +110,13 @@ class Menu {
     });
 
     this.coordsCheckbox.addEventListener('change', (e) => {
-      var choice = 'point';
-      globe.updateShape(choice, e.target.checked);
+      /*var choice = 'point';
+      globe.updateShape(choice, e.target.checked);*/
       this.showCoords(e.target.checked);
     });
 
     this.ligneCheckbox.addEventListener('change', (e) => {
-      var choice = 'line';
-      var choice2 = 'dessin';
-        globe.updateShape(choice, choice2, e.target.checked);
+      globe.measureDistance(e.target.checked);
     });
 
     this.surfaceCheckbox.addEventListener('change', (e) => {
@@ -135,21 +131,30 @@ class Menu {
 
     this.cpointCheckbox.addEventListener('change', (e) => {
       var choice = 'point';
-        globe.updateShape(choice, e.target.checked);
+      var choice2 = 'construction'
+        globe.updateShape(choice, choice2, e.target.checked);
 
     });
 
     this.cligneCheckbox.addEventListener('change', (e) => {
       var choice = 'line';
-      var choice2 = 'construction';
+      var choice2 = 'construction'
         globe.updateShape(choice, choice2, e.target.checked);
 
     });
 
     this.csurfaceCheckbox.addEventListener('change', (e) => {
       var choice = 'polygon';
-      var choice2 = 'construction';
+      var choice2 = 'construction'
         globe.updateShape(choice, choice2, e.target.checked);
+
+    });
+
+    this.supprCheckbox.addEventListener('click', function() {
+      var choice;
+      var show;
+      var choice2 = 'suppr';
+        globe.updateShape(choice, choice2, show);
 
     });
 
@@ -214,13 +219,9 @@ class Menu {
   }
 
 
-  // Fonction qui permet d'afficher ou de masquer les coordonnées au survol de la souris
+  // Convertit les lat/lon/hauteur en CC48 / IGN69 et les affiche
   showCoords(show){
-    if(show){
-      this.globe.setCoordsCallback((longitude, latitude, hauteur) => { // Fonction éxécuté a chaque mouvement de souris qui recoit les coordonnées
-        this.longitude = longitude;
-        this.latitude = latitude;
-        this.height = hauteur;
+        this.globe.setCoordsCallback((longitude, latitude, hauteur) => { // Fonction éxécutée à chaque clic
 
         var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
         this.coordX.innerHTML = coords[0].toFixed(4);
@@ -228,29 +229,12 @@ class Menu {
         this.coordZ.innerHTML = (Number(hauteur) - Number(this.raf09.getGeoide(latitude, longitude))).toFixed(3);
 
       });
+    if(show){
       this.coordsList.classList.remove('hidden');
-
     } else{
-
       this.coordsList.classList.add('hidden');
       this.globe.setCoordsCallback(undefined);
     }
-  }
-
-  getCoord() {
-      var points = [];
-      this.globe.setCoordsCallback((longitude, latitude, hauteur) => { // Fonction éxécuté a chaque mouvement de souris qui recoit les coordonnées
-      this.longitude = longitude;
-      this.latitude = latitude;
-      this.height = hauteur;
-
-      var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
-      X = coords[0].toFixed(4);
-      Y = coords[1].toFixed(4);
-      Z = (Number(hauteur) - Number(this.raf09.getGeoide(latitude, longitude))).toFixed(3);
-
-      return points;
-    });
   }
 
 }
