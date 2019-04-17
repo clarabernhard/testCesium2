@@ -70,7 +70,16 @@ class Menu {
     this.dataSources = {};
 
     this.menuDeroulant();
+    this.registerMenuEvent();
 
+  }
+
+  registerMenuEvent(){
+      // Crée l'évènement qui permet d'ouvrir le menu
+      document.querySelector("#left-pane #toggle-menu").addEventListener('click', (e) => {
+          this.leftPane.classList.toggle('menu-open');
+          this.menu.classList.toggle('menu-open');
+      });
   }
 
   // Evenement pour les menus déroulants
@@ -116,7 +125,7 @@ class Menu {
     });
 
     this.ligneCheckbox.addEventListener('change', (e) => {
-      globe.measureDistance(e.target.checked);
+      globe.ligne(e.target.checked);
     });
 
     this.surfaceCheckbox.addEventListener('change', (e) => {

@@ -9,23 +9,25 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    overflow: auto;
+    overflow-x: none;
+    overflow-y: auto;
     font-family: sans-serif;
     background: #000;
 }
 
 /* Style de la barre de menu */
  #menu {
-    position: fixed;
+    position: absolute;
     top: 0;
-    left: 0px;
+    left: -425px;
     width: 425px;
     height: 88%;
     background-color: rgba(9, 12, 16, 0.60);
     padding: 5px 5px 0px 5px;
     border: 1px solid #000;
     border-radius: 5px;
-    overflow: auto;
+    overflow-x: none;
+    overflow-y: auto;
 }
 
 #menu-content {
@@ -40,16 +42,32 @@ html, body {
   color: black;
 }
 
+#menu.menu-open{
+    left: 0;
+}
+
 /* Style de la légende des coordonnées */
 #left-pane{
     position: absolute;
     top: 00px;
-    left: 425px;
+    left: 00px;
     width: 200px;
     color: white;
     padding: 5px 5px 0 5px;
     bottom: 120px;
     overflow-y: auto;
+}
+
+#left-pane.menu-open {
+    left: 425px;
+}
+
+#left-pane #toggle-menu {
+    display: inline-block;
+    margin-bottom: 25px;
+    background-color: rgba(57, 71, 75, 0.90);
+    border: 1px solid #000;
+    border-radius: 5px;
 }
 
 #left-pane h2 {
@@ -86,20 +104,25 @@ html, body {
     height: 100%;
 }
 
+/* Annimation du menu */
+#menu, #left-pane {
+    transition: left 0.5s;
+}
+
 /* Style des panels contenus dans le menu */
  .panel{
-   display: inline-block;
+   display: block;
    border: 1px solid #4E535A;
    border-radius: 5px;
    color: white;
    margin-bottom: 5px;
 	 width: 415px;
-	 position: fixed;
    z-index: 1;
    top: 0;
    left: 0;
    white-space: nowrap;
-   overflow: auto;
+   overflow-x: none;
+   overflow-y: auto;
 
  }
 
@@ -283,4 +306,21 @@ i {
 
  .hidden {
     display: none;
+}
+
+.hamburger-icon {
+    position: relative;
+    padding: 5px 5px 5px calc(5px + 1.25em);
+    cursor: pointer;
+}
+
+.hamburger-icon:before {
+    content: "";
+    position: absolute;
+    top: calc(5px + 0.25em);
+    left: 5px;
+    width: 1em;
+    height: 0.125em;
+    border-top: 0.375em double #FFF;
+    border-bottom: 0.125em solid #FFF;
 }
