@@ -17,11 +17,6 @@ class Menu {
     this.terrain = terrain;
     this.viewer = Globe.viewer;
 
-    this.raf09 = undefined;
-    new Raf09('../Cesium/data/RAF09.mnt', (raf090) => {
-      this.raf09 = raf090;
-    });
-
     // Récuperer les éléments du menu
     this.leftPane = document.querySelector('#left-pane');
     this.menu = document.querySelector('#menu');
@@ -46,19 +41,8 @@ class Menu {
     this.supprCheckbox = document.querySelector("#suppr");
 
     this.coupeCheckbox = document.querySelector('#plancoupe');
-
     this.monumentCheckbox = document.querySelector('#monument');
 
-    // show coords
-    this.coordsList = document.querySelector('#coordsList');
-    this.distanceList = document.querySelector('#distanceList');
-
-
-    // Mouse over the globe to see the cartographic position
-    this.coordX = document.querySelector('#coordX');
-    this.coordY = document.querySelector('#coordY');
-    this.coordZ = document.querySelector('#coordZ');
-    this.distance = document.querySelector('#distance');
 
     // Créer le datepicker
     this.datepicker = $("#date")
@@ -119,52 +103,54 @@ class Menu {
     });
 
     this.coordsCheckbox.addEventListener('change', (e) => {
-      /*var choice = 'point';
-      globe.updateShape(choice, e.target.checked);*/
-      this.showCoords(e.target.checked);
+      globe.showCoords(e.target.checked);
     });
 
     this.ligneCheckbox.addEventListener('change', (e) => {
-      globe.ligne(e.target.checked);
+      var choice = 'line';
+      var choice2 = 'mesure';
+      globe.updateShape(choice, choice2, e.target.checked);
     });
 
     this.surfaceCheckbox.addEventListener('change', (e) => {
       var choice = 'polygon';
-      var choice2 = 'dessin';
-        globe.updateShape(choice, choice2, e.target.checked);
-    });
+      var choice2 = 'mesure';
+      globe.updateShape(choice, choice2, e.target.checked);
 
-    this.coupeCheckbox.addEventListener('change', (e) => {
-      globe.addClippingPlanes(terrain, e.target.checked);
     });
 
     this.cpointCheckbox.addEventListener('change', (e) => {
       var choice = 'point';
-      var choice2 = 'construction'
-        globe.updateShape(choice, choice2, e.target.checked);
+      var choice2 = 'construction';
+      globe.updateShape(choice, choice2, e.target.checked);
 
     });
 
     this.cligneCheckbox.addEventListener('change', (e) => {
       var choice = 'line';
-      var choice2 = 'construction'
-        globe.updateShape(choice, choice2, e.target.checked);
+      var choice2 = 'construction';
+      globe.updateShape(choice, choice2, e.target.checked);
 
     });
 
     this.csurfaceCheckbox.addEventListener('change', (e) => {
       var choice = 'polygon';
-      var choice2 = 'construction'
-        globe.updateShape(choice, choice2, e.target.checked);
+      var choice2 = 'construction';
+      globe.updateShape(choice, choice2, e.target.checked);
 
     });
 
     this.supprCheckbox.addEventListener('click', function() {
       var choice;
       var show;
-      var choice2 = 'suppr';
-        globe.updateShape(choice, choice2, show);
+      var choice2 = 'mesure';
+      globe.updateShape(choice, choice2, show);
 
+    });
+
+    this.coupeCheckbox.addEventListener('change', (e) => {
+      globe.legende();
+      //globe.addClippingPlanes(terrain, e.target.checked);
     });
 
     this.monumentCheckbox.addEventListener('change', (e) => {
@@ -228,22 +214,6 @@ class Menu {
   }
 
 
-  // Convertit les lat/lon/hauteur en CC48 / IGN69 et les affiche
-  showCoords(show){
-        this.globe.setCoordsCallback((longitude, latitude, hauteur) => { // Fonction éxécutée à chaque clic
 
-        var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
-        this.coordX.innerHTML = coords[0].toFixed(4);
-        this.coordY.innerHTML = coords[1].toFixed(4);
-        this.coordZ.innerHTML = (Number(hauteur) - Number(this.raf09.getGeoide(latitude, longitude))).toFixed(3);
-
-      });
-    if(show){
-      this.coordsList.classList.remove('hidden');
-    } else{
-      this.coordsList.classList.add('hidden');
-      this.globe.setCoordsCallback(undefined);
-    }
-  }
 
 }

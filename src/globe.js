@@ -11,8 +11,10 @@ class Globe {
       selectionIndicator: false
     });
 
-
-    this.geodesic = new Cesium.EllipsoidGeodesic();
+    this.raf09 = undefined;
+    new Raf09('../Cesium/data/RAF09.mnt', (raf090) => {
+      this.raf09 = raf090;
+    });
 
     // insère les logos en bas
     this.viewer.bottomContainer.innerHTML = '<img src="src/img/logo/logo-strasbourg.png" alt="Logo strasbourg" />\
@@ -22,9 +24,20 @@ class Globe {
     // variable qui stocke les évenements liés à la souris
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
 
-    // Récup de certains éléments de l'html
+    // Légendes qui s'affichent au clic
     this.aideCheckbox = document.querySelector('#aide');
     this.distanceList = document.querySelector('#distanceList');
+    this.aireList = document.querySelector('#aireList');
+    this.planList = document.querySelector('#planList');
+    this.coordsList = document.querySelector('#coordsList');
+    this.constructionList = document.querySelector('#constructionList');
+
+    // Boite à outils mesures coords
+    this.coordX = document.querySelector('#coordX');
+    this.coordY = document.querySelector('#coordY');
+    this.coordZ = document.querySelector('#coordZ');
+
+    // mesures de distance
     this.distance = document.querySelector('#distance');
     this.hauteur = document.querySelector('#hauteur');
 
@@ -135,6 +148,75 @@ setCoordsCallback(callback){
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
 
+// Convertit les lat/lon/hauteur en CC48 / IGN69 et les affiche
+showCoords(show){
+  this.setCoordsCallback((longitude, latitude, hauteur) => { // Fonction éxécutée à chaque clic
+
+    var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
+    this.coordX.innerHTML = coords[0].toFixed(4);
+    this.coordY.innerHTML = coords[1].toFixed(4);
+    this.coordZ.innerHTML = (Number(hauteur) - Number(this.raf09.getGeoide(latitude, longitude))).toFixed(3);
+
+  });
+  if(show){
+    this.coordsList.classList.remove('hidden');
+  } else{
+    this.coordsList.classList.add('hidden');
+    this.setCoordsCallback(undefined);
+  }
+}
+
+legende(){
+  this.planList.classList.remove('hidden');
+
+  // interactivité du plan de coupe
+  var X = parseFloat(document.getElementById('#X').value);
+  var Y = parseFloat(document.getElementById('#Y').value);
+  var hauteurCoupe = parseFloat(document.getElementById('#hauteurcoupe').value);
+  var longueurCoupe = parseFloat(document.getElementById('#longueurcoupe').value);
+  var largeurCoupe = parseFloat(document.getElementById('#largeurcoupe').value);
+
+  console.log(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe);
+
+}
+
+// Afficher ou enlever le plan de coupe
+addClippingPlanes(tileset, show) {
+
+  if(show) {
+
+    var planeEntities = [];
+    var clippingPlanes = new Cesium.ClippingPlaneCollection({
+      planes : [
+        new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 0.0, -1.0), 0.0)
+      ],
+    });
+
+
+    for (var i = 0; i < clippingPlanes.length; ++i) {
+      var plane = clippingPlanes.get(i);
+      var planeEntity = this.viewer.entities.add({
+        position : Cesium.Cartesian3.fromDegrees(7.754114, 48.584783, hauteurCoupe),
+        plane : {
+          dimensions : new Cesium.Cartesian2(longueurCoupe, largeurCoupe),
+          material : Cesium.Color.WHITE.withAlpha(0.4),
+          plane : new Cesium.CallbackProperty(this.planeUpdate(plane), false),
+          outline : true,
+          outlineColor : Cesium.Color.WHITE
+        }
+      });
+
+      planeEntities.push(planeEntity);
+    }
+
+  } else {
+    this.planList.classList.add('hidden');
+    this.viewer.entities.removeAll();
+    planeEntities = [];
+
+  }
+
+}
 
 // Fonction qui permet de gérer les mouvements du plan de coupe
 planeUpdate(plane) {
@@ -183,39 +265,6 @@ planeUpdate(plane) {
   };
 }
 
-// Afficher ou enlever le plan de coupe
-addClippingPlanes(tileset, show) {
-
-  var planeEntities = [];
-  var clippingPlanes = new Cesium.ClippingPlaneCollection({
-    planes : [
-      new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 0.0, -1.0), 0.0)
-    ],
-  });
-
-  if(show) {
-    for (var i = 0; i < clippingPlanes.length; ++i) {
-      var plane = clippingPlanes.get(i);
-      var planeEntity = this.viewer.entities.add({
-        position : Cesium.Cartesian3.fromDegrees(7.754114, 48.584783, 260),
-        plane : {
-          dimensions : new Cesium.Cartesian2(2800, 1800),
-          material : Cesium.Color.WHITE.withAlpha(0.4),
-          plane : new Cesium.CallbackProperty(this.planeUpdate(plane), false),
-          outline : true,
-          outlineColor : Cesium.Color.WHITE
-        }
-      });
-
-      planeEntities.push(planeEntity);
-    }
-  } else {
-    this.viewer.entities.removeAll();
-    planeEntities = [];
-  }
-
-}
-
 //outil construction
 createPoint(worldPosition) {
   this.cartographic = Cesium.Cartographic.fromCartesian(worldPosition);
@@ -225,7 +274,7 @@ createPoint(worldPosition) {
   var point = this.viewer.entities.add({
     position : worldPosition,
     point : {
-      color : Cesium.Color.WHITE,
+      color : Cesium.Color.ORANGE,
       pixelSize : 5,
       heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
     }
@@ -237,6 +286,7 @@ drawLine(positionData) {
   var shape = this.viewer.entities.add({
     polyline : {
       positions : positionData,
+      color : Cesium.Color.WHITE,
       clampToGround : true,
       width : 3
     }
@@ -261,71 +311,90 @@ updateShape(choice, choice2, show) {
   var scene = this.viewer.scene;
   this.handler.globe = this;
 
-  if(choice2 === 'construction') {
-    if(show) {
-      //this.viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
-      this.handler.setInputAction(function(event) {
-        var earthPosition = scene.pickPosition(event.position);
-        if(Cesium.defined(earthPosition)) {
-          if(activeShapePoints.length === 0) {
-            floatingPoint = globe.createPoint(earthPosition);
-            activeShapePoints.push(earthPosition);
-            var dynamicPositions = new Cesium.CallbackProperty(function () {
-              return activeShapePoints;
-            }, false);
-            if(choice === 'point') {
-              activeShape = globe.createPoint(dynamicPositions);
-            } else if(choice === 'line') {
-              activeShape = globe.drawLine(dynamicPositions);
-            } else if(choice === 'polygon') {
-              activeShape = globe.drawPolygon(dynamicPositions);
-            }
-          }
+  if(show) {
+    //this.viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    this.handler.setInputAction(function(event) {
+      var earthPosition = scene.pickPosition(event.position);
+      if(Cesium.defined(earthPosition)) {
+        if(activeShapePoints.length === 0) {
+          floatingPoint = globe.createPoint(earthPosition);
           activeShapePoints.push(earthPosition);
-          globe.createPoint(earthPosition);
-
-        }
-      }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
-      this.handler.setInputAction(function(event) {
-        if(Cesium.defined(floatingPoint)) {
-          var newPosition = scene.pickPosition(event.endPosition);
-          if (Cesium.defined(newPosition)) {
-            floatingPoint.position.setValue(newPosition);
-            activeShapePoints.pop();
-            activeShapePoints.push(newPosition);
+          var dynamicPositions = new Cesium.CallbackProperty(function () {
+            return activeShapePoints;
+          }, false);
+          if(choice === 'point') {
+            activeShape = globe.createPoint(dynamicPositions);
+          } else if(choice === 'line') {
+            activeShape = globe.drawLine(dynamicPositions);
+          } else if(choice === 'polygon') {
+            activeShape = globe.drawPolygon(dynamicPositions);
           }
         }
-      }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+        activeShapePoints.push(earthPosition);
+        globe.createPoint(earthPosition);
 
-      this.handler.setInputAction(function(event) {
-        activeShapePoints.pop();
-        if(choice === 'point') {
-          globe.createPoint(activeShapePoints);
-        } else if(choice === 'line') {
-          globe.drawLine(activeShapePoints);
-        } else if( choice === 'polygon') {
-          globe.drawPolygon(activeShapePoints);
+      }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+    this.handler.setInputAction(function(event) {
+      if(Cesium.defined(floatingPoint)) {
+        var newPosition = scene.pickPosition(event.endPosition);
+        if (Cesium.defined(newPosition)) {
+          floatingPoint.position.setValue(newPosition);
+          activeShapePoints.pop();
+          activeShapePoints.push(newPosition);
         }
-        globe.viewer.entities.remove(floatingPoint);
-        globe.viewer.entities.remove(activeShape);
-        floatingPoint = undefined;
-        activeShape = undefined;
-        activeShapePoints = [];
-      }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
-      this.aideCheckbox.classList.remove('hidden');
-    } else {
+      }
+      if(choice2 === 'mesure') {
+        globe.measureDistance(activeShapePoints);
+      }
+    }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
-      this.handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
-      this.handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-      this.handler.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK);
-      this.aideCheckbox.classList.add('hidden');
+    this.handler.setInputAction(function(event) {
+      activeShapePoints.pop();
+      if(choice === 'point') {
+        globe.createPoint(activeShapePoints);
+      } else if(choice === 'line') {
+        globe.drawLine(activeShapePoints);
+      } else if( choice === 'polygon') {
+        globe.drawPolygon(activeShapePoints);
+      }
+      globe.viewer.entities.remove(floatingPoint);
+      globe.viewer.entities.remove(activeShape);
+      floatingPoint = undefined;
+      activeShape = undefined;
+      //activeShapePoints = [];
+    }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
+    this.aideCheckbox.classList.remove('hidden');
+
+    if(choice === 'line' && choice2 === 'mesure') {
+      globe.distanceList.classList.remove('hidden');
     }
-  } else if(choice2 === 'suppr'){
+    if(choice === 'polygon'&& choice2 === 'mesure') {
+      globe.aireList.classList.remove('hidden');
+    }
+    if(choice2 === 'construction') {
+      globe.constructionList.classList.remove('hidden');
+    }
+
+  } else if(choice2 === 'construction') {
+
     this.handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
     this.handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
     this.handler.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+    this.aideCheckbox.classList.add('hidden');
+    this.constructionList.classList.add('hidden');
+
+  } else if(choice2 === 'mesure'){
+    this.handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    this.handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+    this.handler.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+
+    this.distanceList.classList.add('hidden');
+    this.aideCheckbox.classList.add('hidden');
+    this.aireList.classList.add('hidden');
+
     this.viewer.entities.removeAll();
   }
 }
@@ -355,67 +424,6 @@ measureDistance(activeShapePoints)  {
 
     }
   }
-}
-
-ligne(show) {
-  var activeShapePoints = [];
-  var activeShape;
-  var floatingPoint;
-  var scene = this.viewer.scene;
-  this.handler.globe = this;
-
-  if(show) {
-    //this.viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
-    this.handler.setInputAction(function(event) {
-      var earthPosition = scene.pickPosition(event.position);
-      if(Cesium.defined(earthPosition)) {
-        if(activeShapePoints.length === 0) {
-          floatingPoint = globe.createPoint(earthPosition);
-          activeShapePoints.push(earthPosition);
-          var dynamicPositions = new Cesium.CallbackProperty(function () {
-            return activeShapePoints;
-          }, false);
-          activeShape = globe.drawLine(dynamicPositions);
-        }
-        activeShapePoints.push(earthPosition);
-        globe.createPoint(earthPosition);
-      }
-    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
-    this.handler.setInputAction(function(event) {
-      if(Cesium.defined(floatingPoint)) {
-        var newPosition = scene.pickPosition(event.endPosition);
-        if (Cesium.defined(newPosition)) {
-          floatingPoint.position.setValue(newPosition);
-          activeShapePoints.pop();
-          activeShapePoints.push(newPosition);
-        }
-      }
-      globe.measureDistance(activeShapePoints);
-    }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-
-    this.handler.setInputAction(function(event) {
-      activeShapePoints.pop();
-      globe.drawLine(activeShapePoints);
-      globe.viewer.entities.remove(floatingPoint);
-      globe.viewer.entities.remove(activeShape);
-      floatingPoint = undefined;
-      activeShape = undefined;
-    }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
-
-    this.distanceList.classList.remove('hidden');
-    this.aideCheckbox.classList.remove('hidden');
-
-  } else {
-
-    this.handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
-    this.handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-    this.handler.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK);
-    this.distanceList.classList.add('hidden');
-    this.aideCheckbox.classList.add('hidden');
-    this.viewer.entities.removeAll();
-  }
-
 }
 
 }

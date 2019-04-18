@@ -31,13 +31,36 @@
       <p>Différence de hauteur (m): <span id="hauteur"></span></p>
     </div>
 
-    <div class="legend hidden" id="surfaceList">
-      <h2>Surface (m²): <span id="surface"></span></h2>
+    <div class="legend hidden" id="aireList">
+      <h4>Surface (m²): <span id="aire"></span></h4>
     </div>
+
+    <form class="legend hidden" id="planList">
+      <h2>Propriétés du plan de coupe</h2>
+      <p>Coordonnées du point central : <br/>
+        <input id="X" type="text" size="12"/> <br/>
+        <input id="Y" type="text" size="12"/> <br/>
+      </p>
+      <p>Hauteur (m):<input id="hauteurcoupe" type="text" size="6"/> </p>
+      <p>Longeur (m):<input id="longueurcoupe" type="text" size="6"/> </p>
+      <p>Largeur (m):<input id="largeurcoupe" type="text" size="6"/> </p>
+      <input type="submit" id="submit" value="Envoyer"/>
+    </form>
+
+    <form class="legend hidden" id="constructionList">
+      <h2>Propriétés de construction</h2>
+      <p>Largeur (pixel):<input id="largeur" type="text" size="3"/> </p>
+      <p>Couleur :<input id="couleur" type="text" size="6"/> </p>
+      <a href="https://www.webfx.com/web-design/color-picker/">Choisissez votre couleur ici</a>
+      <h5>Pour les surfaces : </h5>
+      <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparence" type="text" size="3"/> </p>
+    </form>
+
   </div>
 
   <div id=right-pane>
     <div class="annotation hidden" id="aide">
+      <h4>Tracé des figures géométriques</h4>
       <p>Clic gauche pour ajouter un point</p>
       <p>Clic droit pour terminer la figure</p>
     </div>
