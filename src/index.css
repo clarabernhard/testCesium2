@@ -9,8 +9,7 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    overflow-x: none;
-    overflow-y: auto;
+    overflow: auto;
     font-family: sans-serif;
     background: #000;
 }
@@ -26,8 +25,7 @@ html, body {
     padding: 5px 5px 0px 5px;
     border: 1px solid #000;
     border-radius: 5px;
-    overflow-x: none;
-    overflow-y: auto;
+    overflow: auto;
 }
 
 #menu-content {
@@ -173,6 +171,7 @@ html, body {
     color: #fff;
     line-height: 150%;
     font-size: small;
+    overflow: auto;
 }
 
 .legend a:link, .legend a:visited, .legend a:hover {

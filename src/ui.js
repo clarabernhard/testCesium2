@@ -149,8 +149,8 @@ class Menu {
     });
 
     this.coupeCheckbox.addEventListener('change', (e) => {
-      globe.legende();
-      //globe.addClippingPlanes(terrain, e.target.checked);
+      //globe.legende();
+      globe.addClippingPlanes(terrain, e.target.checked);
     });
 
     this.monumentCheckbox.addEventListener('change', (e) => {

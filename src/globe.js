@@ -166,7 +166,7 @@ showCoords(show){
   }
 }
 
-legende(){
+/*legende(){
   this.planList.classList.remove('hidden');
 
   // interactivité du plan de coupe
@@ -178,12 +178,10 @@ legende(){
 
   console.log(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe);
 
-}
+}*/
 
 // Afficher ou enlever le plan de coupe
 addClippingPlanes(tileset, show) {
-
-  if(show) {
 
     var planeEntities = [];
     var clippingPlanes = new Cesium.ClippingPlaneCollection({
@@ -192,13 +190,13 @@ addClippingPlanes(tileset, show) {
       ],
     });
 
-
+    if(show) {
     for (var i = 0; i < clippingPlanes.length; ++i) {
       var plane = clippingPlanes.get(i);
       var planeEntity = this.viewer.entities.add({
-        position : Cesium.Cartesian3.fromDegrees(7.754114, 48.584783, hauteurCoupe),
+        position : Cesium.Cartesian3.fromDegrees(7.754114, 48.584783, 260),
         plane : {
-          dimensions : new Cesium.Cartesian2(longueurCoupe, largeurCoupe),
+          dimensions : new Cesium.Cartesian2(200, 200),
           material : Cesium.Color.WHITE.withAlpha(0.4),
           plane : new Cesium.CallbackProperty(this.planeUpdate(plane), false),
           outline : true,
@@ -211,7 +209,9 @@ addClippingPlanes(tileset, show) {
 
   } else {
     this.planList.classList.add('hidden');
-    this.viewer.entities.removeAll();
+    for (var i = 0; i < planeEntities.length; ++i) {
+      this.viewer.entities.remove(planeEntities[i]);
+    }
     planeEntities = [];
 
   }
@@ -286,7 +286,7 @@ drawLine(positionData) {
   var shape = this.viewer.entities.add({
     polyline : {
       positions : positionData,
-      color : Cesium.Color.WHITE,
+      material : Cesium.Color.fromCssColorString('#2DC9ED'),
       clampToGround : true,
       width : 3
     }
@@ -298,7 +298,7 @@ drawPolygon(positionData) {
   var shape = this.viewer.entities.add({
     polygon: {
       hierarchy: positionData,
-      material: new Cesium.ColorMaterialProperty(Cesium.Color.WHITE.withAlpha(0.7))
+      material : Cesium.Color.fromCssColorString('rgba(183,246,243,0.5)')
     }
   });
   return shape;
@@ -318,6 +318,9 @@ updateShape(choice, choice2, show) {
       if(Cesium.defined(earthPosition)) {
         if(activeShapePoints.length === 0) {
           floatingPoint = globe.createPoint(earthPosition);
+          // on ajoute 2 fois un point au début pour permettre l'affichage de la ligne/surface
+          // le dernier point correspond au point flottant du mouvement de la souris
+          activeShapePoints.push(earthPosition);
           activeShapePoints.push(earthPosition);
           var dynamicPositions = new Cesium.CallbackProperty(function () {
             return activeShapePoints;
@@ -330,8 +333,10 @@ updateShape(choice, choice2, show) {
             activeShape = globe.drawPolygon(dynamicPositions);
           }
         }
-        activeShapePoints.push(earthPosition);
-        globe.createPoint(earthPosition);
+        else {
+          activeShapePoints.push(earthPosition);
+          globe.createPoint(earthPosition);
+        }
 
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
@@ -351,6 +356,7 @@ updateShape(choice, choice2, show) {
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
     this.handler.setInputAction(function(event) {
+      // on supprime le dernier point flottant
       activeShapePoints.pop();
       if(choice === 'point') {
         globe.createPoint(activeShapePoints);
@@ -363,7 +369,11 @@ updateShape(choice, choice2, show) {
       globe.viewer.entities.remove(activeShape);
       floatingPoint = undefined;
       activeShape = undefined;
-      //activeShapePoints = [];
+
+      if(choice2 === 'construction'){
+        // garder les activeShapePoints définis permet l'affichage des mesures
+        activeShapePoints = [];
+      }
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
     this.aideCheckbox.classList.remove('hidden');
@@ -400,30 +410,51 @@ updateShape(choice, choice2, show) {
 }
 
 measureDistance(activeShapePoints)  {
-  var coords = [];
-  this.distance.innerHTML = 0;
-  this.hauteur.innerHTML = 0;
+  var coordsX = [];
+  var coordsY = [];
+  var coordsZ = [];
 
-  if(activeShapePoints.length > 1) {
     for (let i=0; i < activeShapePoints.length; i+=1) {
       var x1 = activeShapePoints[i].x;
       var y1 = activeShapePoints[i].y;
       var z1 = activeShapePoints[i].z;
-      coords.push(x1);
-      coords.push(y1);
-      coords.push(z1);
+      coordsX.push(x1);
+      coordsY.push(y1);
+      coordsZ.push(z1);
+    }
+    console.log(coordsX, coordsY, coordsZ);
+
+    for (let i=0; i < coordsX.length; i+=3) {
+      var a = (coordsX[i+1]-coordsX[i])*(coordsX[i+1]-coordsX[i]);
+      var b = (coordsY[i+1]-coordsY[i])*(coordsY[i+1]-coordsY[i]);
+      var diff = (coordsZ[i+1]-coordsZ[i]);
+
+      console.log(a,b,diff);
+
+      this.distance.innerHTML = Math.sqrt(a+b).toFixed(3);
+      this.hauteur.innerHMTL = diff;
+
+      /*for (let i=0; i < activeShapePoints.length; i+=1) {
+        var coords = proj4('EPSG:4326','EPSG:3948', [activeShapePoints[i].x, activeShapePoints[i].y]);
+        //var z1 = (Number(activeShapePoints[i].z) - Number(this.raf09.getGeoide(activeShapePoints[i].x, activeShapePoints[i].y)));
+        coordsX.push(coords[i]);
+        coordsY.push(coords[i+1]);
+        //coordsZ.push(z1);
+      }
+
+      for (let i=0; i < coordsX.length; i+=3) {
+        console.log(coordsX, coordsY, coordsZ);
+        var a = (coordsX[i+1]-coordsX[i])*(coordsX[i+1]-coordsX[i]);
+        var b = (coordsY[i+1]-coordsY[i])*(coordsY[i+1]-coordsY[i]);
+        var diff = (coordsZ[i+1]-coordsZ[i]);
+
+        console.log(a,b,diff);
+
+        this.distance.innerHTML = Math.sqrt(a+b).toFixed(3);
+        this.hauteur.innerHMTL = diff;*/
     }
 
-    for (let i=0; i < coords.length; i+=3) {
-      var a = (coords[i+3]-coords[i])*(coords[i+3]-coords[i]);
-      var b = (coords[i+4]-coords[i+1])*(coords[i+4]-coords[i+1]);
 
-      //this.hauteur.innerHMTL = 'coucou';
-      this.distance.innerHTML += Math.sqrt(a+b).toFixed(3);
-      this.hauteur.innerHMTL += (coords[i+5]-coords[i+2]);
-
-    }
-  }
 }
 
 }
