@@ -27,12 +27,16 @@
 
     <div class="legend hidden" id="distanceList">
       <h2>Mesures de distance</h2>
-      <p>Distance (m): <span id="distance"></span></p>
-      <p>Différence de hauteur (m): <span id="hauteur"></span></p>
+      <p>Distance horizontale (m): <span id="distance"></span></p>
+      <p>-cumulée (m): <span id="distancecumulee"></span></p>
+      <p>Distance inclinée (m): <span id="distanceinclinee"></span></p>
+      <p>-cumulée (m): <span id="distanceinclineecum"></span></p>
+      <p>Différence d'altitudes (m): <span id="hauteur"></span></p>
     </div>
-
+ 
     <div class="legend hidden" id="aireList">
-      <h4>Surface (m²): <span id="aire"></span></h4>
+      <h2>Mesures de surface</h2>
+      <p>Aire (m²): <span id="aire"></span></p>
     </div>
 
     <form class="legend hidden" id="planList">
@@ -44,17 +48,13 @@
       <p>Hauteur (m):<input id="hauteurcoupe" type="text" size="6"/> </p>
       <p>Longeur (m):<input id="longueurcoupe" type="text" size="6"/> </p>
       <p>Largeur (m):<input id="largeurcoupe" type="text" size="6"/> </p>
-      <input type="submit" id="submit" value="Envoyer"/>
+      <input type="submit" id="submit" value="Envoyer" onclick="globe.envoyer()"/>
     </form>
 
     <form class="legend hidden" id="constructionList">
       <h2>Propriétés de construction</h2>
       <p>Largeur (pixel):<input id="largeur" type="text" size="3"/> </p>
-      <p>Couleur :<br/>
-        Rouge: <input id="rouge" type="text" size="3"/> <br/>
-        Vert:  <input id="vert" type="text" size="3"/> <br/>
-        Bleu:  <input id="bleu" type="text" size="3"/> <br/>
-      </p>
+      <p>Couleur : <input id="couleur" type="text" size="6"/><br/> </p>
       <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
       <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparence" type="text" size="3"/> </p>
     </form>

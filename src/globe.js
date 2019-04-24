@@ -24,7 +24,7 @@ class Globe {
     // variable qui stocke les évenements liés à la souris
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
 
-    // Légendes qui s'affichent au clic
+    // Légendes qui s'affichent au clic des boîtes à outils associées
     this.aideCheckbox = document.querySelector('#aide');
     this.distanceList = document.querySelector('#distanceList');
     this.aireList = document.querySelector('#aireList');
@@ -32,14 +32,20 @@ class Globe {
     this.coordsList = document.querySelector('#coordsList');
     this.constructionList = document.querySelector('#constructionList');
 
-    // Boite à outils mesures coords
+    // mesures de coords
     this.coordX = document.querySelector('#coordX');
     this.coordY = document.querySelector('#coordY');
     this.coordZ = document.querySelector('#coordZ');
 
     // mesures de distance
     this.distance = document.querySelector('#distance');
+    this.distanceCumulee = document.querySelector('#distancecumulee');
     this.hauteur = document.querySelector('#hauteur');
+    this.distanceInclinee = document.querySelector('#distanceinclinee');
+    this.distanceInclineeC = document.querySelector('#distanceinclineecum');
+
+    // mesures de surface
+    this.aire = document.querySelector('#aire');
 
     /*var elevation = new Cesium.WebMapServiceImageryProvider({
     url : 'http://wxs.ign.fr/pvwmk1wgxoei8orp7rd1re78/geoportail/r/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap',
@@ -137,9 +143,11 @@ setCoordsCallback(callback){
   this.handler.setInputAction(function(event) {
 
     let cartesian = scene.pickPosition(event.position);
+    console.log(cartesian);
 
     if (Cesium.defined(cartesian)) {
       let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+      console.log(cartographic);
       let longitudeString = Cesium.Math.toDegrees(cartographic.longitude).toFixed(7);
       let latitudeString = Cesium.Math.toDegrees(cartographic.latitude).toFixed(7);
       let heightString = cartographic.height.toFixed(3);
@@ -166,7 +174,7 @@ showCoords(show){
   }
 }
 
-/*legende(){
+legende(){
   this.planList.classList.remove('hidden');
 
   // interactivité du plan de coupe
@@ -178,11 +186,10 @@ showCoords(show){
 
   console.log(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe);
 
-}*/
+}
 
 // Afficher ou enlever le plan de coupe
 addClippingPlanes(tileset, show) {
-
     var planeEntities = [];
     var clippingPlanes = new Cesium.ClippingPlaneCollection({
       planes : [
@@ -267,14 +274,10 @@ planeUpdate(plane) {
 
 //outil construction
 createPoint(worldPosition) {
-  this.cartographic = Cesium.Cartographic.fromCartesian(worldPosition);
-  this.longitude = Cesium.Math.toDegrees(this.cartographic.longitude).toFixed(7);
-  this.latitude = Cesium.Math.toDegrees(this.cartographic.latitude).toFixed(7);
-  this.height = this.cartographic.height.toFixed(3);
   var point = this.viewer.entities.add({
     position : worldPosition,
     point : {
-      color : Cesium.Color.ORANGE,
+      color : Cesium.Color.fromCssColorString('#FFFFFF'),
       pixelSize : 5,
       heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
     }
@@ -286,7 +289,19 @@ drawLine(positionData) {
   var shape = this.viewer.entities.add({
     polyline : {
       positions : positionData,
-      material : Cesium.Color.fromCssColorString('#2DC9ED'),
+      material : Cesium.Color.fromCssColorString('#DE0505'),
+      //clampToGround : true,
+      width : 3
+    }
+  });
+  return shape;
+}
+
+drawLine2(positionData) {
+  var shape = this.viewer.entities.add({
+    polyline : {
+      positions : positionData,
+      material : Cesium.Color.fromCssColorString('#000000').withAlpha(0.5),
       clampToGround : true,
       width : 3
     }
@@ -298,7 +313,7 @@ drawPolygon(positionData) {
   var shape = this.viewer.entities.add({
     polygon: {
       hierarchy: positionData,
-      material : Cesium.Color.fromCssColorString('rgba(183,246,243,0.5)')
+      material : Cesium.Color.fromCssColorString('#2DC9ED').withAlpha(0.5)
     }
   });
   return shape;
@@ -306,6 +321,7 @@ drawPolygon(positionData) {
 
 updateShape(choice, choice2, show) {
   var activeShapePoints = [];
+  var coordDegrees = [];
   var activeShape;
   var floatingPoint;
   var scene = this.viewer.scene;
@@ -329,6 +345,7 @@ updateShape(choice, choice2, show) {
             activeShape = globe.createPoint(dynamicPositions);
           } else if(choice === 'line') {
             activeShape = globe.drawLine(dynamicPositions);
+            activeShape = globe.drawLine2(dynamicPositions);
           } else if(choice === 'polygon') {
             activeShape = globe.drawPolygon(dynamicPositions);
           }
@@ -350,9 +367,13 @@ updateShape(choice, choice2, show) {
           activeShapePoints.push(newPosition);
         }
       }
-      if(choice2 === 'mesure') {
+      if(choice === 'line' && choice2 === 'mesure') {
         globe.measureDistance(activeShapePoints);
       }
+      if(choice === 'polygon'&& choice2 === 'mesure') {
+        globe.measureSurface(activeShapePoints);
+      }
+
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
     this.handler.setInputAction(function(event) {
@@ -362,6 +383,7 @@ updateShape(choice, choice2, show) {
         globe.createPoint(activeShapePoints);
       } else if(choice === 'line') {
         globe.drawLine(activeShapePoints);
+        globe.drawLine2(activeShapePoints);
       } else if( choice === 'polygon') {
         globe.drawPolygon(activeShapePoints);
       }
@@ -413,48 +435,82 @@ measureDistance(activeShapePoints)  {
   var coordsX = [];
   var coordsY = [];
   var coordsZ = [];
+  var distance = 0;
+  var distanceIncl = 0;
+  var difference = 0;
+  this.distance.innerHTML = 0;
+  this.distanceCumulee.innerHTML = 0;
+  this.hauteur.innerHTML = 0;
+  this.distanceInclinee.innerHTML = 0;
+  this.distanceInclineeC.innerHTML = 0;
 
-    for (let i=0; i < activeShapePoints.length; i+=1) {
-      var x1 = activeShapePoints[i].x;
-      var y1 = activeShapePoints[i].y;
-      var z1 = activeShapePoints[i].z;
-      coordsX.push(x1);
-      coordsY.push(y1);
-      coordsZ.push(z1);
-    }
-    console.log(coordsX, coordsY, coordsZ);
+  for (let i=0; i < activeShapePoints.length; i+=1) {
+    var cartesian = new Cesium.Cartesian3(activeShapePoints[i].x, activeShapePoints[i].y, activeShapePoints[i].z);
 
-    for (let i=0; i < coordsX.length; i+=3) {
-      var a = (coordsX[i+1]-coordsX[i])*(coordsX[i+1]-coordsX[i]);
-      var b = (coordsY[i+1]-coordsY[i])*(coordsY[i+1]-coordsY[i]);
-      var diff = (coordsZ[i+1]-coordsZ[i]);
+    let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+    let longitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(7);
+    let latitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(7);
+    let height = cartographic.height.toFixed(3);
 
-      console.log(a,b,diff);
+    var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
+    coordsX.push(coords[0]);
+    coordsY.push(coords[1]);
+    var z = (Number(height) - Number(this.raf09.getGeoide(latitude, longitude)));
+    coordsZ.push(z);
 
-      this.distance.innerHTML = Math.sqrt(a+b).toFixed(3);
-      this.hauteur.innerHMTL = diff;
+  }
 
-      /*for (let i=0; i < activeShapePoints.length; i+=1) {
-        var coords = proj4('EPSG:4326','EPSG:3948', [activeShapePoints[i].x, activeShapePoints[i].y]);
-        //var z1 = (Number(activeShapePoints[i].z) - Number(this.raf09.getGeoide(activeShapePoints[i].x, activeShapePoints[i].y)));
-        coordsX.push(coords[i]);
-        coordsY.push(coords[i+1]);
-        //coordsZ.push(z1);
-      }
+  for (let i=0; i < coordsX.length-1; i+=1) {
+    var a = (coordsX[i+1]-coordsX[i])*(coordsX[i+1]-coordsX[i]);
+    var b = (coordsY[i+1]-coordsY[i])*(coordsY[i+1]-coordsY[i]);
+    var c = (coordsZ[i+1]-coordsZ[i])*(coordsZ[i+1]-coordsZ[i]);
+    distance = Number(Math.sqrt(a+b).toFixed(3));
+    distanceIncl = Number(Math.sqrt(a+b+c).toFixed(3));
+    difference = Number(coordsZ[i+1]-coordsZ[i]).toFixed(3);
 
-      for (let i=0; i < coordsX.length; i+=3) {
-        console.log(coordsX, coordsY, coordsZ);
-        var a = (coordsX[i+1]-coordsX[i])*(coordsX[i+1]-coordsX[i]);
-        var b = (coordsY[i+1]-coordsY[i])*(coordsY[i+1]-coordsY[i]);
-        var diff = (coordsZ[i+1]-coordsZ[i]);
+    this.distanceCumulee.innerHTML = (Number(this.distanceCumulee.innerHTML) + distance).toFixed(3);
+    this.distanceInclineeC.innerHTML = (Number(this.distanceInclineeC.innerHTML) + distanceIncl).toFixed(3);
+  }
+  this.distance.innerHTML = distance;
+  this.distanceInclinee.innerHTML = distanceIncl;
+  this.hauteur.innerHTML = difference;
 
-        console.log(a,b,diff);
+}
 
-        this.distance.innerHTML = Math.sqrt(a+b).toFixed(3);
-        this.hauteur.innerHMTL = diff;*/
-    }
+measureSurface(activeShapePoints) {
+  var coordsX = [];
+  var coordsY = [];
 
+  var aire = 0;
+  this.aire.innerHTML = 0;
 
+  for (let i=0; i < activeShapePoints.length; i+=1) {
+    var cartesian = new Cesium.Cartesian3(activeShapePoints[i].x, activeShapePoints[i].y, activeShapePoints[i].z);
+
+    let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+    let longitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(7);
+    let latitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(7);
+
+    var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
+    coordsX.push(coords[0]);
+    coordsY.push(coords[1]);
+
+  }
+
+  if(coordsX.length > 2){
+  for (let i=0; i < coordsX.length-1; i+=1) {
+    var a = Number(coordsY[i]*coordsX[i+1]);
+    var b = Number(coordsY[i+1]*coordsX[i]);
+    var c = Number((a-b));
+    console.log(c);
+    var d = c/2;
+    console.log(d);
+    aire = Number(aire + d).toFixed(4);
+    console.log(aire);
+  }
+}
+
+  this.aire.innerHTML = aire;
 }
 
 }

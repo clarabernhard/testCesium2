@@ -149,7 +149,7 @@ class Menu {
     });
 
     this.coupeCheckbox.addEventListener('change', (e) => {
-      //globe.legende();
+      globe.legende();
       globe.addClippingPlanes(terrain, e.target.checked);
     });
 
