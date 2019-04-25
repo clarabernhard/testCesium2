@@ -22,9 +22,16 @@ class Menu {
     this.menu = document.querySelector('#menu');
     this.dropdown = document.getElementsByClassName("panel-title");
 
-
     // Créer un gestionnaire pour les légendes
     this.legendManager = new LegendManager(this.leftPane);
+
+    // Légendes qui s'affichent au clic des boîtes à outils associées
+    this.aideCheckbox = document.querySelector('#aide');
+    this.distanceList = document.querySelector('#distanceList');
+    this.aireList = document.querySelector('#aireList');
+    this.planList = document.querySelector('#planList');
+    this.constructionList = document.querySelector('#constructionList');
+    //this.pointList = document.querySelector('#pointList');
 
     // Récuperer les checkboxes
     this.photoMaillageCheckbox = document.querySelector('#photoMaillage');
@@ -38,10 +45,13 @@ class Menu {
     this.cligneCheckbox = document.querySelector('#cligne');
     this.csurfaceCheckbox = document.querySelector('#csurface');
     this.volumeCheckbox = document.querySelector('#volume');
+
     this.supprCheckbox = document.querySelector("#suppr");
+    this.supprCons = document.querySelector("#supprimercons");
 
     this.coupeCheckbox = document.querySelector('#plancoupe');
     this.monumentCheckbox = document.querySelector('#monument');
+    this.supprCoupe = document.querySelector("#supprimercoupe");
 
 
     // Créer le datepicker
@@ -109,48 +119,107 @@ class Menu {
     this.ligneCheckbox.addEventListener('change', (e) => {
       var choice = 'line';
       var choice2 = 'mesure';
-      globe.updateShape(choice, choice2, e.target.checked);
+
+      if(e.target.checked){
+        globe.updateShape(choice, choice2, 3, '#FF0000', 1);
+        this.distanceList.classList.remove('hidden');
+        this.aideCheckbox.classList.remove('hidden');
+      } else{
+        this.distanceList.classList.add('hidden');
+        this.aideCheckbox.classList.add('hidden');
+        globe.supprSouris();
+        globe.supprEntities();
+      }
+
     });
 
     this.surfaceCheckbox.addEventListener('change', (e) => {
       var choice = 'polygon';
       var choice2 = 'mesure';
-      globe.updateShape(choice, choice2, e.target.checked);
+
+      if(e.target.checked){
+        globe.updateShape(choice, choice2, 3, '#1ABFD0', 0.4);
+        this.aireList.classList.remove('hidden');
+        this.aideCheckbox.classList.remove('hidden');
+      } else{
+        this.aireList.classList.add('hidden');
+        this.aideCheckbox.classList.add('hidden');
+        globe.supprSouris();
+        globe.supprEntities();
+      }
 
     });
 
     this.cpointCheckbox.addEventListener('change', (e) => {
       var choice = 'point';
       var choice2 = 'construction';
-      globe.updateShape(choice, choice2, e.target.checked);
+      var transparence;
+
+      if(e.target.checked){
+        this.pointList.classList.remove('hidden');
+        globe.updateShape(choice, choice2, 5, '#FFFFFF', 1);
+      } else{
+        this.pointList.classList.add('hidden');
+        globe.supprSouris();
+
+      }
 
     });
 
     this.cligneCheckbox.addEventListener('change', (e) => {
       var choice = 'line';
       var choice2 = 'construction';
-      globe.updateShape(choice, choice2, e.target.checked);
+
+      if(e.target.checked){
+        globe.formulaireConstruction(choice, choice2);
+        this.constructionList.classList.remove('hidden');
+        this.aideCheckbox.classList.remove('hidden');
+      } else{
+        this.constructionList.classList.add('hidden');
+        this.aideCheckbox.classList.add('hidden');
+        globe.supprSouris();
+
+      }
 
     });
 
     this.csurfaceCheckbox.addEventListener('change', (e) => {
       var choice = 'polygon';
       var choice2 = 'construction';
-      globe.updateShape(choice, choice2, e.target.checked);
+
+      if(e.target.checked){
+        globe.formulaireConstruction(choice, choice2);
+        this.constructionList.classList.remove('hidden');
+        this.aideCheckbox.classList.remove('hidden');
+      } else{
+        this.constructionList.classList.add('hidden');
+        this.aideCheckbox.classList.add('hidden');
+        globe.supprSouris();
+
+      }
 
     });
 
     this.supprCheckbox.addEventListener('click', function() {
-      var choice;
-      var show;
-      var choice2 = 'mesure';
-      globe.updateShape(choice, choice2, show);
-
+      globe.supprEntities();
+    });
+    this.supprCons.addEventListener('click', function() {
+      globe.supprEntities();
+    });
+    this.supprCoupe.addEventListener('click', function() {
+      globe.supprEntities();
     });
 
     this.coupeCheckbox.addEventListener('change', (e) => {
-      globe.legende();
-      globe.addClippingPlanes(terrain, e.target.checked);
+      if(e.target.checked){
+        this.planList.classList.remove('hidden');
+        globe.formulairePlan();
+      } else{
+        this.planList.classList.add('hidden');
+        globe.supprEntities();
+      }
+
+
     });
 
     this.monumentCheckbox.addEventListener('change', (e) => {
@@ -159,11 +228,11 @@ class Menu {
 				'inscrit': '#F07200'
 			}
 
-			if(e.target.checked){
-                this.legendManager.addLegend('monuments_historiques', colors);
-            } else{
-                this.legendManager.removeLegend('monuments_historiques');
-            }
+      if(e.target.checked){
+        this.legendManager.addLegend('monuments_historiques', colors);
+      } else{
+        this.legendManager.removeLegend('monuments_historiques');
+      }
 
 			this.show('monuments_historiques', '../Cesium/data/geojson/monumentsS.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
 				classification: true,

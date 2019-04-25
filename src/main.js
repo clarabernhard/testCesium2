@@ -13,7 +13,7 @@ proj4.defs([
 ]);
 
 
-// Créer le globe --> appele le constucteur globe créée dans la classe correspondante
+// Créer le globe --> appele le constucteur globe créé dans la classe correspondante
 let globe = new Globe('cesiumContainer', new Geocoder("http://adict.strasbourg.eu/addok/search"));
 
 // Charger le photo mailage --> appelle la fonction créée dans la classe globe

@@ -33,31 +33,49 @@
       <p>-cumulée (m): <span id="distanceinclineecum"></span></p>
       <p>Différence d'altitudes (m): <span id="hauteur"></span></p>
     </div>
- 
+
     <div class="legend hidden" id="aireList">
       <h2>Mesures de surface</h2>
       <p>Aire (m²): <span id="aire"></span></p>
     </div>
 
-    <form class="legend hidden" id="planList">
+    <div class="legend hidden" id="planList">
+    <form>
       <h2>Propriétés du plan de coupe</h2>
       <p>Coordonnées du point central : <br/>
-        <input id="X" type="text" size="12"/> <br/>
-        <input id="Y" type="text" size="12"/> <br/>
+        <input id="X" type="text" size="12" value="X"/> <br/>
+        <input id="Y" type="text" size="12"value="Y"/> <br/>
       </p>
-      <p>Hauteur (m):<input id="hauteurcoupe" type="text" size="6"/> </p>
-      <p>Longeur (m):<input id="longueurcoupe" type="text" size="6"/> </p>
-      <p>Largeur (m):<input id="largeurcoupe" type="text" size="6"/> </p>
-      <input type="submit" id="submit" value="Envoyer" onclick="globe.envoyer()"/>
+      <p>Hauteur (m):<input id="hauteurcoupe" type="text" size="6" value="200"/> </p>
+      <p>Longeur (m):<input id="longueurcoupe" type="text" size="6" value="200"/> </p>
+      <p>Largeur (m):<input id="largeurcoupe" type="text" size="6" value="200"/> </p>
+      <p>Couleur : <input id="couleurcoupe" type="text" size="6" value="#FFFFFF"/><br/> </p>
     </form>
+    <button id="envoyercoupe">Envoyer</button>
+    <button id="supprimercoupe">Supprimer le plan</button>
+    </div>
 
-    <form class="legend hidden" id="constructionList">
+    <div class="legend hidden" id="constructionList">
+    <form>
       <h2>Propriétés de construction</h2>
-      <p>Largeur (pixel):<input id="largeur" type="text" size="3"/> </p>
-      <p>Couleur : <input id="couleur" type="text" size="6"/><br/> </p>
+      <p>Largeur ligne (pixels):<input id="largeur" type="text" size="3" value="3"/> </p>
+      <p>Couleur : <input id="couleur" type="text" size="6" value="#FF0000"/><br/> </p>
       <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
-      <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparence" type="text" size="3"/> </p>
+      <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparence" type="text" size="3" value="1"/> </p>
     </form>
+    <button id="envoyercons">Envoyer</button>
+    <button id="supprimercons">Supprimer les constructions</button>
+    </div>
+
+    <!--<div class="legend hidden" id="pointList">
+    <form>
+      <h2>Propriétés du point</h2>
+      <p>Taille (pixels):<input id="largeurpoint" type="text" size="3" value="5"/> </p>
+      <p>Couleur : <input id="couleurpoint" type="text" size="6" value="#FFFFFF"/><br/> </p>
+      <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
+    </form>
+    <button id="envoyerpoint">Envoyer</button>
+  </div>-->
 
   </div>
 
@@ -66,6 +84,7 @@
       <h4>Tracé des figures géométriques</h4>
       <p>Clic gauche pour ajouter un point</p>
       <p>Clic droit pour terminer la figure</p>
+      <p>Pour les constructions: cliquer sur envoyer</p>
     </div>
   </div>
 
@@ -241,8 +260,6 @@
     <div id="loadingIcon" class="loadingIcon"></div>
   </div>
 
-  <div id="measureContainer"></div>
-
   <!-- Our app code. -->
   <script src="../Cesium/lib/jQuery/jquery-3.3.1.min.js"></script>
   <script src="../Cesium/lib/jQuery/jquery-ui.min.js"></script>
@@ -254,7 +271,6 @@
   <script src="src/raf09.js"></script>
   <script src="src/ui.js"></script>
   <script src="src/main.js"></script>
-
 
 </body>
 </html>
