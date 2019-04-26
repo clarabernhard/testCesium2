@@ -31,28 +31,34 @@ class Menu {
     this.aireList = document.querySelector('#aireList');
     this.planList = document.querySelector('#planList');
     this.constructionList = document.querySelector('#constructionList');
-    //this.pointList = document.querySelector('#pointList');
+    this.pointList = document.querySelector('#pointList');
+    this.volumeList = document.querySelector('#volumeList');
 
     // Récuperer les checkboxes
     this.photoMaillageCheckbox = document.querySelector('#photoMaillage');
     this.shadowCheckbox = document.querySelector('#shadows');
+    this.monumentCheckbox = document.querySelector('#monument');
 
+    // mesures
     this.coordsCheckbox = document.querySelector('#point');
     this.ligneCheckbox = document.querySelector('#ligne');
     this.surfaceCheckbox = document.querySelector('#surface');
 
+    //construction
     this.cpointCheckbox = document.querySelector('#cpoint');
     this.cligneCheckbox = document.querySelector('#cligne');
     this.csurfaceCheckbox = document.querySelector('#csurface');
     this.volumeCheckbox = document.querySelector('#volume');
 
+    // plan de coupe
+    this.coupeCheckbox = document.querySelector('#plancoupe');
+
+    // boutons supprimer
     this.supprCheckbox = document.querySelector("#suppr");
     this.supprCons = document.querySelector("#supprimercons");
-
-    this.coupeCheckbox = document.querySelector('#plancoupe');
-    this.monumentCheckbox = document.querySelector('#monument');
+    this.supprPoint = document.querySelector("#supprimerpoint");
     this.supprCoupe = document.querySelector("#supprimercoupe");
-
+    this.supprVolume = document.querySelector("#supprimervol");
 
     // Créer le datepicker
     this.datepicker = $("#date")
@@ -69,11 +75,11 @@ class Menu {
   }
 
   registerMenuEvent(){
-      // Crée l'évènement qui permet d'ouvrir le menu
-      document.querySelector("#left-pane #toggle-menu").addEventListener('click', (e) => {
-          this.leftPane.classList.toggle('menu-open');
-          this.menu.classList.toggle('menu-open');
-      });
+    // Crée l'évènement qui permet d'ouvrir le menu
+    document.querySelector("#left-pane #toggle-menu").addEventListener('click', (e) => {
+      this.leftPane.classList.toggle('menu-open');
+      this.menu.classList.toggle('menu-open');
+    });
   }
 
   // Evenement pour les menus déroulants
@@ -119,9 +125,10 @@ class Menu {
     this.ligneCheckbox.addEventListener('change', (e) => {
       var choice = 'line';
       var choice2 = 'mesure';
+      var hauteurVol;
 
       if(e.target.checked){
-        globe.updateShape(choice, choice2, 3, '#FF0000', 1);
+        globe.updateShape(choice, choice2, 3, '#FF0000', 1, hauteurVol);
         this.distanceList.classList.remove('hidden');
         this.aideCheckbox.classList.remove('hidden');
       } else{
@@ -136,9 +143,10 @@ class Menu {
     this.surfaceCheckbox.addEventListener('change', (e) => {
       var choice = 'polygon';
       var choice2 = 'mesure';
+      var hauteurVol;
 
       if(e.target.checked){
-        globe.updateShape(choice, choice2, 3, '#1ABFD0', 0.4);
+        globe.updateShape(choice, choice2, 3, '#1ABFD0', 0.4, hauteurVol);
         this.aireList.classList.remove('hidden');
         this.aideCheckbox.classList.remove('hidden');
       } else{
@@ -157,7 +165,7 @@ class Menu {
 
       if(e.target.checked){
         this.pointList.classList.remove('hidden');
-        globe.updateShape(choice, choice2, 5, '#FFFFFF', 1);
+        globe.formulairePoint(choice, choice2);
       } else{
         this.pointList.classList.add('hidden');
         globe.supprSouris();
@@ -200,15 +208,22 @@ class Menu {
 
     });
 
-    this.supprCheckbox.addEventListener('click', function() {
-      globe.supprEntities();
-    });
-    this.supprCons.addEventListener('click', function() {
-      globe.supprEntities();
-    });
-    this.supprCoupe.addEventListener('click', function() {
-      globe.supprEntities();
-    });
+    /*this.volumeCheckbox.addEventListener('change', (e) => {
+      var choice = 'volume';
+      var choice2 = 'construction';
+
+      if(e.target.checked){
+        globe.formulaireVolume(choice, choice2, terrain);
+        this.volumeList.classList.remove('hidden');
+        this.aideCheckbox.classList.remove('hidden');
+      } else{
+        this.volumeList.classList.add('hidden');
+        this.aideCheckbox.classList.add('hidden');
+        globe.supprSouris();
+
+      }
+
+    });*/
 
     this.coupeCheckbox.addEventListener('change', (e) => {
       if(e.target.checked){
@@ -223,10 +238,10 @@ class Menu {
     });
 
     this.monumentCheckbox.addEventListener('change', (e) => {
-			let colors = {
-				'classé': '#D1D716',
-				'inscrit': '#F07200'
-			}
+      let colors = {
+        'classé': '#D1D716',
+        'inscrit': '#F07200'
+      }
 
       if(e.target.checked){
         this.legendManager.addLegend('monuments_historiques', colors);
@@ -234,15 +249,33 @@ class Menu {
         this.legendManager.removeLegend('monuments_historiques');
       }
 
-			this.show('monuments_historiques', '../Cesium/data/geojson/monumentsS.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
-				classification: true,
-                classificationField: 'type_entite',
-				colors: colors,
-				alpha: 0.4
-			});
+      this.show('monuments_historiques', '../Cesium/data/geojson/monumentsS.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'type_entite',
+        colors: colors,
+        alpha: 0.4
+      });
 
-  });
-}
+    });
+
+
+    this.supprCheckbox.addEventListener('click', function() {
+      globe.supprEntities();
+    });
+    this.supprCons.addEventListener('click', function() {
+      globe.supprEntities();
+    });
+    this.supprCoupe.addEventListener('click', function() {
+      globe.supprEntities();
+    });
+    this.supprPoint.addEventListener('click', function() {
+      globe.supprEntities();
+    });
+    this.supprVolume.addEventListener('click', function() {
+      globe.supprEntities();
+    });
+
+  }
 
   /*
   * Afficher ou masquer la source de données "name" en fonction de la valeur de "show"

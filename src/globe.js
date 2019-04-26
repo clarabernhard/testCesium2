@@ -40,11 +40,8 @@ class Globe {
     // mesures de surface
     this.aire = document.querySelector('#aire');
 
-    // formulaire
-    //this.formulaire = new Formulaire();
-    this.formulaireCoupe = document.querySelector('#envoyercoupe');
-    this.formulaireCons = document.querySelector('#envoyercons');
-    this.formulaireP = document.querySelector("#envoyerpoint");
+    // plan de coupe
+    this.altitude = document.querySelector('#alticoupe');
 
     /*var elevation = new Cesium.WebMapServiceImageryProvider({
     url : 'http://wxs.ign.fr/pvwmk1wgxoei8orp7rd1re78/geoportail/r/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap',
@@ -227,6 +224,8 @@ planeUpdate(plane, couleurCoupe) {
   var targetY = 0.0;
   var selectedPlane;
   var scene = this.viewer.scene;
+  this.altitude.innerHTML = 0;
+  this.handler.globe = this;
 
   // Select plane when mouse down
   var downHandler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
@@ -260,6 +259,7 @@ planeUpdate(plane, couleurCoupe) {
       var deltaY = movement.startPosition.y - movement.endPosition.y;
       targetY += deltaY;
     }
+    globe.altitude.innerHTML = targetY;
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
   return function () {
@@ -269,7 +269,8 @@ planeUpdate(plane, couleurCoupe) {
 }
 
 formulaireConstruction(choice, choice2){
-    document.querySelector("#envoyercons").addEventListener('click', function(e) {
+  var hauteurVol;
+    document.querySelector("#envoyercons").addEventListener('click', (e) => {
       var largeur = $('#largeur').val();
       var couleur = $('#couleur').val();
       var transparence = $('#transparence').val();
@@ -279,25 +280,39 @@ formulaireConstruction(choice, choice2){
     });
   }
 
-  /*formulairePoint(choice, choice2){
+  formulairePoint(choice, choice2){
     var transparence;
+    var hauteurVol;
 
     document.querySelector("#envoyerpoint").addEventListener('click', (e) => {
       var largeur = $('#largeurpoint').val();
       var couleur = $('#couleurpoint').val();
-      console.log(largeur, couleur, transparence);
       this.updateShape(choice, choice2, largeur, couleur, transparence);
+
+    });
+  }
+
+/*  formulaireVolume(choice, choice2, tileset){
+    var largeur;
+
+    document.querySelector("#envoyervol").addEventListener('click', (e) => {
+      var hauteurVol = $('#hauteurvol').val();
+      var couleur = $('#couleurvol').val();
+      var transparence = $('#transparencevol').val();
+
+      console.log(hauteurVol, couleur, transparence);
+      this.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
 
     });
   }*/
 
 //outil construction
-createPoint(worldPosition) {
+createPoint(worldPosition, largeur, couleur) {
   var point = this.viewer.entities.add({
     position : worldPosition,
     point : {
-      color : Cesium.Color.fromCssColorString('#FFFFFF'),
-      pixelSize : 5,
+      color : Cesium.Color.fromCssColorString(couleur),
+      pixelSize : largeur,
       heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
     }
   });
@@ -332,17 +347,27 @@ drawPolygon(positionData, couleur, transparence) {
     polygon: {
       hierarchy: positionData,
       material : Cesium.Color.fromCssColorString(couleur).withAlpha(transparence)
-      /*outline: true,
-      outlineWidth: largeur*/
-      //extrudedHeight: positionData
-      //extrudedHeightReference :
+      /*extrudedHeight: hauteurVol,
+      extrudedHeightReference : tileset*/
     }
   });
   return shape;
 }
 
-updateShape(choice, choice2, largeur, couleur, transparence) {
+/*drawVolume(positionData, couleur, transparence, hauteurVol, tileset) {
+  var shape = this.viewer.entities.add({
+    polygon: {
+      hierarchy: positionData,
+      material : Cesium.Color.fromCssColorString(couleur).withAlpha(transparence),
+      extrudedHeight: hauteurVol,
+      extrudedHeightReference : tileset
+    }
+  });
+  return shape;
+}*/
 
+updateShape(choice, choice2, largeur, couleur, transparence) {
+  var tileset;
   var activeShapePoints = [];
   var coordDegrees = [];
   var activeShape;
@@ -355,7 +380,7 @@ updateShape(choice, choice2, largeur, couleur, transparence) {
       var earthPosition = scene.pickPosition(event.position);
       if(Cesium.defined(earthPosition)) {
         if(activeShapePoints.length === 0) {
-          floatingPoint = globe.createPoint(earthPosition);
+          floatingPoint = globe.createPoint(earthPosition, largeur, couleur);
           // on ajoute 2 fois un point au début pour permettre l'affichage de la ligne/surface
           // le dernier point correspond au point flottant du mouvement de la souris
           activeShapePoints.push(earthPosition);
@@ -363,21 +388,31 @@ updateShape(choice, choice2, largeur, couleur, transparence) {
           var dynamicPositions = new Cesium.CallbackProperty(function () {
             return activeShapePoints;
           }, false);
+          largeur = parseFloat(largeur);
+          transparence = parseFloat(transparence);
+          couleur = couleur.toString();
           if(choice === 'point') {
-            activeShape = globe.createPoint(dynamicPositions);
+            activeShape = globe.createPoint(dynamicPositions, largeur, couleur);
           } else if(choice === 'line') {
+            couleur = couleur.toString();
             activeShape = globe.drawLine(dynamicPositions, largeur, couleur, transparence);
             largeur = parseFloat(largeur);
             activeShape = globe.drawLine2(dynamicPositions, largeur);
           } else if(choice === 'polygon') {
             activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence);
-          }
+          } /*else if(choice === 'volume') {
+            console.log(couleur, transparence, hauteurVol);
+            activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence, hauteurVol, tileset);
+          }*/
         }
         else {
           activeShapePoints.push(earthPosition);
-          globe.createPoint(earthPosition);
+          globe.createPoint(earthPosition, largeur, couleur);
         }
 
+      }
+      if(choice === 'polygon'&& choice2 === 'mesure') {
+        globe.measureSurface(activeShapePoints);
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
@@ -393,25 +428,24 @@ updateShape(choice, choice2, largeur, couleur, transparence) {
       if(choice === 'line' && choice2 === 'mesure') {
         globe.measureDistance(activeShapePoints);
       }
-      if(choice === 'polygon'&& choice2 === 'mesure') {
-        globe.measureSurface(activeShapePoints);
-      }
-
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
     this.handler.setInputAction(function(event) {
       largeur = parseFloat(largeur);
       transparence = parseFloat(transparence);
+      couleur = couleur.toString();
       // on supprime le dernier point flottant
       activeShapePoints.pop();
       if(choice === 'point') {
-        globe.createPoint(activeShapePoints);
+        globe.createPoint(activeShapePoints, largeur, couleur);
       } else if(choice === 'line') {
         globe.drawLine(activeShapePoints, largeur, couleur, transparence);
         globe.drawLine2(activeShapePoints, largeur);
       } else if( choice === 'polygon') {
         globe.drawPolygon(activeShapePoints, couleur, transparence);
-      }
+      } /*else if( choice === 'volume') {
+        globe.drawPolygon(activeShapePoints, couleur, transparence);
+      }*/
       globe.viewer.entities.remove(floatingPoint);
       globe.viewer.entities.remove(activeShape);
       floatingPoint = undefined;
@@ -474,11 +508,10 @@ measureDistance(activeShapePoints)  {
 measureSurface(activeShapePoints) {
   var coordsX = [];
   var coordsY = [];
-
   var aire = 0;
   this.aire.innerHTML = 0;
 
-  for (let i=0; i < activeShapePoints.length; i+=1) {
+  for (let i=0; i < activeShapePoints.length-1; i+=1) {
     var cartesian = new Cesium.Cartesian3(activeShapePoints[i].x, activeShapePoints[i].y, activeShapePoints[i].z);
 
     let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
@@ -492,15 +525,27 @@ measureSurface(activeShapePoints) {
   }
 
   if(coordsX.length > 2){
-  for (let i=0; i < coordsX.length-1; i+=1) {
-    var a = Number(coordsY[i]*coordsX[i+1]);
-    var b = Number(coordsY[i+1]*coordsX[i]);
-    var c = Number((a-b));
+    // problème: aires trop grandes --> comment implementer retour au début (indice n+1= indice 1) ?
+  for (let i=1; i < coordsX.length-1; i+=1) {
+
+    var a = (coordsX[(i+1) % coordsX.length] - coordsX[i]);
+    var b = (coordsY[(i+1) % coordsX.length] + coordsY[i] - (2 * coordsY[0]));
+    var c = ((Number(a) * Number(b))/2);
     console.log(c);
-    var d = c/2;
-    console.log(d);
-    aire = Number(aire + d).toFixed(4);
+    aire = (Number(aire) + Number(c)).toFixed(4);
     console.log(aire);
+
+
+    /*console.log(coordsY[i], coordsX[i+1], coordsX[i-1]);
+    var a = (Number(coordsX[i+1]-coordsX[i-1]));
+    console.log(a);
+    var b = a * Number(coordsY[i]);
+    console.log(b);
+    var c = b/2;
+    console.log(c);
+    aire = (Number(aire) + Number(c)).toFixed(4);
+    console.log(aire);*/
+
   }
 }
 
@@ -511,7 +556,6 @@ supprSouris(){
   this.handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
   this.handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
   this.handler.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK);
-
 }
 
 supprEntities(){
