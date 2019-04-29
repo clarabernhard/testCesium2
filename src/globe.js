@@ -228,12 +228,9 @@ planeUpdate(plane, couleurCoupe) {
   this.handler.globe = this;
 
   // Select plane when mouse down
-  var downHandler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
-  downHandler.setInputAction(function(movement) {
+  this.handler.setInputAction(function(movement) {
     var pickedObject = scene.pick(movement.position);
-    if (Cesium.defined(pickedObject) &&
-    Cesium.defined(pickedObject.id) &&
-    Cesium.defined(pickedObject.id.plane)) {
+    if (Cesium.defined(pickedObject) && Cesium.defined(pickedObject.id) && Cesium.defined(pickedObject.id.plane)) {
       selectedPlane = pickedObject.id.plane;
       selectedPlane.material = Cesium.Color.fromCssColorString(couleurCoupe).withAlpha(0.4);
       selectedPlane.outlineColor = Cesium.Color.WHITE;
@@ -242,8 +239,7 @@ planeUpdate(plane, couleurCoupe) {
   }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 
   // Release plane on mouse up
-  var upHandler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
-  upHandler.setInputAction(function() {
+  this.handler.setInputAction(function() {
     if (Cesium.defined(selectedPlane)) {
       selectedPlane.material = Cesium.Color.fromCssColorString(couleurCoupe).withAlpha(0.4);
       selectedPlane.outlineColor = Cesium.Color.WHITE;
@@ -253,8 +249,7 @@ planeUpdate(plane, couleurCoupe) {
   }, Cesium.ScreenSpaceEventType.LEFT_UP);
 
   // Update plane on mouse move
-  var moveHandler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
-  moveHandler.setInputAction(function(movement) {
+  this.handler.setInputAction(function(movement) {
     if (Cesium.defined(selectedPlane)) {
       var deltaY = movement.startPosition.y - movement.endPosition.y;
       targetY += deltaY;
@@ -268,43 +263,43 @@ planeUpdate(plane, couleurCoupe) {
   };
 }
 
+// formulaires
 formulaireConstruction(choice, choice2){
   var hauteurVol;
-    document.querySelector("#envoyercons").addEventListener('click', (e) => {
-      var largeur = $('#largeur').val();
-      var couleur = $('#couleur').val();
-      var transparence = $('#transparence').val();
+  document.querySelector("#envoyercons").addEventListener('click', (e) => {
+    var largeur = $('#largeur').val();
+    var couleur = $('#couleur').val();
+    var transparence = $('#transparence').val();
 
-      globe.updateShape(choice, choice2, largeur, couleur, transparence);
+    globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
 
-    });
-  }
+  });
+}
 
-  formulairePoint(choice, choice2){
-    var transparence;
-    var hauteurVol;
+formulairePoint(choice, choice2){
+  var transparence;
+  var hauteurVol;
 
-    document.querySelector("#envoyerpoint").addEventListener('click', (e) => {
-      var largeur = $('#largeurpoint').val();
-      var couleur = $('#couleurpoint').val();
-      this.updateShape(choice, choice2, largeur, couleur, transparence);
+  document.querySelector("#envoyerpoint").addEventListener('click', (e) => {
+    var largeur = $('#largeurpoint').val();
+    var couleur = $('#couleurpoint').val();
+    this.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
 
-    });
-  }
+  });
+}
 
-/*  formulaireVolume(choice, choice2, tileset){
-    var largeur;
+formulaireVolume(choice, choice2){
+  var largeur = 3;
 
-    document.querySelector("#envoyervol").addEventListener('click', (e) => {
-      var hauteurVol = $('#hauteurvol').val();
-      var couleur = $('#couleurvol').val();
-      var transparence = $('#transparencevol').val();
+  document.querySelector("#envoyervol").addEventListener('click', (e) => {
+    var hauteurVol = $('#hauteurvol').val();
+    var couleur = $('#couleurvol').val();
+    var transparence = $('#transparencevol').val();
 
-      console.log(hauteurVol, couleur, transparence);
-      this.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
+    this.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
 
-    });
-  }*/
+  });
+}
 
 //outil construction
 createPoint(worldPosition, largeur, couleur) {
@@ -347,27 +342,24 @@ drawPolygon(positionData, couleur, transparence) {
     polygon: {
       hierarchy: positionData,
       material : Cesium.Color.fromCssColorString(couleur).withAlpha(transparence)
-      /*extrudedHeight: hauteurVol,
-      extrudedHeightReference : tileset*/
     }
   });
   return shape;
 }
 
-/*drawVolume(positionData, couleur, transparence, hauteurVol, tileset) {
+drawVolume(positionData, couleur, transparence, hauteurVol) {
   var shape = this.viewer.entities.add({
     polygon: {
       hierarchy: positionData,
       material : Cesium.Color.fromCssColorString(couleur).withAlpha(transparence),
-      extrudedHeight: hauteurVol,
-      extrudedHeightReference : tileset
+      extrudedHeight: hauteurVol
+      //extrudedHeightReference : Cesium.HeightReference.CLAMP_TO_GROUND
     }
   });
   return shape;
-}*/
+}
 
-updateShape(choice, choice2, largeur, couleur, transparence) {
-  var tileset;
+updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
   var activeShapePoints = [];
   var coordDegrees = [];
   var activeShape;
@@ -400,10 +392,11 @@ updateShape(choice, choice2, largeur, couleur, transparence) {
             activeShape = globe.drawLine2(dynamicPositions, largeur);
           } else if(choice === 'polygon') {
             activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence);
-          } /*else if(choice === 'volume') {
-            console.log(couleur, transparence, hauteurVol);
-            activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence, hauteurVol, tileset);
-          }*/
+          } else if(choice === 'volume') {
+            var z = globe.getHauteur(activeShapePoints, hauteurVol);
+            console.log(z);
+            activeShape = globe.drawVolume(dynamicPositions, couleur, transparence, z);
+          }
         }
         else {
           activeShapePoints.push(earthPosition);
@@ -443,20 +436,25 @@ updateShape(choice, choice2, largeur, couleur, transparence) {
         globe.drawLine2(activeShapePoints, largeur);
       } else if( choice === 'polygon') {
         globe.drawPolygon(activeShapePoints, couleur, transparence);
-      } /*else if( choice === 'volume') {
-        globe.drawPolygon(activeShapePoints, couleur, transparence);
-      }*/
-      globe.viewer.entities.remove(floatingPoint);
-      globe.viewer.entities.remove(activeShape);
+      } else if( choice === 'volume') {
+        var z = globe.getHauteur(activeShapePoints, hauteurVol);
+        console.log(z);
+        globe.drawVolume(activeShapePoints, couleur, transparence, z);
+      }
       floatingPoint = undefined;
       activeShape = undefined;
-
       if(choice2 === 'construction'){
         // garder les activeShapePoints définis permet l'affichage des mesures
         activeShapePoints = [];
       }
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
+    document.querySelector("#nouvdist").addEventListener('click', (e) => {
+      activeShapePoints = [];
+    });
+    document.querySelector("#nouvsurf").addEventListener('click', (e) => {
+      activeShapePoints = [];
+    });
 }
 
 measureDistance(activeShapePoints)  {
@@ -521,35 +519,31 @@ measureSurface(activeShapePoints) {
     var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
     coordsX.push(coords[0]);
     coordsY.push(coords[1]);
-
   }
 
   if(coordsX.length > 2){
-    // problème: aires trop grandes --> comment implementer retour au début (indice n+1= indice 1) ?
-  for (let i=1; i < coordsX.length-1; i+=1) {
-
+  for (let i=0; i < coordsX.length; i+=1) {
     var a = (coordsX[(i+1) % coordsX.length] - coordsX[i]);
     var b = (coordsY[(i+1) % coordsX.length] + coordsY[i] - (2 * coordsY[0]));
     var c = ((Number(a) * Number(b))/2);
-    console.log(c);
-    aire = (Number(aire) + Number(c)).toFixed(4);
-    console.log(aire);
-
-
-    /*console.log(coordsY[i], coordsX[i+1], coordsX[i-1]);
-    var a = (Number(coordsX[i+1]-coordsX[i-1]));
-    console.log(a);
-    var b = a * Number(coordsY[i]);
-    console.log(b);
-    var c = b/2;
-    console.log(c);
-    aire = (Number(aire) + Number(c)).toFixed(4);
-    console.log(aire);*/
-
+    aire = (Number(aire) + Number(c)).toFixed(3);
   }
 }
+  this.aire.innerHTML = Math.abs(aire);
 
-  this.aire.innerHTML = aire;
+}
+
+getHauteur(activeShapePoints, hauteurVol){
+    var cartesian = new Cesium.Cartesian3(activeShapePoints[0].x, activeShapePoints[0].y, activeShapePoints[0].z);
+
+    let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+    let longitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(7);
+    let latitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(7);
+
+    var a = Number(this.raf09.getGeoide(latitude, longitude));
+    var z = (Number(hauteurVol) + a);
+    return z;
+
 }
 
 supprSouris(){

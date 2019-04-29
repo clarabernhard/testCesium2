@@ -208,12 +208,12 @@ class Menu {
 
     });
 
-    /*this.volumeCheckbox.addEventListener('change', (e) => {
+    this.volumeCheckbox.addEventListener('change', (e) => {
       var choice = 'volume';
       var choice2 = 'construction';
 
       if(e.target.checked){
-        globe.formulaireVolume(choice, choice2, terrain);
+        globe.formulaireVolume(choice, choice2);
         this.volumeList.classList.remove('hidden');
         this.aideCheckbox.classList.remove('hidden');
       } else{
@@ -223,7 +223,7 @@ class Menu {
 
       }
 
-    });*/
+    });
 
     this.coupeCheckbox.addEventListener('change', (e) => {
       if(e.target.checked){
