@@ -18,81 +18,92 @@
   <div id=left-pane>
     <div id="toggle-menu" class="hamburger-icon">Menu</div>
 
-    <div class="legend hidden" id="coordsList">
+    <div class="backdrop hidden" id="coordsList">
       <h2>Coordonnées <br/> (CC48 / IGN69)</h2>
       <p>X (m): <span id="coordX"></span></p>
       <p>Y (m): <span id="coordY"></span></p>
       <p>Z (m): <span id="coordZ"></span></p>
     </div>
 
-    <div class="legend hidden" id="distanceList">
+    <div class="backdrop hidden" id="distanceList">
       <h2>Mesures de distance</h2>
       <p>Distance horizontale (m): <span id="distance"></span></p>
       <p><span class="tab"></span>- cumulée (m):<span id="distancecumulee"></span></p>
       <p>Distance inclinée (m): <span id="distanceinclinee"></span></p>
       <p><span class="tab"></span>- cumulée (m):<span id="distanceinclineecum"></span></p>
       <p>Différence d'altitude (m): <span id="hauteur"></span></p>
-      <button id="nouvdist">Nouvelle mesure</button>
+      <button class="nouv">Nouvelle mesure</button>
     </div>
 
-    <div class="legend hidden" id="aireList">
+    <div class="backdrop hidden" id="aireList">
       <h2>Mesures de surface</h2>
       <p>Aire (m²): <span id="aire"></span></p>
-      <button id="nouvsurf">Nouvelle mesure</button>
+      <button class="nouv">Nouvelle mesure</button>
     </div>
 
-    <div class="legend hidden" id="planList">
+    <div class="backdrop hidden" id="pointList">
+      <form>
+        <h2>Propriétés du point</h2>
+        <p>Taille (pixels):<input id="largeurpoint" type="text" size="3" value="5"/> </p>
+        <p>Couleur : <input id="couleurpoint" type="text" size="6" value="#FFFFFF"/><br/> </p>
+        <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a><br/>
+      </form>
+      <button id="envoyerpoint">Envoyer</button>
+      <button id="supprimerpoint">Supprimer</button>
+    </div>
+
+    <div class="backdrop hidden" id="ligneList">
+      <form>
+        <h2>Propriétés de la ligne</h2>
+        <p>Largeur ligne (pixels):<input id="largeur" type="text" size="3" value="3"/> </p>
+        <p>Couleur : <input id="couleur" type="text" size="6" value="#FF0000"/><br/> </p>
+        <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
+        <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparence" type="text" size="3" value="1"/> </p>
+      </form>
+      <button id="envoyerligne">Envoyer</button>
+      <button id="supprimerligne">Supprimer</button>
+    </div>
+
+    <div class="backdrop hidden" id="surfaceList">
+      <form>
+        <h2>Propriétés de la surface</h2>
+        <p>Couleur : <input id="couleursurf" type="text" size="6" value="#FF0000"/><br/> </p>
+        <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
+        <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparencesurf" type="text" size="3" value="1"/> </p>
+      </form>
+      <button id="envoyersurf">Envoyer</button>
+      <button class="supprimersurf">Supprimer</button>
+    </div>
+
+    <div class="backdrop hidden" id="volumeList">
+      <form>
+        <h2>Propriétés du volume</h2>
+        <p>Hauteur (m):<input id="hauteurvol" type="text" size="6" value="200"/> </p>
+        <p>Couleur : <input id="couleurvol" type="text" size="6" value="#FFFFFF"/><br/> </p>
+        <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
+        <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparencevol" type="text" size="3" value="1"/> </p>
+      </form>
+      <button id="envoyervol">Envoyer</button>
+      <button id="supprimervol">Supprimer</button>
+    </div>
+
+    <div class="backdrop hidden" id="planList">
       <h2>Propriétés du plan de coupe</h2>
-    <form>
-      <p>Coordonnées du point central : <br/>
-        X :<input id="X" type="text" size="12" value="2050200"/> <br/>
-        Y :<input id="Y" type="text" size="12" value="7275400"/> <br/>
-      </p>
-      <p>Hauteur (m):<input id="hauteurcoupe" type="text" size="6" value="200"/> </p>
-      <p>Longeur (m):<input id="longueurcoupe" type="text" size="6" value="200"/> </p>
-      <p>Largeur (m):<input id="largeurcoupe" type="text" size="6" value="200"/> </p>
-      <p>Couleur : <input id="couleurcoupe" type="text" size="6" value="#FFFFFF"/><br/> </p>
-      <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
-    </form>
-    <p>Différence de hauteur (m): <span id="alticoupe"></span></p>
-    <button id="envoyercoupe">Envoyer</button>
-    <button id="supprimercoupe">Supprimer</button>
+      <form>
+        <p>Coordonnées du point central : <br/>
+          X :<input id="X" type="text" size="12" value="2050200"/> <br/>
+          Y :<input id="Y" type="text" size="12" value="7275400"/> <br/>
+        </p>
+        <p>Hauteur (m):<input id="hauteurcoupe" type="text" size="6" value="200"/> </p>
+        <p>Longeur (m):<input id="longueurcoupe" type="text" size="6" value="200"/> </p>
+        <p>Largeur (m):<input id="largeurcoupe" type="text" size="6" value="200"/> </p>
+        <p>Couleur : <input id="couleurcoupe" type="text" size="6" value="#FFFFFF"/><br/> </p>
+        <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
+      </form>
+      <p>Différence de hauteur (m): <span id="alticoupe"></span></p>
+      <button id="envoyercoupe">Envoyer</button>
+      <button id="supprimercoupe">Supprimer</button>
     </div>
-
-    <div class="legend hidden" id="constructionList">
-    <form>
-      <h2>Propriétés de construction</h2>
-      <p>Largeur ligne (pixels):<input id="largeur" type="text" size="3" value="3"/> </p>
-      <p>Couleur : <input id="couleur" type="text" size="6" value="#FF0000"/><br/> </p>
-      <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
-      <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparence" type="text" size="3" value="1"/> </p>
-    </form>
-    <button id="envoyercons">Envoyer</button>
-    <button id="supprimercons">Supprimer</button>
-    </div>
-
-    <div class="legend hidden" id="pointList">
-    <form>
-      <h2>Propriétés du point</h2>
-      <p>Taille (pixels):<input id="largeurpoint" type="text" size="3" value="5"/> </p>
-      <p>Couleur : <input id="couleurpoint" type="text" size="6" value="#FFFFFF"/><br/> </p>
-      <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
-    </form>
-    <button id="envoyerpoint">Envoyer</button>
-    <button id="supprimerpoint">Supprimer</button>
-  </div>
-
-  <div class="legend hidden" id="volumeList">
-  <form>
-    <h2>Propriétés du volume</h2>
-    <p>Hauteur (m):<input id="hauteurvol" type="text" size="6" value="200"/> </p>
-    <p>Couleur : <input id="couleurvol" type="text" size="6" value="#FFFFFF"/><br/> </p>
-    <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
-    <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparencevol" type="text" size="3" value="1"/> </p>
-  </form>
-  <button id="envoyervol">Envoyer</button>
-  <button id="supprimervol">Supprimer</button>
-</div>
 
   </div>
 
@@ -197,6 +208,12 @@
       </div>
 
     </div>
+
+    <div id="bouton">
+      <!--<label for="test" class="btn">Ajouter</label>-->
+      <input id="test" type="file">
+    </div>
+
   </div>
 
   <div class= "w3-dropdown-hover w3-right" id="mesures">

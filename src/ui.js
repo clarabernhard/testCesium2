@@ -30,7 +30,8 @@ class Menu {
     this.distanceList = document.querySelector('#distanceList');
     this.aireList = document.querySelector('#aireList');
     this.planList = document.querySelector('#planList');
-    this.constructionList = document.querySelector('#constructionList');
+    this.ligneList = document.querySelector('#ligneList');
+    this.surfaceList = document.querySelector('#surfaceList');
     this.pointList = document.querySelector('#pointList');
     this.volumeList = document.querySelector('#volumeList');
 
@@ -55,10 +56,6 @@ class Menu {
 
     // boutons supprimer
     this.supprCheckbox = document.querySelector("#suppr");
-    this.supprCons = document.querySelector("#supprimercons");
-    this.supprPoint = document.querySelector("#supprimerpoint");
-    this.supprCoupe = document.querySelector("#supprimercoupe");
-    this.supprVolume = document.querySelector("#supprimervol");
 
     // Créer le datepicker
     this.datepicker = $("#date")
@@ -135,7 +132,7 @@ class Menu {
         this.distanceList.classList.add('hidden');
         this.aideCheckbox.classList.add('hidden');
         globe.supprSouris();
-        globe.supprEntities();
+        //globe.supprEntities();
       }
 
     });
@@ -153,7 +150,7 @@ class Menu {
         this.aireList.classList.add('hidden');
         this.aideCheckbox.classList.add('hidden');
         globe.supprSouris();
-        globe.supprEntities();
+        //globe.supprEntities();
       }
 
     });
@@ -179,11 +176,11 @@ class Menu {
       var choice2 = 'construction';
 
       if(e.target.checked){
-        globe.formulaireConstruction(choice, choice2);
-        this.constructionList.classList.remove('hidden');
+        globe.formulaireLigne(choice, choice2);
+        this.ligneList.classList.remove('hidden');
         this.aideCheckbox.classList.remove('hidden');
       } else{
-        this.constructionList.classList.add('hidden');
+        this.ligneList.classList.add('hidden');
         this.aideCheckbox.classList.add('hidden');
         globe.supprSouris();
 
@@ -196,11 +193,11 @@ class Menu {
       var choice2 = 'construction';
 
       if(e.target.checked){
-        globe.formulaireConstruction(choice, choice2);
-        this.constructionList.classList.remove('hidden');
+        globe.formulaireSurface(choice, choice2);
+        this.surfaceList.classList.remove('hidden');
         this.aideCheckbox.classList.remove('hidden');
       } else{
-        this.constructionList.classList.add('hidden');
+        this.surfaceList.classList.add('hidden');
         this.aideCheckbox.classList.add('hidden');
         globe.supprSouris();
 
@@ -260,18 +257,6 @@ class Menu {
 
 
     this.supprCheckbox.addEventListener('click', function() {
-      globe.supprEntities();
-    });
-    this.supprCons.addEventListener('click', function() {
-      globe.supprEntities();
-    });
-    this.supprCoupe.addEventListener('click', function() {
-      globe.supprEntities();
-    });
-    this.supprPoint.addEventListener('click', function() {
-      globe.supprEntities();
-    });
-    this.supprVolume.addEventListener('click', function() {
       globe.supprEntities();
     });
 

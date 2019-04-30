@@ -23,6 +23,7 @@ class Globe {
 
     // variable qui stocke les évenements liés à la souris
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
+    //this.leftClick = this.viewer.cesiumWidget.screenSpaceEventHandler.setInputAction(Cesium.ScreenSpaceEventTypeLEFT_CLICK);
 
     // mesures de coords
     this.coordX = document.querySelector('#coordX');
@@ -257,6 +258,8 @@ planeUpdate(plane, couleurCoupe) {
     globe.altitude.innerHTML = targetY;
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
+
+
   return function () {
     plane.distance = targetY;
     return plane;
@@ -264,12 +267,24 @@ planeUpdate(plane, couleurCoupe) {
 }
 
 // formulaires
-formulaireConstruction(choice, choice2){
+formulaireLigne(choice, choice2){
   var hauteurVol;
-  document.querySelector("#envoyercons").addEventListener('click', (e) => {
+  document.querySelector("#envoyerligne").addEventListener('click', (e) => {
     var largeur = $('#largeur').val();
     var couleur = $('#couleur').val();
     var transparence = $('#transparence').val();
+
+    globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
+
+  });
+}
+
+formulaireSurface(choice, choice2){
+  var hauteurVol;
+  var largeur = 3;
+  document.querySelector("#envoyersurf").addEventListener('click', (e) => {
+    var couleur = $('#couleursurf').val();
+    var transparence = $('#transparencesurf').val();
 
     globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
 
@@ -340,6 +355,7 @@ drawLine2(positionData, largeur) {
 drawPolygon(positionData, couleur, transparence) {
   var shape = this.viewer.entities.add({
     polygon: {
+      id: 'polygon',
       hierarchy: positionData,
       material : Cesium.Color.fromCssColorString(couleur).withAlpha(transparence)
     }
@@ -360,10 +376,20 @@ drawVolume(positionData, couleur, transparence, hauteurVol) {
 }
 
 updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
+  var line;
+  var line2;
+  var point;
+  var volume;
+  var surface;
+  var dline = [];
+  var dline2 = [];
+  var dsurface = [];
+
   var activeShapePoints = [];
-  var coordDegrees = [];
+  var figures = [];
   var activeShape;
   var floatingPoint;
+
   var scene = this.viewer.scene;
   this.handler.globe = this;
 
@@ -394,7 +420,6 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
             activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence);
           } else if(choice === 'volume') {
             var z = globe.getHauteur(activeShapePoints, hauteurVol);
-            console.log(z);
             activeShape = globe.drawVolume(dynamicPositions, couleur, transparence, z);
           }
         }
@@ -429,17 +454,25 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
       couleur = couleur.toString();
       // on supprime le dernier point flottant
       activeShapePoints.pop();
-      if(choice === 'point') {
-        globe.createPoint(activeShapePoints, largeur, couleur);
-      } else if(choice === 'line') {
-        globe.drawLine(activeShapePoints, largeur, couleur, transparence);
-        globe.drawLine2(activeShapePoints, largeur);
-      } else if( choice === 'polygon') {
-        globe.drawPolygon(activeShapePoints, couleur, transparence);
-      } else if( choice === 'volume') {
-        var z = globe.getHauteur(activeShapePoints, hauteurVol);
-        console.log(z);
-        globe.drawVolume(activeShapePoints, couleur, transparence, z);
+      if(choice2 === 'construction'){
+        if(choice === 'point') {
+          point = globe.createPoint(activeShapePoints, largeur, couleur);
+        } else if(choice === 'line') {
+          line = globe.drawLine(activeShapePoints, largeur, couleur, transparence);
+          line2 = globe.drawLine2(activeShapePoints, largeur);
+        } else if( choice === 'polygon') {
+          surface = globe.drawPolygon(activeShapePoints, couleur, transparence);
+        } else if( choice === 'volume') {
+          var z = globe.getHauteur(activeShapePoints, hauteurVol);
+          volume = globe.drawVolume(activeShapePoints, couleur, transparence, z);
+        }
+      } else if(choice2 === 'mesure'){
+        if(choice === 'line') {
+          dline = globe.drawLine(activeShapePoints, largeur, couleur, transparence);
+          dline2 = globe.drawLine2(activeShapePoints, largeur);
+        } else if( choice === 'polygon') {
+          dsurface = globe.drawPolygon(activeShapePoints, couleur, transparence);
+        }
       }
       floatingPoint = undefined;
       activeShape = undefined;
@@ -449,12 +482,32 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
       }
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
-    document.querySelector("#nouvdist").addEventListener('click', (e) => {
+    $('.nouv').click(function(e) {
       activeShapePoints = [];
     });
-    document.querySelector("#nouvsurf").addEventListener('click', (e) => {
-      activeShapePoints = [];
+
+    document.querySelector("#supprimerpoint").addEventListener('click', (e) => {
+      globe.viewer.entities.remove(point);
     });
+    document.querySelector("#supprimerligne").addEventListener('click', (e) => {
+      globe.viewer.entities.remove(line);
+      globe.viewer.entities.remove(line2);
+    });
+    document.querySelector("#supprimersurf").addEventListener('click', (e) => {
+      globe.viewer.entities.remove(surface);
+    });
+    document.querySelector("#supprimervol").addEventListener('click', (e) => {
+      globe.viewer.entities.remove(volume);
+    });
+    /*document.querySelector("#aireList").addEventListener('change', (e) => {
+      globe.viewer.entities.remove(dline);
+      globe.viewer.entities.remove(dline2);
+    });
+    document.querySelector("#distanceList").addEventListener('change', (e) => {
+      globe.viewer.entities.remove(dsurface);
+    });*/
+
+
 }
 
 measureDistance(activeShapePoints)  {
@@ -497,8 +550,8 @@ measureDistance(activeShapePoints)  {
     this.distanceCumulee.innerHTML = (Number(this.distanceCumulee.innerHTML) + distance).toFixed(3);
     this.distanceInclineeC.innerHTML = (Number(this.distanceInclineeC.innerHTML) + distanceIncl).toFixed(3);
   }
-  this.distance.innerHTML = distance;
-  this.distanceInclinee.innerHTML = distanceIncl;
+  this.distance.innerHTML = distance.toFixed(3);
+  this.distanceInclinee.innerHTML = distanceIncl.toFixed(3);
   this.hauteur.innerHTML = difference;
 
 }
