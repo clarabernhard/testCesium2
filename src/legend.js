@@ -26,9 +26,9 @@ class LegendManager {
         legend.parentElement.removeChild(legend);
     }
 
-    hasLegend(id){
+    /*hasLegend(id){
         return this.legendContainer.querySelectorAll('#' + id).length != 0;
-    }
+    }*/
 
     makeLegendItem(label, color){
         let legendColor = document.createElement('span');

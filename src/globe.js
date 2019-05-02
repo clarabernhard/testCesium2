@@ -213,9 +213,19 @@ addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe)
           outlineColor : Cesium.Color.WHITE
         }
       });
+      }
 
       planeEntities.push(planeEntity);
-    }
+      document.querySelector("#supprimercoupe").addEventListener('click', (e) => {
+        this.viewer.entities.remove(planeEntity);
+        this.viewer.entities.remove(planeEntities);
+        clippingPlanes = [];
+      });
+      document.querySelector("#plancoupe").addEventListener('click', (e) => {
+        this.viewer.entities.remove(planeEntity);
+        this.viewer.entities.remove(planeEntities);
+        clippingPlanes = [];
+      });
 
 }
 
@@ -326,6 +336,13 @@ createPoint(worldPosition, largeur, couleur) {
       heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
     }
   });
+  /*var symbol = this.viewer.entities.add({
+    position : worldPosition,
+    billboard : {
+      image : 'src/img/interface.png',
+      heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
+    }
+  });*/
   return point;
 }
 
@@ -381,9 +398,9 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
   var point;
   var volume;
   var surface;
-  var dline = [];
-  var dline2 = [];
-  var dsurface = [];
+  var dline;
+  var dline2;
+  var dsurface;
 
   var activeShapePoints = [];
   var figures = [];
@@ -460,6 +477,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
         } else if(choice === 'line') {
           line = globe.drawLine(activeShapePoints, largeur, couleur, transparence);
           line2 = globe.drawLine2(activeShapePoints, largeur);
+          console.log(line, line2);
         } else if( choice === 'polygon') {
           surface = globe.drawPolygon(activeShapePoints, couleur, transparence);
         } else if( choice === 'volume') {
@@ -487,27 +505,27 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
     });
 
     document.querySelector("#supprimerpoint").addEventListener('click', (e) => {
-      globe.viewer.entities.remove(point);
+      this.viewer.entities.remove(point);
     });
     document.querySelector("#supprimerligne").addEventListener('click', (e) => {
-      globe.viewer.entities.remove(line);
-      globe.viewer.entities.remove(line2);
+      this.viewer.entities.remove(line);
+      this.viewer.entities.remove(line2);
     });
     document.querySelector("#supprimersurf").addEventListener('click', (e) => {
-      globe.viewer.entities.remove(surface);
+      this.viewer.entities.remove(surface);
     });
     document.querySelector("#supprimervol").addEventListener('click', (e) => {
-      globe.viewer.entities.remove(volume);
+      this.viewer.entities.remove(volume);
     });
-    /*document.querySelector("#aireList").addEventListener('change', (e) => {
-      globe.viewer.entities.remove(dline);
-      globe.viewer.entities.remove(dline2);
+    document.querySelector("#ligne").addEventListener('click', (e) => {
+      activeShapePoints = [];
+      this.viewer.entities.remove(dline);
+      this.viewer.entities.remove(dline2);
     });
-    document.querySelector("#distanceList").addEventListener('change', (e) => {
-      globe.viewer.entities.remove(dsurface);
-    });*/
-
-
+    document.querySelector("#surface").addEventListener('click', (e) => {
+      activeShapePoints = [];
+      this.viewer.entities.remove(dsurface);
+    });
 }
 
 measureDistance(activeShapePoints)  {

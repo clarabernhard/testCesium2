@@ -67,12 +67,12 @@
     <div class="backdrop hidden" id="surfaceList">
       <form>
         <h2>Propriétés de la surface</h2>
-        <p>Couleur : <input id="couleursurf" type="text" size="6" value="#FF0000"/><br/> </p>
+        <p>Couleur : <input id="couleursurf" type="text" size="6" value="#F1B559"/><br/> </p>
         <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
-        <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparencesurf" type="text" size="3" value="1"/> </p>
+        <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparencesurf" type="text" size="3" value="0.6"/> </p>
       </form>
       <button id="envoyersurf">Envoyer</button>
-      <button class="supprimersurf">Supprimer</button>
+      <button id="supprimersurf">Supprimer</button>
     </div>
 
     <div class="backdrop hidden" id="volumeList">
@@ -125,7 +125,7 @@
         <label for="photoMaillage">Afficher le photomaillage</label>
       </div>
 
-      <button class="panel-title">ECOLOGIE
+      <button class="panel-title">REGLEMENTAIRE - PLU
         <i class="arrow"></i>
       </button>
       <div class="panel-content">
@@ -133,67 +133,30 @@
           <input id="monument" type="checkbox"/>
           <label for="monument">Afficher les monuments historiques</label>
         </div>
+
+        <div class="nowrap">
+          <input id="bati" type="checkbox"/>
+          <label for="bati">Afficher les bâtiments exceptionnels et intéressants</label>
+        </div>
+
+        <div class="nowrap">
+          <input id="plu" type="checkbox"/>
+          <label for="plu">Afficher le PLU</label>
+        </div>
+
+        <div class="nowrap">
+          <input id="plante" type="checkbox"/>
+          <label for="plante">Afficher les espaces plantés à protéger ou à créer</label>
+        </div>
       </div>
 
-      <button class="panel-title">PLU
+      <button class="panel-title">ECOLOGIE
         <i class="arrow"></i>
       </button>
       <div class="panel-content">
         <div class="nowrap">
-          <input id="placebo2" type="checkbox"/>
-          <label for="placebo2">Un bouton qui ne sert à rien</label>
-        </div>
-        <div class="nowrap">
-          <input id="placebo2" type="checkbox"/>
-          <label for="placebo2">Un bouton qui ne sert à rien</label>
-        </div>
-        <div class="nowrap">
-          <input id="placebo2" type="checkbox"/>
-          <label for="placebo2">Un bouton qui ne sert à rien</label>
-        </div>
-        <div class="nowrap">
-          <input id="placebo2" type="checkbox"/>
-          <label for="placebo2">Un bouton qui ne sert à rien</label>
-        </div>
-        <div class="nowrap">
-          <input id="placebo2" type="checkbox"/>
-          <label for="placebo2">Un bouton qui ne sert à rien</label>
-        </div>
-        <div class="nowrap">
-          <input id="placebo2" type="checkbox"/>
-          <label for="placebo2">Un bouton qui ne sert à rien</label>
-        </div>
-        <div class="nowrap">
-          <input id="placebo2" type="checkbox"/>
-          <label for="placebo2">Un bouton qui ne sert à rien</label>
-        </div>
-        <div class="nowrap">
-          <input id="placebo2" type="checkbox"/>
-          <label for="placebo2">Un bouton qui ne sert à rien</label>
-        </div>
-        <div class="nowrap">
-          <input id="placebo2" type="checkbox"/>
-          <label for="placebo2">Un bouton qui ne sert à rien</label>
-        </div>
-        <div class="nowrap">
-          <input id="placebo2" type="checkbox"/>
-          <label for="placebo2">Un bouton qui ne sert à rien</label>
-        </div>
-        <div class="nowrap">
-          <input id="placebo2" type="checkbox"/>
-          <label for="placebo2">Un bouton qui ne sert à rien</label>
-        </div>
-        <div class="nowrap">
-          <input id="placebo2" type="checkbox"/>
-          <label for="placebo2">Un bouton qui ne sert à rien</label>
-        </div>
-        <div class="nowrap">
-          <input id="placebo2" type="checkbox"/>
-          <label for="placebo2">Un bouton qui ne sert à rien</label>
-        </div>
-        <div class="nowrap">
-          <input id="placebo2" type="checkbox"/>
-          <label for="placebo2">Un bouton qui ne sert à rien</label>
+          <input id="trame" type="checkbox"/>
+          <label for="trame">Afficher la trame verte et bleue</label>
         </div>
       </div>
 
@@ -201,10 +164,7 @@
         <i class="arrow"></i>
       </button>
       <div class="panel-content">
-        <div class="nowrap">
-          <input id="placebo3" type="checkbox"/>
-          <label for="placebo3">Un bouton qui ne sert à rien</label>
-        </div>
+
       </div>
 
     </div>
@@ -227,13 +187,14 @@
 
       <div class="nowrap">
         <input id="ligne" type="checkbox"/>
-        <label for="ligne">Ligne</label>
+        <label for="ligne">Distance</label>
       </div>
 
       <div class="nowrap">
         <input id="surface" type="checkbox"/>
-        <label for="surface">Surface</label>
+        <label for="surface">Aire</label>
       </div>
+
     </div>
   </div>
 
@@ -242,26 +203,26 @@
     <div class="w3-dropdown-content">
       <div class="nowrap">
         <input id="cpoint" type="checkbox"/>
-        <label for="cpoint">Construction point</label>
+        <label for="cpoint">Dessin point</label>
       </div>
 
       <div class="nowrap">
         <input id="cligne" type="checkbox"/>
-        <label for="cligne">Construction ligne</label>
+        <label for="cligne">Dessin ligne</label>
       </div>
 
       <div class="nowrap">
         <input id="csurface" type="checkbox"/>
-        <label for="csurface">Construction surface</label>
+        <label for="csurface">Dessin surface</label>
       </div>
 
       <div class="nowrap">
         <input id="volume" type="checkbox"/>
-        <label for="volume">Construction volume</label>
+        <label for="volume">Dessin volume</label>
       </div>
 
       <div class="nowrap">
-        <button id="suppr">Supprimer les constructions</button>
+        <button id="suppr">Supprimer les dessins</button>
       </div>
 
     </div>
@@ -273,7 +234,7 @@
 
       <div class="nowrap">
         <input id="plancoupe" type="checkbox"/>
-        <label for="plancoupe">Plan de coupe</label>
+        <label for="plancoupe">Voile de hauteur</label>
       </div>
 
     </div>
