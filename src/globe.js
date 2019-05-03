@@ -346,23 +346,12 @@ createPoint(worldPosition, largeur, couleur) {
   return point;
 }
 
-drawLine(positionData, largeur, couleur, transparence) {
+drawLine(positionData, largeur, couleur, transparence, clamp) {
   var shape = this.viewer.entities.add({
     polyline : {
       positions : positionData,
       material : Cesium.Color.fromCssColorString(couleur).withAlpha(transparence),
-      width : largeur
-    }
-  });
-  return shape;
-}
-
-drawLine2(positionData, largeur) {
-  var shape = this.viewer.entities.add({
-    polyline : {
-      positions : positionData,
-      material : Cesium.Color.fromCssColorString('#000000').withAlpha(0.5),
-      clampToGround : true,
+      clampToGround : clamp,
       width : largeur
     }
   });
@@ -393,9 +382,8 @@ drawVolume(positionData, couleur, transparence, hauteurVol) {
 }
 
 updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
-  var line;
-  var line2;
   var point;
+  var line;
   var volume;
   var surface;
   var dline;
@@ -426,21 +414,26 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
           largeur = parseFloat(largeur);
           transparence = parseFloat(transparence);
           couleur = couleur.toString();
+
           if(choice === 'point') {
             activeShape = globe.createPoint(dynamicPositions, largeur, couleur);
-          } else if(choice === 'line') {
-            couleur = couleur.toString();
-            activeShape = globe.drawLine(dynamicPositions, largeur, couleur, transparence);
-            largeur = parseFloat(largeur);
-            activeShape = globe.drawLine2(dynamicPositions, largeur);
           } else if(choice === 'polygon') {
             activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence);
           } else if(choice === 'volume') {
             var z = globe.getHauteur(activeShapePoints, hauteurVol);
             activeShape = globe.drawVolume(dynamicPositions, couleur, transparence, z);
+          } else if(choice === 'line') {
+            if(choice2 === 'mesure') {
+              couleur = couleur.toString();
+              activeShape = globe.drawLine(dynamicPositions, largeur, couleur, transparence, false);
+              largeur = parseFloat(largeur);
+              activeShape = globe.drawLine(dynamicPositions, largeur, '#000000', '0.5', true);
+            } else if(choice2 === 'construction') {
+              couleur = couleur.toString();
+              activeShape = globe.drawLine(dynamicPositions, largeur, couleur, transparence, true);
+            }
           }
-        }
-        else {
+        } else {
           activeShapePoints.push(earthPosition);
           globe.createPoint(earthPosition, largeur, couleur);
         }
@@ -475,9 +468,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
         if(choice === 'point') {
           point = globe.createPoint(activeShapePoints, largeur, couleur);
         } else if(choice === 'line') {
-          line = globe.drawLine(activeShapePoints, largeur, couleur, transparence);
-          line2 = globe.drawLine2(activeShapePoints, largeur);
-          console.log(line, line2);
+          line = globe.drawLine(activeShapePoints, largeur, couleur, transparence, false);
         } else if( choice === 'polygon') {
           surface = globe.drawPolygon(activeShapePoints, couleur, transparence);
         } else if( choice === 'volume') {
@@ -486,8 +477,8 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
         }
       } else if(choice2 === 'mesure'){
         if(choice === 'line') {
-          dline = globe.drawLine(activeShapePoints, largeur, couleur, transparence);
-          dline2 = globe.drawLine2(activeShapePoints, largeur);
+          dline = globe.drawLine(activeShapePoints, largeur, couleur, transparence, true);
+          dline2 = globe.drawLine(activeShapePoints, largeur, '#000000', '0.5', true);
         } else if( choice === 'polygon') {
           dsurface = globe.drawPolygon(activeShapePoints, couleur, transparence);
         }
@@ -509,7 +500,6 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
     });
     document.querySelector("#supprimerligne").addEventListener('click', (e) => {
       this.viewer.entities.remove(line);
-      this.viewer.entities.remove(line2);
     });
     document.querySelector("#supprimersurf").addEventListener('click', (e) => {
       this.viewer.entities.remove(surface);
