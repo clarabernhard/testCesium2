@@ -38,11 +38,25 @@ class Menu {
     // Récuperer les checkboxes
     this.photoMaillageCheckbox = document.querySelector('#photoMaillage');
     this.shadowCheckbox = document.querySelector('#shadows');
-    this.monumentCheckbox = document.querySelector('#monument');
-    this.batiCheckbox = document.querySelector('#bati');
-    this.planteCheckbox = document.querySelector('#plante');
-    this.trameCheckbox = document.querySelector('#trame');
+
+    // PLU
     this.pluCheckbox = document.querySelector('#plu');
+    this.ensPaysagerCheckbox = document.querySelector('#ensPaysager');
+    this.batiInteressantCheckbox = document.querySelector('#batiInteressant');
+    this.batiExceptionnelCheckbox = document.querySelector('#batiExceptionnel');
+    this.planteCheckbox = document.querySelector('#plante');
+    this.continuiteCheckbox = document.querySelector('#continuite');
+    this.jardinCheckbox = document.querySelector('#jardin');
+    this.alignementCheckbox = document.querySelector('#alignement');
+    this.arbreCheckbox = document.querySelector('#arbre');
+
+    // Ecologie
+    this.trameCheckbox = document.querySelector('#tvb');
+    this.zhAvereesCheckbox = document.querySelector('#zhaverees');
+
+    //Habitat
+    this.monumentCheckbox = document.querySelector('#monument');
+    this.batiPublicCheckbox = document.querySelector('#batipublic');
 
     // mesures
     this.coordsCheckbox = document.querySelector('#point');
@@ -107,7 +121,7 @@ class Menu {
   // Créer tous les évènements
   registerEvents(){
     this.photoMaillageCheckbox.addEventListener('change', (e) => {
-      this.show('photoMaillage', 'data/photoMaillage/EXPORT_Cesium_130.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
+      this.show('photoMaillage', 'data/Photomaillage/Cesium_1.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
     });
 
     this.shadowCheckbox.addEventListener('change', function(e){
@@ -119,6 +133,7 @@ class Menu {
       this.onDateChanged(this.datepicker.val());
     });
 
+    // Boite à outils
     this.coordsCheckbox.addEventListener('change', (e) => {
       globe.showCoords(e.target.checked);
     });
@@ -136,7 +151,6 @@ class Menu {
         this.distanceList.classList.add('hidden');
         this.aideCheckbox.classList.add('hidden');
         globe.supprSouris();
-        //globe.supprEntities();
       }
 
     });
@@ -154,7 +168,6 @@ class Menu {
         this.aireList.classList.add('hidden');
         this.aideCheckbox.classList.add('hidden');
         globe.supprSouris();
-        //globe.supprEntities();
       }
 
     });
@@ -170,7 +183,6 @@ class Menu {
       } else{
         this.pointList.classList.add('hidden');
         globe.supprSouris();
-
       }
 
     });
@@ -187,7 +199,6 @@ class Menu {
         this.ligneList.classList.add('hidden');
         this.aideCheckbox.classList.add('hidden');
         globe.supprSouris();
-
       }
 
     });
@@ -204,7 +215,6 @@ class Menu {
         this.surfaceList.classList.add('hidden');
         this.aideCheckbox.classList.add('hidden');
         globe.supprSouris();
-
       }
 
     });
@@ -221,7 +231,6 @@ class Menu {
         this.volumeList.classList.add('hidden');
         this.aideCheckbox.classList.add('hidden');
         globe.supprSouris();
-
       }
 
     });
@@ -232,12 +241,15 @@ class Menu {
         globe.formulairePlan();
       } else{
         this.planList.classList.add('hidden');
-
       }
-
-
     });
 
+    this.supprCheckbox.addEventListener('click', function() {
+      globe.supprEntities();
+    });
+
+
+    // Couches en surbrillance
     this.monumentCheckbox.addEventListener('change', (e) => {
       let colors = {
         'classé': '#D1D716',
@@ -250,7 +262,7 @@ class Menu {
         this.legendManager.removeLegend('monuments_historiques');
       }
 
-      this.show('monuments_historiques', '../Cesium/data/geojson/monumentsS.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+      this.show('monuments_historiques', 'data/geojson/monument_histo.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'type_entite',
         colors: colors,
@@ -259,12 +271,22 @@ class Menu {
 
     });
 
+    this.pluCheckbox.addEventListener('change', (e) => {
+      this.showPlu(e.target.checked);
+    });
+
     this.planteCheckbox.addEventListener('change', (e) => {
       let color = {
-        '07_espace_plante': '#8ACC6C',
+        'Espace planté': '#8ACC6C',
       }
 
-      this.show('espaces_plantes', '../Cesium/data/geojson/esp_plantes.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+      if(e.target.checked){
+        this.legendManager.addLegend('plante', color);
+      } else{
+        this.legendManager.removeLegend('plante');
+      }
+
+      this.show('espaces_plantes', 'data/geojson/esp_plante.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'sous_type',
         colors: color,
@@ -272,36 +294,18 @@ class Menu {
       });
     });
 
-    this.pluCheckbox.addEventListener('change', (e) => {
-      this.showPlu(e.target.checked);
-    });
-
-    this.trameCheckbox.addEventListener('change', (e) => {
-      let color = {
-        'null': '#24B9E0'
-      }
-
-      this.show('trame_verte_bleue', '../Cesium/data/geojson/trame.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
-        classification: true,
-        classificationField: 'useless',
-        colors: color,
-        alpha: 0.4
-      });
-    });
-
-    this.batiCheckbox.addEventListener('change', (e) => {
+    this.batiInteressantCheckbox.addEventListener('change', (e) => {
       let colors = {
-        'Exceptionnel': '#E02466',
-        'Interessant': '#8D28B3'
+        'Intéressant': '#8D28B3'
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('batiments', colors); // Création de la légende qui a l'ID 'batiments' avec ces couleurs
+        this.legendManager.addLegend('batimentsInteressant', colors); // Création de la légende qui a l'ID 'batiments' avec ces couleurs
       } else{
-        this.legendManager.removeLegend('batiments'); // Suppression de la légende qui a l'ID 'batiments'
+        this.legendManager.removeLegend('batimentsInteressant'); // Suppression de la légende qui a l'ID 'batiments'
       }
 
-      this.show('geoJsonBat', '../Cesium/data/geojson/Bati_IAndE.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+      this.show('bati_interessant', 'data/geojson/bati_interessant.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'sous_type',
         colors: colors,
@@ -310,10 +314,103 @@ class Menu {
 
     });
 
+    this.batiExceptionnelCheckbox.addEventListener('change', (e) => {
+      let colors = {
+        'Exceptionnel': '#E02466'
+      }
 
-    this.supprCheckbox.addEventListener('click', function() {
-      globe.supprEntities();
+      if(e.target.checked){
+        this.legendManager.addLegend('batimentsExceptionnel', colors);
+      } else{
+        this.legendManager.removeLegend('batimentsExceptionnel');
+      }
+
+      this.show('bati_exceptionnel', 'data/geojson/bati_exceptionnel.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'sous_type',
+        colors: colors,
+        alpha: 0.4
+      });
+
     });
+
+    this.ensPaysagerCheckbox.addEventListener('change', (e) => {
+      let colors = {
+        'Ensemble paysager': '#E0F4AA'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('ensPaysager', colors);
+      } else{
+        this.legendManager.removeLegend('ensPaysager');
+      }
+
+      this.show('ens_paysager', 'data/geojson/ens_paysager.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'sous_type',
+        colors: colors,
+        alpha: 0.4
+      });
+
+    });
+
+    this.trameCheckbox.addEventListener('change', (e) => {
+      let color = {
+        'TVB': '#24B9E0'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('trame', color);
+      } else{
+        this.legendManager.removeLegend('trame');
+      }
+
+      this.show('trame_verte_bleue', 'data/geojson/tvb.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'type',
+        colors: color,
+        alpha: 0.4
+      });
+    });
+
+    /*this.continuiteCheckbox.addEventListener('change', (e) => {
+      let color = {
+        'TVB': '#24B9E0'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('trame', colors);
+      } else{
+        this.legendManager.removeLegend('trame');
+      }
+
+      this.show('continuite_eco', 'data/geojson/cont_ecologique.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'sous_type',
+        colors: color,
+        alpha: 0.4
+      });
+    });*/
+
+    this.zhAvereesCheckbox.addEventListener('change', (e) => {
+      let color = {
+        'Zone humide avérée': '#AAA9E0'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('zh_averees', color);
+      } else{
+        this.legendManager.removeLegend('zh_averees');
+      }
+
+      this.show('zones_humides', 'data/geojson/zh_averees.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'type',
+        colors: color,
+        alpha: 0.4
+      });
+    });
+
 
   }
 
