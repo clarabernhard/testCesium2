@@ -53,6 +53,8 @@ class Menu {
     // Ecologie
     this.trameCheckbox = document.querySelector('#tvb');
     this.zhAvereesCheckbox = document.querySelector('#zhaverees');
+    this.solPollueCheckbox = document.querySelector('#pollue');
+    this.risqueTechnoCheckbox = document.querySelector('#risquetechno');
 
     //Habitat
     this.monumentCheckbox = document.querySelector('#monument');
@@ -179,7 +181,7 @@ class Menu {
 
       if(e.target.checked){
         this.pointList.classList.remove('hidden');
-        globe.formulairePoint(choice, choice2);
+        this.formulairePoint(choice, choice2);
       } else{
         this.pointList.classList.add('hidden');
         globe.supprSouris();
@@ -192,7 +194,7 @@ class Menu {
       var choice2 = 'construction';
 
       if(e.target.checked){
-        globe.formulaireLigne(choice, choice2);
+        this.formulaireLigne(choice, choice2);
         this.ligneList.classList.remove('hidden');
         this.aideCheckbox.classList.remove('hidden');
       } else{
@@ -208,7 +210,7 @@ class Menu {
       var choice2 = 'construction';
 
       if(e.target.checked){
-        globe.formulaireSurface(choice, choice2);
+        this.formulaireSurface(choice, choice2);
         this.surfaceList.classList.remove('hidden');
         this.aideCheckbox.classList.remove('hidden');
       } else{
@@ -224,7 +226,7 @@ class Menu {
       var choice2 = 'construction';
 
       if(e.target.checked){
-        globe.formulaireVolume(choice, choice2);
+        this.formulaireVolume(choice, choice2);
         this.volumeList.classList.remove('hidden');
         this.aideCheckbox.classList.remove('hidden');
       } else{
@@ -250,48 +252,29 @@ class Menu {
 
 
     // Couches en surbrillance
-    this.monumentCheckbox.addEventListener('change', (e) => {
-      let colors = {
-        'classé': '#D1D716',
-        'inscrit': '#F07200'
-      }
-
-      if(e.target.checked){
-        this.legendManager.addLegend('monuments_historiques', colors);
-      } else{
-        this.legendManager.removeLegend('monuments_historiques');
-      }
-
-      this.show('monuments_historiques', 'data/geojson/monument_histo.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
-        classification: true,
-        classificationField: 'type_entite',
-        colors: colors,
-        alpha: 0.4
-      });
-
-    });
-
+    //PLU
     this.pluCheckbox.addEventListener('change', (e) => {
       this.showPlu(e.target.checked);
     });
 
-    this.planteCheckbox.addEventListener('change', (e) => {
-      let color = {
-        'Espace planté': '#8ACC6C',
+    this.ensPaysagerCheckbox.addEventListener('change', (e) => {
+      let colors = {
+        'Ensemble paysager': '#E0F4AA'
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('plante', color);
+        this.legendManager.addLegend('ensPaysager', colors);
       } else{
-        this.legendManager.removeLegend('plante');
+        this.legendManager.removeLegend('ensPaysager');
       }
 
-      this.show('espaces_plantes', 'data/geojson/esp_plante.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+      this.show('ens_paysager', 'data/geojson/ens_paysager.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'sous_type',
-        colors: color,
+        colors: colors,
         alpha: 0.4
       });
+
     });
 
     this.batiInteressantCheckbox.addEventListener('change', (e) => {
@@ -334,26 +317,66 @@ class Menu {
 
     });
 
-    this.ensPaysagerCheckbox.addEventListener('change', (e) => {
-      let colors = {
-        'Ensemble paysager': '#E0F4AA'
+    this.continuiteCheckbox.addEventListener('change', (e) => {
+      let color = {
+        'Continuité écologique': '#3479E0'
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('ensPaysager', colors);
+        this.legendManager.addLegend('continuite', color);
       } else{
-        this.legendManager.removeLegend('ensPaysager');
+        this.legendManager.removeLegend('continuite');
       }
 
-      this.show('ens_paysager', 'data/geojson/ens_paysager.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+      this.show('continuite_eco', 'data/geojson/cont_ecologique.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'sous_type',
-        colors: colors,
+        colors: color,
         alpha: 0.4
       });
-
     });
 
+    this.planteCheckbox.addEventListener('change', (e) => {
+      let color = {
+        'Espace planté': '#8ACC6C',
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('plante', color);
+      } else{
+        this.legendManager.removeLegend('plante');
+      }
+
+      this.show('espaces_plantes', 'data/geojson/esp_plante.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'sous_type',
+        colors: color,
+        alpha: 0.4
+      });
+    });
+
+    this.arbreCheckbox.addEventListener('change', (e) => {
+      let color = {
+        'Arbre': '#8AC467',
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('arbre', color);
+      } else{
+        this.legendManager.removeLegend('arbre');
+      }
+
+      this.show('arbre', 'data/geojson/arbres.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'type_prescription',
+        /*markerSymbol:*/
+        colors: color,
+        alpha: 0.4
+      });
+    });
+
+
+    // ECOLOGIE
     this.trameCheckbox.addEventListener('change', (e) => {
       let color = {
         'TVB': '#24B9E0'
@@ -373,24 +396,7 @@ class Menu {
       });
     });
 
-    /*this.continuiteCheckbox.addEventListener('change', (e) => {
-      let color = {
-        'TVB': '#24B9E0'
-      }
 
-      if(e.target.checked){
-        this.legendManager.addLegend('trame', colors);
-      } else{
-        this.legendManager.removeLegend('trame');
-      }
-
-      this.show('continuite_eco', 'data/geojson/cont_ecologique.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
-        classification: true,
-        classificationField: 'sous_type',
-        colors: color,
-        alpha: 0.4
-      });
-    });*/
 
     this.zhAvereesCheckbox.addEventListener('change', (e) => {
       let color = {
@@ -409,6 +415,66 @@ class Menu {
         colors: color,
         alpha: 0.4
       });
+    });
+
+    this.solPollueCheckbox.addEventListener('change', (e) => {
+      let color = {
+        'Sol pollué': '#AABC89'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('sol_pollue', color);
+      } else{
+        this.legendManager.removeLegend('sol_pollue');
+      }
+
+      this.show('solpollue', 'data/geojson/sol_pollue.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'sous_type',
+        colors: color,
+        alpha: 0.4
+      });
+    });
+
+    this.risqueTechnoCheckbox.addEventListener('change', (e) => {
+      let color = {
+        'Technologique': '#FFBC89'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('risquetechno', color);
+      } else{
+        this.legendManager.removeLegend('risquetechno');
+      }
+
+      this.show('risque_techno', 'data/geojson/risque_techno.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'sous_type',
+        colors: color,
+        alpha: 0.4
+      });
+    });
+
+    // HABITAT
+    this.monumentCheckbox.addEventListener('change', (e) => {
+      let colors = {
+        'classé': '#D1D716',
+        'inscrit': '#F07200'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('monuments_historiques', colors);
+      } else{
+        this.legendManager.removeLegend('monuments_historiques');
+      }
+
+      this.show('monuments_historiques', 'data/geojson/monument_histo.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'type_entite',
+        colors: colors,
+        alpha: 0.4
+      });
+
     });
 
 
@@ -450,6 +516,56 @@ class Menu {
     let stopTime = Cesium.JulianDate.fromIso8601(year + '-' + month + '-' + day + 'T23:59:59Z');
 
     this.globe.viewer.timeline.zoomTo(startTime, stopTime); // Définit la portion visible de la timeline
+  }
+
+  // formulaires
+  formulaireLigne(choice, choice2){
+    var hauteurVol;
+    document.querySelector("#envoyerligne").addEventListener('click', (e) => {
+      var largeur = $('#largeur').val();
+      var couleur = $('#couleur').val();
+      var transparence = $('#transparence').val();
+
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
+
+    });
+  }
+
+  formulaireSurface(choice, choice2){
+    var hauteurVol;
+    var largeur = 3;
+    document.querySelector("#envoyersurf").addEventListener('click', (e) => {
+      var couleur = $('#couleursurf').val();
+      var transparence = $('#transparencesurf').val();
+
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
+
+    });
+  }
+
+  formulairePoint(choice, choice2){
+    var transparence;
+    var hauteurVol;
+
+    document.querySelector("#envoyerpoint").addEventListener('click', (e) => {
+      var largeur = $('#largeurpoint').val();
+      var couleur = $('#couleurpoint').val();
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
+
+    });
+  }
+
+  formulaireVolume(choice, choice2){
+    var largeur = 3;
+
+    document.querySelector("#envoyervol").addEventListener('click', (e) => {
+      var hauteurVol = $('#hauteurvol').val();
+      var couleur = $('#couleurvol').val();
+      var transparence = $('#transparencevol').val();
+
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
+
+    });
   }
 
   showPlu(show){

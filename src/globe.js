@@ -81,7 +81,7 @@ load3DTiles(link, options = {}){
   return tileset.readyPromise;
 }
 
-loadKml(link, options = {}){
+loadKml(link, options = {clampToGround : true}){
   // Chargement du fichier KML (les points avec leurs descriptions)
   let promisse = Cesium.KmlDataSource.load(link);
   promisse.then((dataSource) => {
@@ -275,56 +275,6 @@ planeUpdate(plane, couleurCoupe) {
     plane.distance = targetY;
     return plane;
   };
-}
-
-// formulaires
-formulaireLigne(choice, choice2){
-  var hauteurVol;
-  document.querySelector("#envoyerligne").addEventListener('click', (e) => {
-    var largeur = $('#largeur').val();
-    var couleur = $('#couleur').val();
-    var transparence = $('#transparence').val();
-
-    globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
-
-  });
-}
-
-formulaireSurface(choice, choice2){
-  var hauteurVol;
-  var largeur = 3;
-  document.querySelector("#envoyersurf").addEventListener('click', (e) => {
-    var couleur = $('#couleursurf').val();
-    var transparence = $('#transparencesurf').val();
-
-    globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
-
-  });
-}
-
-formulairePoint(choice, choice2){
-  var transparence;
-  var hauteurVol;
-
-  document.querySelector("#envoyerpoint").addEventListener('click', (e) => {
-    var largeur = $('#largeurpoint').val();
-    var couleur = $('#couleurpoint').val();
-    this.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
-
-  });
-}
-
-formulaireVolume(choice, choice2){
-  var largeur = 3;
-
-  document.querySelector("#envoyervol").addEventListener('click', (e) => {
-    var hauteurVol = $('#hauteurvol').val();
-    var couleur = $('#couleurvol').val();
-    var transparence = $('#transparencevol').val();
-
-    this.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
-
-  });
 }
 
 //outil construction
