@@ -21,6 +21,8 @@ class Menu {
     this.leftPane = document.querySelector('#left-pane');
     this.menu = document.querySelector('#menu');
     this.dropdown = document.getElementsByClassName("panel-title");
+    this.deroulant = document.getElementsByClassName("deroulant");
+    this.test = document.getElementById('test');
 
     // Créer un gestionnaire pour les légendes
     this.legendManager = new LegendManager(this.leftPane);
@@ -55,6 +57,13 @@ class Menu {
     this.zhAvereesCheckbox = document.querySelector('#zhaverees');
     this.solPollueCheckbox = document.querySelector('#pollue');
     this.risqueTechnoCheckbox = document.querySelector('#risquetechno');
+    this.ppriNappeCheckbox = document.querySelector('#ppriNappe');
+    this.ppriRemontCheckbox = document.querySelector('#ppriRemont');
+    this.ppriSubCheckbox = document.querySelector('#ppriSub');
+    this.corridorHCheckbox = document.querySelector('#corridorH');
+    this.corridorACheckbox = document.querySelector('#corridorA');
+    this.reservoirHCheckbox = document.querySelector('#reservoirH');
+    this.reservoirACheckbox = document.querySelector('#reservoirA');
 
     //Habitat
     this.monumentCheckbox = document.querySelector('#monument');
@@ -84,10 +93,12 @@ class Menu {
 
     // Créer la liste des dataSource sous forme d'un object clé / valeur
     // Avec le nom de la source comme clé et la dataSource comme valeur
-    this.dataSources = {};
+    this.dataSources = [];
 
-    this.menuDeroulant();
     this.openMenu();
+    this.menuDeroulant(this.dropdown);
+    this.menuDeroulant(this.deroulant);
+    this.menuClic();
 
   }
 
@@ -100,10 +111,10 @@ class Menu {
   }
 
   // Evenement pour les menus déroulants
-  menuDeroulant(){
+  menuDeroulant(element){
     var i;
-    for (i = 0; i < this.dropdown.length; i++) {
-      this.dropdown[i].addEventListener('click', function() {
+    for (i = 0; i < element.length; i++) {
+      element[i].addEventListener('click', function() {
         this.classList.toggle("active");
         var dropdownContent = this.nextElementSibling;
         if (dropdownContent.style.display === "block") {
@@ -114,6 +125,26 @@ class Menu {
       });
     }
   }
+
+  menuClic() {
+    document.querySelector("#test").addEventListener('click', (e) => {
+      this.test.classList.toggle('show');
+    });
+  }
+
+// Close the dropdown menu if the user clicks outside of it
+/*window.onclick = function(event) {
+  if (!event.target.matches('.w3-button')) {
+    var dropdowns = document.getElementsByClassName("w3-dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}*/
 
   // Ajouter une source de données a la liste en donnant son nom "name" et la datasource "value"
   addDataSource(name, value){
@@ -259,7 +290,7 @@ class Menu {
 
     this.ensPaysagerCheckbox.addEventListener('change', (e) => {
       let colors = {
-        'Ensemble paysager': '#E0F4AA'
+        'Ensemble paysager': '#063868'
       }
 
       if(e.target.checked){
@@ -279,7 +310,7 @@ class Menu {
 
     this.batiInteressantCheckbox.addEventListener('change', (e) => {
       let colors = {
-        'Intéressant': '#8D28B3'
+        'Intéressant': '#298EEF'
       }
 
       if(e.target.checked){
@@ -299,7 +330,7 @@ class Menu {
 
     this.batiExceptionnelCheckbox.addEventListener('change', (e) => {
       let colors = {
-        'Exceptionnel': '#E02466'
+        'Exceptionnel': '#1561A9'
       }
 
       if(e.target.checked){
@@ -319,7 +350,7 @@ class Menu {
 
     this.continuiteCheckbox.addEventListener('change', (e) => {
       let color = {
-        'Continuité écologique': '#3479E0'
+        'Continuité écologique': '#00741D'
       }
 
       if(e.target.checked){
@@ -338,7 +369,7 @@ class Menu {
 
     this.planteCheckbox.addEventListener('change', (e) => {
       let color = {
-        'Espace planté': '#8ACC6C',
+        'Espace planté': '#39BC56',
       }
 
       if(e.target.checked){
@@ -348,6 +379,44 @@ class Menu {
       }
 
       this.show('espaces_plantes', 'data/geojson/esp_plante.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'sous_type',
+        colors: color,
+        alpha: 0.4
+      });
+    });
+
+    this.jardinCheckbox.addEventListener('change', (e) => {
+      let color = {
+        '07_jardin_devant': '#42B50C',
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('jardin', color);
+      } else{
+        this.legendManager.removeLegend('jardin');
+      }
+
+      this.show('jardin', 'data/geojson/jardin_devant.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'sous_type',
+        colors: color,
+        alpha: 0.4
+      });
+    });
+
+    this.alignementCheckbox.addEventListener('change', (e) => {
+      let color = {
+        '07_alignement_arbres': '#08BA2A',
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('aligne', color);
+      } else{
+        this.legendManager.removeLegend('aligne');
+      }
+
+      this.show('alignement', 'data/geojson/alignement_arbres.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'sous_type',
         colors: color,
@@ -369,9 +438,9 @@ class Menu {
       this.show('arbre', 'data/geojson/arbres.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'type_prescription',
-        /*markerSymbol:*/
-        colors: color,
-        alpha: 0.4
+        markerSymbol: 'park'
+        /*colors: color,
+        alpha: 0.4*/
       });
     });
 
@@ -400,7 +469,7 @@ class Menu {
 
     this.zhAvereesCheckbox.addEventListener('change', (e) => {
       let color = {
-        'Zone humide avérée': '#AAA9E0'
+        'Zone humide avérée': '#A551ED'
       }
 
       if(e.target.checked){
@@ -419,7 +488,7 @@ class Menu {
 
     this.solPollueCheckbox.addEventListener('change', (e) => {
       let color = {
-        'Sol pollué': '#AABC89'
+        'Sol pollué': '#84560D'
       }
 
       if(e.target.checked){
@@ -438,7 +507,7 @@ class Menu {
 
     this.risqueTechnoCheckbox.addEventListener('change', (e) => {
       let color = {
-        'Technologique': '#FFBC89'
+        'Technologique': '#D40606'
       }
 
       if(e.target.checked){
@@ -450,6 +519,148 @@ class Menu {
       this.show('risque_techno', 'data/geojson/risque_techno.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'sous_type',
+        colors: color,
+        alpha: 0.4
+      });
+    });
+
+    this.ppriNappeCheckbox.addEventListener('change', (e) => {
+      let color = {
+        '< 0 m (nappe débordante)': '#FF0000',
+        'de 0 à 1 m': '#CE6A27'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('nappe', color);
+      } else{
+        this.legendManager.removeLegend('nappe');
+      }
+
+      this.show('nappe', 'data/geojson/ppri_nappe.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'classe',
+        colors: color,
+        alpha: 0.4
+      });
+    });
+
+    this.ppriRemontCheckbox.addEventListener('change', (e) => {
+      let colors = {
+        'Zone_verte': '#014F03',
+        'Zone_vert_clair': '#0E8E12'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('remont', colors);
+      } else{
+        this.legendManager.removeLegend('remont');
+      }
+
+      this.show('remontee', 'data/geojson/ppri_innond_remontee.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'nom',
+        colors: colors,
+        alpha: 0.4
+      });
+    });
+
+    this.ppriSubCheckbox.addEventListener('change', (e) => {
+      let colors = {
+        'Sous_zone_bleu_clair_hachuree': '#40839A',
+        'Zone_rouge_clair': '#EC2B2B',
+        'Zone_rouge_fonce': '#A70505',
+        'Zone_bleu_clair': '#049AD6',
+        'Zone_de_securite':'#9300ED',
+        'Zone_bleu_fonce_hachuree': '#0013ED',
+        'Zone_orange': '#E6840A'
+
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('submersion', colors);
+      } else{
+        this.legendManager.removeLegend('submersion');
+      }
+
+      this.show('submersion', 'data/geojson/ppri_innond_debord.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'nom',
+        colors: colors,
+        alpha: 0.4
+      });
+    });
+
+    this.reservoirACheckbox.addEventListener('change', (e) => {
+      let color = {
+        'Réservoir arboré': '#A2A706'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('reservoirA', color);
+      } else{
+        this.legendManager.removeLegend('reservoirA');
+      }
+
+      this.show('tnu_reservoirA', 'data/geojson/tnu_reserv_arbore.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'type',
+        colors: color,
+        alpha: 0.4
+      });
+    });
+
+    this.reservoirHCheckbox.addEventListener('change', (e) => {
+      let color = {
+        'Réservoir herbacé': '#5FA706'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('reservoirH', color);
+      } else{
+        this.legendManager.removeLegend('reservoirH');
+      }
+
+      this.show('tnu_reservoirH', 'data/geojson/tnu_reservoir_herbace.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'type',
+        colors: color,
+        alpha: 0.4
+      });
+    });
+
+    this.corridorHCheckbox.addEventListener('change', (e) => {
+      let color = {
+        'Corridor herbacé': '#06A783'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('corridorH', color);
+      } else{
+        this.legendManager.removeLegend('corridorH');
+      }
+
+      this.show('tnu_corridorH', 'data/geojson/tnu_corridor_herbace.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'type',
+        colors: color,
+        alpha: 0.4
+      });
+    });
+
+    this.corridorACheckbox.addEventListener('change', (e) => {
+      let color = {
+        'Corridor arboré': '#D7C518'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('corridorA', color);
+      } else{
+        this.legendManager.removeLegend('corridorA');
+      }
+
+      this.show('tnu_corridorA', 'data/geojson/tnu_corridor_arbore.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'type',
         colors: color,
         alpha: 0.4
       });
@@ -498,9 +709,8 @@ class Menu {
         this.dataSources[name].show = true;
       }
     } else{
-      if(this.dataSources[name] !== undefined){
         this.dataSources[name].show = false;
-      }
+        this.dataSources.pop();
     }
   }
 

@@ -200,6 +200,47 @@
           <label for="risquetechno">Risques technologiques</label>
         </div>
 
+        <button class="deroulant">PPRI
+          <i class="arrow"></i>
+        </button>
+        <div class="ppri">
+          <div class="nowrap">
+            <input id="ppriNappe" type="checkbox"/>
+            <label for="ppriNappe">Profondeur de la nappe phréatique en période de hautes eaux centennales</label>
+          </div>
+          <div class="nowrap">
+            <input id="ppriRemont" type="checkbox"/>
+            <label for="ppriRemont">Aléas inondation par remontée de nappe</label>
+          </div>
+          <div class="nowrap">
+            <input id="ppriSub" type="checkbox"/>
+            <label for="ppriSub">Aléas inondation par submersion</label>
+          </div>
+        </div>
+        <br/> <br/>
+
+        <button class="deroulant">Tissu naturel urbain
+          <i class="arrow"></i>
+        </button>
+        <div class="ppri">
+          <div class="nowrap">
+            <input id="corridorH" type="checkbox"/>
+            <label for="corridorH">Corridor herbacé</label>
+          </div>
+          <div class="nowrap">
+            <input id="corridorA" type="checkbox"/>
+            <label for="corridorA">Corridor arboré</label>
+          </div>
+          <div class="nowrap">
+            <input id="reservoirH" type="checkbox"/>
+            <label for="reservoirH">Réservoir herbacé</label>
+          </div>
+          <div class="nowrap">
+            <input id="reservoirA" type="checkbox"/>
+            <label for="reservoirA">Réservoir arboré</label>
+          </div>
+        </div>
+
       </div>
 
       <button class="panel-title">HABITAT
@@ -223,14 +264,14 @@
 
     <div id="bouton">
       <!--<label for="test" class="btn">Ajouter</label>-->
-      <input id="test" type="file">
+      <input id="fichier" type="file">
     </div>
 
   </div>
 
-  <div class= "w3-dropdown-hover w3-right" id="mesures">
-    <button class="w3-button"><img src="src/img/icons8-length-filled-50.png"></button>
-    <div class="w3-dropdown-content">
+  <div class= "menuClic" id="mesures">
+    <button class="button"><img src="src/img/icons8-length-filled-50.png"></button>
+    <div class="menuClic-content">
 
       <div class="nowrap">
         <input id="point" type="checkbox"/>
@@ -250,9 +291,9 @@
     </div>
   </div>
 
-  <div class= "w3-dropdown-hover w3-right" id="construction">
-    <button class="w3-button"><img src="src/img/icons8-maintenance-filled-50.png"></button>
-    <div class="w3-dropdown-content">
+  <div class= "menuClic" id="construction">
+    <button class="button"><img src="src/img/icons8-maintenance-filled-50.png"></button>
+    <div class="menuClic-content">
       <div class="nowrap">
         <input id="cpoint" type="checkbox"/>
         <label for="cpoint">Dessin point</label>
@@ -280,9 +321,9 @@
     </div>
   </div>
 
-  <div class= "w3-dropdown-hover w3-right" id="coupe">
-    <button class="w3-button"><img src="src/img/icons8-scissors-26.png"></button>
-    <div class="w3-dropdown-content">
+  <div class= "menuClic" id="coupe">
+    <button class="button"><img src="src/img/icons8-scissors-26.png"></button>
+    <div class="menuClic-content" id="test">
 
       <div class="nowrap">
         <input id="plancoupe" type="checkbox"/>
@@ -292,9 +333,9 @@
     </div>
   </div>
 
-  <div class="w3-dropdown-hover w3-right" id="time">
-    <button class="w3-button"><img src="src/img/icons8-partly-cloudy-day-filled-50.png"></button>
-    <div class="w3-dropdown-content">
+  <div class="menuClic" id="time">
+    <button class="button"><img src="src/img/icons8-partly-cloudy-day-filled-50.png"></button>
+    <div class="menuClic-content">
       <div class="nowrap">
         <input id="shadows" type="checkbox"/>
         <label for="shadows">Afficher les ombres</label>

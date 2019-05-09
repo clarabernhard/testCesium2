@@ -172,6 +172,10 @@ html, body {
    padding: 10px;
  }
 
+ .ppri {
+   display: none;
+ }
+
 
 /* Style des légendes */
 .backdrop {
@@ -261,25 +265,32 @@ i {
 
 /* Boite à outils */
 /* style des boutons de la boîte à outils*/
-.w3-dropdown-hover {
+.menuClic {
   display: inline-block;
+  float: right;
+  position: relative;
+}
+
+.button {
   background-color: #2B2F33;
   border-radius: 3px;
+  cursor: pointer;
 }
 
 /* changement de couleur au survol des boutons */
-.w3-button:hover {
-  color: rgba(42, 143, 231, 0.5);
+.button:hover {
+  background-color: rgba(42, 143, 231, 0.5);
 }
 
 /* alignement à droite du menu déroulant */
-.w3-dropdown-content {
-  position: relative;
-  right: 0;
+.menuClic-content {
   display: none;
+  position: absolute;
+  right: 0;
   background-color: #969DA4;
   border: 1px solid #000;
   border-radius: 3px;
+  z-index: 1;
 }
 
 /* position du premier bouton */
@@ -343,4 +354,8 @@ i {
     height: 0.125em;
     border-top: 0.375em double #FFF;
     border-bottom: 0.125em solid #FFF;
+}
+
+.show {
+  display:block;
 }

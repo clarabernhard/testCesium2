@@ -91,7 +91,10 @@ loadKml(link, options = {clampToGround : true}){
 }
 
 loadGeoJson(link, options = {}){
-  let promisse = Cesium.GeoJsonDataSource.load(link, {clampToGround : true});
+  let promisse = Cesium.GeoJsonDataSource.load(link, {
+    clampToGround : true,
+    markerSymbol: 'park'
+  });
   promisse.then((dataSource) => {
 
     this.viewer.dataSources.add(dataSource);
@@ -278,7 +281,7 @@ planeUpdate(plane, couleurCoupe) {
 }
 
 //outil construction
-createPoint(worldPosition, largeur, couleur, test) {
+createPoint(worldPosition, largeur, couleur) {
   var point = this.viewer.entities.add({
     position : worldPosition,
     point : {
@@ -287,16 +290,19 @@ createPoint(worldPosition, largeur, couleur, test) {
       heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
     }
   });
+  return point;
+}
+
+createBillboard(worldPosition) {
   var symbol = this.viewer.entities.add({
     position : worldPosition,
     billboard : {
-      show: test,
       image : 'src/img/interface.png',
       heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
       verticalOrigin: Cesium.VerticalOrigin.BOTTOM
     }
   });
-  return point;
+  return symbol;
 }
 
 drawLine(positionData, largeur, couleur, transparence, clamp) {
@@ -327,7 +333,8 @@ drawVolume(positionData, couleur, transparence, hauteurVol) {
     polygon: {
       hierarchy: positionData,
       material : Cesium.Color.fromCssColorString(couleur).withAlpha(transparence),
-      extrudedHeight: hauteurVol
+      extrudedHeight: hauteurVol,
+      shadows : Cesium.ShadowMode.ENABLED
       //extrudedHeightReference : Cesium.HeightReference.CLAMP_TO_GROUND
     }
   });
@@ -335,10 +342,12 @@ drawVolume(positionData, couleur, transparence, hauteurVol) {
 }
 
 updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
-  var point;
-  var line;
-  var volume;
-  var surface;
+  var point = [];
+  var billboard = [];
+  var line = [];
+  var volume = [];
+  var surface = [];
+  var dpoint = [];
   var dline;
   var dline2;
   var dsurface;
@@ -358,6 +367,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
         if(activeShapePoints.length === 0) {
           // on ajoute 2 fois un point au début pour permettre l'affichage de la ligne/surface
           // le dernier point correspond au point flottant du mouvement de la souris
+          floatingPoint = globe.createPoint(earthPosition, largeur, couleur);
           activeShapePoints.push(earthPosition);
           activeShapePoints.push(earthPosition);
           var dynamicPositions = new Cesium.CallbackProperty(function () {
@@ -367,23 +377,20 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
           transparence = parseFloat(transparence);
           couleur = couleur.toString();
           if(choice === 'point') {
-            floatingPoint = globe.createPoint(earthPosition, largeur, couleur, true);
-            activeShape = globe.createPoint(dynamicPositions, largeur, couleur, true);
+            floatingPoint = globe.createBillboard(earthPosition);
+            activeShape = globe.createPoint(dynamicPositions, largeur, couleur);
+            activeShape = globe.createBillboard(dynamicPositions);
           } else if(choice === 'polygon') {
-            floatingPoint = globe.createPoint(earthPosition, largeur, couleur, false);
             activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence);
           } else if(choice === 'volume') {
-            floatingPoint = globe.createPoint(earthPosition, largeur, couleur, false);
             var z = globe.getHauteur(activeShapePoints, hauteurVol);
             activeShape = globe.drawVolume(dynamicPositions, couleur, transparence, z);
           } else if(choice === 'line') {
             if(choice2 === 'mesure') {
-              floatingPoint = globe.createPoint(earthPosition, largeur, couleur, false);
               activeShape = globe.drawLine(dynamicPositions, largeur, couleur, transparence, false);
               largeur = parseFloat(largeur);
               activeShape = globe.drawLine(dynamicPositions, largeur, '#000000', '0.5', true);
             } else if(choice2 === 'construction') {
-              floatingPoint = globe.createPoint(earthPosition, largeur, couleur, false);
               couleur = couleur.toString();
               activeShape = globe.drawLine(dynamicPositions, largeur, couleur, transparence, true);
             }
@@ -391,12 +398,12 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
         } else {
           activeShapePoints.push(earthPosition);
           if(choice === 'point'){
-            globe.createPoint(earthPosition, largeur, couleur, true);
+            point.push(globe.createPoint(earthPosition, largeur, couleur));
+            billboard.push(globe.createBillboard(earthPosition));
           } else {
-            globe.createPoint(earthPosition, largeur, couleur, false);
+            dpoint.push(globe.createPoint(earthPosition, largeur, couleur));
           }
         }
-
       }
       if(choice === 'polygon'&& choice2 === 'mesure') {
         globe.measureSurface(activeShapePoints);
@@ -425,18 +432,18 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
       activeShapePoints.pop();
       if(choice2 === 'construction'){
         if(choice === 'point') {
-          point = globe.createPoint(activeShapePoints, largeur, couleur, true);
+          point.push(globe.createPoint(activeShapePoints, largeur, couleur));
+          billboard.push(globe.createBillboard(activeShapePoints));
         } else if(choice === 'line') {
-          line = globe.drawLine(activeShapePoints, largeur, couleur, transparence, true);
+          line.push(globe.drawLine(activeShapePoints, largeur, couleur, transparence, true));
         } else if( choice === 'polygon') {
-          surface = globe.drawPolygon(activeShapePoints, couleur, transparence);
+          surface.push(globe.drawPolygon(activeShapePoints, couleur, transparence));
         } else if( choice === 'volume') {
           var z = globe.getHauteur(activeShapePoints, hauteurVol);
-          volume = globe.drawVolume(activeShapePoints, couleur, transparence, z);
+          volume.push(globe.drawVolume(activeShapePoints, couleur, transparence, z));
         }
       } else if(choice2 === 'mesure'){
         if(choice === 'line') {
-          console.log('coucou');
           dline = globe.drawLine(activeShapePoints, largeur, couleur, transparence, false);
           dline2 = globe.drawLine(activeShapePoints, largeur, '#000000', '0.5', true);
         } else if( choice === 'polygon') {
@@ -458,24 +465,38 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
     });
 
     document.querySelector("#supprimerpoint").addEventListener('click', (e) => {
-      this.viewer.entities.remove(point);
+      for(var i = 0; i < point.length; i++){
+        this.viewer.entities.remove(point[i]);
+        this.viewer.entities.remove(billboard[i]);
+      }
     });
     document.querySelector("#supprimerligne").addEventListener('click', (e) => {
-      this.viewer.entities.remove(line);
+      for(var i = 0; i < line.length; i++){
+        this.viewer.entities.remove(dpoint[i]);
+        this.viewer.entities.remove(line[i]);
+      }
     });
     document.querySelector("#supprimersurf").addEventListener('click', (e) => {
-      this.viewer.entities.remove(surface);
+      for(var i = 0; i < surface.length; i++){
+        this.viewer.entities.remove(dpoint[i]);
+        this.viewer.entities.remove(surface[i]);
+      }
     });
     document.querySelector("#supprimervol").addEventListener('click', (e) => {
-      this.viewer.entities.remove(volume);
+      for(var i = 0; i < volume.length; i++){
+        this.viewer.entities.remove(dpoint[i]);
+        this.viewer.entities.remove(volume[i]);
+      }
     });
     document.querySelector("#ligne").addEventListener('click', (e) => {
       activeShapePoints = [];
+      this.viewer.entities.remove(dpoint[i]);
       this.viewer.entities.remove(dline);
       this.viewer.entities.remove(dline2);
     });
     document.querySelector("#surface").addEventListener('click', (e) => {
       activeShapePoints = [];
+      this.viewer.entities.remove(dpoint[i]);
       this.viewer.entities.remove(dsurface);
     });
 }
