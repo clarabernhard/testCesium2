@@ -265,12 +265,6 @@ i {
 
 /* Boite à outils */
 /* style des boutons de la boîte à outils*/
-.menuClic {
-  display: inline-block;
-  float: right;
-  position: relative;
-}
-
 .button {
   background-color: #2B2F33;
   border-radius: 3px;
@@ -282,48 +276,92 @@ i {
   background-color: rgba(42, 143, 231, 0.5);
 }
 
-/* alignement à droite du menu déroulant */
 .menuClic-content {
   display: none;
   position: absolute;
-  right: 0;
-  background-color: #969DA4;
+  background-color: #EDEDED;
   border: 1px solid #000;
   border-radius: 3px;
   z-index: 1;
 }
 
-/* position du premier bouton */
+/* position des boutons */
 #mesures {
   position: absolute;
-  top: 75px;
-  right: 10px;
+  top: 7px;
+  left: 100px;
   /* lien à insérer pour l'image: <a href="https://icons8.com/icon/1408/length">Length icon by Icons8</a> */
 }
 
-/* position du deuxième bouton */
 #construction {
   position: absolute;
-  top: 120px;
-  right: 10px;
+  top: 7px;
+  left: 140px;
   /* lien à insérer pour l'image: <a href="https://icons8.com/icon/11219/maintenance-filled">Maintenance Filled icon by Icons8</a> */
 }
 
-/* position du troisième bouton */
 #coupe {
   position: absolute;
-  top: 165px;
-  right: 10px;
+  top: 7px;
+  left: 180px;
   /* lien à insérer pour l'image: <a href="https://icons8.com/icon/9247/partly-cloudy-day-filled">Partly Cloudy Day Filled icon by Icons8</a></a> */
 }
 
 #time {
   position: absolute;
-  top: 210px;
-  right: 10px;
+  top: 7px;
+  left: 220px;
   /* lien à insérer pour l'image: <a href="https://icons8.com/icon/713/scissors">Scissors icon by Icons8</a> */
 }
 
+/* les boutons bougent à l'ouverture du menu */
+#mesures.menu-open {
+  left:540px;
+  transition: left 0.5s;
+}
+#construction.menu-open {
+  left:580px;
+  transition: left 0.5s;
+}
+#coupe.menu-open {
+  left:620px;
+  transition: left 0.5s;
+}
+#time.menu-open {
+  left:660px;
+  transition: left 0.5s;
+}
+
+.aide {
+  display: none;
+  background-color: #FFFFFF;
+  position: absolute;
+
+  font-size: small;
+}
+
+#mesures:hover #annotationM {
+  display: block;
+  width: 120px;
+}
+#construction:hover #annotationD {
+  display: block;
+  width: 110px;
+}
+#coupe:hover #annotationC {
+  display: block;
+  width: 110px;
+}
+#time:hover #annotationT {
+  display: block;
+  width: auto;
+}
+
+.menuClic {
+  display: inline-block;
+  background-color: #2B2F33;
+  border-radius: 3px;
+}
 
 /* Classes utilitaire */
  .nowrap {

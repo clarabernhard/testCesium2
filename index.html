@@ -45,11 +45,12 @@
       <form>
         <h2>Propriétés du point</h2>
         <p>Taille (pixels):<input id="largeurpoint" type="text" size="3" value="5"/> </p>
-        <p>Couleur : <input id="couleurpoint" type="text" size="6" value="#FFFFFF"/><br/> </p>
+        <p>Couleur : <input id="couleurpoint" type="text" size="6" value="#FFFFFF"/></p><br/>
         <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a><br/>
       </form>
-      <button id="envoyerpoint">Envoyer</button>
+      <button id="envoyerpoint">Ajouter</button>
       <button id="supprimerpoint">Supprimer</button>
+      <p>Cliquez sur 'ajouter' pour commencer à dessiner</p>
     </div>
 
     <div class="backdrop hidden" id="ligneList">
@@ -60,8 +61,9 @@
         <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
         <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparence" type="text" size="3" value="1"/> </p>
       </form>
-      <button id="envoyerligne">Envoyer</button>
+      <button id="envoyerligne">Ajouter</button>
       <button id="supprimerligne">Supprimer</button>
+      <p>Cliquez sur 'ajouter' pour commencer à dessiner</p>
     </div>
 
     <div class="backdrop hidden" id="surfaceList">
@@ -71,8 +73,9 @@
         <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
         <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparencesurf" type="text" size="3" value="0.6"/> </p>
       </form>
-      <button id="envoyersurf">Envoyer</button>
+      <button id="envoyersurf">Ajouter</button>
       <button id="supprimersurf">Supprimer</button>
+      <p>Cliquez sur 'ajouter' pour commencer à dessiner</p>
     </div>
 
     <div class="backdrop hidden" id="volumeList">
@@ -83,12 +86,13 @@
         <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
         <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparencevol" type="text" size="3" value="1"/> </p>
       </form>
-      <button id="envoyervol">Envoyer</button>
+      <button id="envoyervol">Ajouter</button>
       <button id="supprimervol">Supprimer</button>
+      <p>Cliquez sur 'ajouter' pour commencer à dessiner</p>
     </div>
 
     <div class="backdrop hidden" id="planList">
-      <h2>Propriétés du plan de coupe</h2>
+      <h2>Propriétés du voile de hauteur</h2>
       <form>
         <p>Coordonnées du point central : <br/>
           X :<input id="X" type="text" size="12" value="2050200"/> <br/>
@@ -101,18 +105,17 @@
         <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
       </form>
       <p>Différence de hauteur (m): <span id="alticoupe"></span></p>
-      <button id="envoyercoupe">Envoyer</button>
-      <button id="supprimercoupe">Supprimer</button>
+      <button id="envoyercoupe">Ajouter</button>
+      <button id="supprimercoupe">Supprimer</button> <br/>
     </div>
 
   </div>
 
   <div id=right-pane>
-    <div class="annotation hidden" id="aide">
+    <div class="annotation hidden">
       <h4>Tracé des figures géométriques</h4>
       <p>Clic gauche pour ajouter un point</p>
       <p>Clic droit pour terminer la figure</p>
-      <p>Pour les constructions: cliquer sur envoyer</p>
     </div>
   </div>
 
@@ -270,8 +273,9 @@
   </div>
 
   <div class= "menuClic" id="mesures">
-    <button class="button"><img src="src/img/icons8-length-filled-50.png"></button>
-    <div class="menuClic-content">
+    <button class="button" id="boutonmesures"><img src="src/img/icons8-length-filled-50.png"></button>
+    <div class="aide" id="annotationM"> Outils de mesures </div>
+    <div class="menuClic-content" id="mesures-content">
 
       <div class="nowrap">
         <input id="point" type="checkbox"/>
@@ -292,8 +296,9 @@
   </div>
 
   <div class= "menuClic" id="construction">
-    <button class="button"><img src="src/img/icons8-maintenance-filled-50.png"></button>
-    <div class="menuClic-content">
+    <button class="button" id="boutonconstruction"><img src="src/img/icons8-maintenance-filled-50.png"></button>
+    <div class="aide" id="annotationD"> Outils de dessin </div>
+    <div class="menuClic-content" id="construction-content">
       <div class="nowrap">
         <input id="cpoint" type="checkbox"/>
         <label for="cpoint">Dessin point</label>
@@ -322,8 +327,9 @@
   </div>
 
   <div class= "menuClic" id="coupe">
-    <button class="button"><img src="src/img/icons8-scissors-26.png"></button>
-    <div class="menuClic-content" id="test">
+    <button class="button" id="boutoncoupe"><img src="src/img/icons8-scissors-26.png"></button>
+    <div class="aide" id="annotationC"> Outils de coupe </div>
+    <div class="menuClic-content" id="coupe-content">
 
       <div class="nowrap">
         <input id="plancoupe" type="checkbox"/>
@@ -334,8 +340,9 @@
   </div>
 
   <div class="menuClic" id="time">
-    <button class="button"><img src="src/img/icons8-partly-cloudy-day-filled-50.png"></button>
-    <div class="menuClic-content">
+    <button class="button" id="boutontime"><img src="src/img/icons8-partly-cloudy-day-filled-50.png"></button>
+    <div class="aide" id="annotationT"> Ombres </div>
+    <div class="menuClic-content" id="time-content">
       <div class="nowrap">
         <input id="shadows" type="checkbox"/>
         <label for="shadows">Afficher les ombres</label>

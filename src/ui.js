@@ -17,18 +17,27 @@ class Menu {
     this.terrain = terrain;
     this.viewer = Globe.viewer;
 
-    // Récuperer les éléments du menu
+    // Récuperer les éléments du menu de gauche
     this.leftPane = document.querySelector('#left-pane');
     this.menu = document.querySelector('#menu');
     this.dropdown = document.getElementsByClassName("panel-title");
     this.deroulant = document.getElementsByClassName("deroulant");
-    this.test = document.getElementById('test');
+
+    // élements des boutons de la boite à outils
+    this.mesuresContent = document.querySelector('#mesures-content');
+    this.constructionContent = document.querySelector('#construction-content');
+    this.coupeContent = document.querySelector('#coupe-content');
+    this.timeContent = document.querySelector('#time-content');
+    this.mesuresDiv = document.querySelector('#mesures');
+    this.constructionDiv = document.querySelector('#construction');
+    this.coupeDiv = document.querySelector('#coupe');
+    this.timeDiv = document.querySelector('#time');
 
     // Créer un gestionnaire pour les légendes
     this.legendManager = new LegendManager(this.leftPane);
 
     // Légendes qui s'affichent au clic des boîtes à outils associées
-    this.aideCheckbox = document.querySelector('#aide');
+    this.aideCheckbox = document.querySelector('.annotation');
     this.distanceList = document.querySelector('#distanceList');
     this.aireList = document.querySelector('#aireList');
     this.planList = document.querySelector('#planList');
@@ -98,7 +107,10 @@ class Menu {
     this.openMenu();
     this.menuDeroulant(this.dropdown);
     this.menuDeroulant(this.deroulant);
-    this.menuClic();
+    this.menuClic("#boutonmesures", this.mesuresContent);
+    this.menuClic("#boutonconstruction", this.constructionContent);
+    this.menuClic("#boutoncoupe", this.coupeContent);
+    this.menuClic("#boutontime", this.timeContent);
 
   }
 
@@ -107,6 +119,10 @@ class Menu {
     document.querySelector("#left-pane #toggle-menu").addEventListener('click', (e) => {
       this.leftPane.classList.toggle('menu-open');
       this.menu.classList.toggle('menu-open');
+      this.mesuresDiv.classList.toggle('menu-open');
+      this.constructionDiv.classList.toggle('menu-open');
+      this.coupeDiv.classList.toggle('menu-open');
+      this.timeDiv.classList.toggle('menu-open');
     });
   }
 
@@ -126,9 +142,9 @@ class Menu {
     }
   }
 
-  menuClic() {
-    document.querySelector("#test").addEventListener('click', (e) => {
-      this.test.classList.toggle('show');
+  menuClic(bouton, element) {
+    document.querySelector(bouton).addEventListener('click', (e) => {
+      element.classList.toggle('show');
     });
   }
 
@@ -271,7 +287,7 @@ class Menu {
     this.coupeCheckbox.addEventListener('change', (e) => {
       if(e.target.checked){
         this.planList.classList.remove('hidden');
-        globe.formulairePlan();
+        this.formulairePlan(terrain);
       } else{
         this.planList.classList.add('hidden');
       }
@@ -303,14 +319,14 @@ class Menu {
         classification: true,
         classificationField: 'sous_type',
         colors: colors,
-        alpha: 0.4
+        alpha: 0.7
       });
 
     });
 
     this.batiInteressantCheckbox.addEventListener('change', (e) => {
       let colors = {
-        'Intéressant': '#298EEF'
+        'Intéressant': '#11C7E9'
       }
 
       if(e.target.checked){
@@ -330,7 +346,7 @@ class Menu {
 
     this.batiExceptionnelCheckbox.addEventListener('change', (e) => {
       let colors = {
-        'Exceptionnel': '#1561A9'
+        'Exceptionnel': '#0C77D9'
       }
 
       if(e.target.checked){
@@ -343,7 +359,7 @@ class Menu {
         classification: true,
         classificationField: 'sous_type',
         colors: colors,
-        alpha: 0.4
+        alpha: 0.6
       });
 
     });
@@ -400,8 +416,10 @@ class Menu {
       this.show('jardin', 'data/geojson/jardin_devant.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'sous_type',
-        colors: color,
-        alpha: 0.4
+        outline: true,
+        outlineColor: color,
+        outlineWidth: 5,
+        alpha: 1
       });
     });
 
@@ -774,6 +792,22 @@ class Menu {
       var transparence = $('#transparencevol').val();
 
       globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
+
+    });
+  }
+
+  // lire les valeurs rentrées par l'utilisateur
+  formulairePlan(tileset){
+    var tileset;
+    document.querySelector("#envoyercoupe").addEventListener('click', (e) => {
+      var X = $('#X').val();
+      var Y = $('#Y').val();
+      var hauteurCoupe = $('#hauteurcoupe').val();
+      var longueurCoupe = $('#longueurcoupe').val();
+      var largeurCoupe = $('#largeurcoupe').val();
+      var couleurCoupe = $('#couleurcoupe').val();
+
+      globe.addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, tileset);
 
     });
   }

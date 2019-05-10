@@ -8,7 +8,7 @@ class Globe {
     // Créer le globe dans la div HTML qui a l'id cesiumContainer
     this.viewer = new Cesium.Viewer(elementId, {
       geocoder: geocoder,
-      vrButton: true,
+      //vrButton: true,
       selectionIndicator: false
     });
 
@@ -173,23 +173,9 @@ showCoords(show){
   }
 }
 
-// lire les valeurs rentrées par l'utilisateur
-formulairePlan(){
-  document.querySelector("#envoyercoupe").addEventListener('click', (e) => {
-    var X = $('#X').val();
-    var Y = $('#Y').val();
-    var hauteurCoupe = $('#hauteurcoupe').val();
-    var longueurCoupe = $('#longueurcoupe').val();
-    var largeurCoupe = $('#largeurcoupe').val();
-    var couleurCoupe = $('#couleurcoupe').val();
-
-    this.addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe);
-
-  });
-}
 
 // Afficher ou enlever le plan de coupe
-addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe) {
+addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, tileset) {
 
     var planeEntities = [];
     var clippingPlanes = new Cesium.ClippingPlaneCollection({
@@ -197,7 +183,7 @@ addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe)
         new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 0.0, -1.0), 0.0)
       ],
     });
-
+return tileset.readyPromise.then(function() {
     for (var i = 0; i < clippingPlanes.length; ++i) {
       var coords = proj4('EPSG:3948','EPSG:4326', [X, Y]);
       var a = Number(this.raf09.getGeoide(coords[1], coords[0]));
@@ -217,19 +203,21 @@ addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe)
           outlineColor : Cesium.Color.WHITE
         }
       });
-      }
-
       planeEntities.push(planeEntity);
-      document.querySelector("#supprimercoupe").addEventListener('click', (e) => {
-        this.viewer.entities.remove(planeEntity);
-        this.viewer.entities.remove(planeEntities);
-        clippingPlanes = [];
-      });
-      document.querySelector("#plancoupe").addEventListener('click', (e) => {
-        this.viewer.entities.remove(planeEntity);
-        this.viewer.entities.remove(planeEntities);
-        clippingPlanes = [];
-      });
+    }
+    return tileset;
+  });
+
+  document.querySelector("#supprimercoupe").addEventListener('click', (e) => {
+    this.viewer.entities.remove(planeEntity);
+    this.viewer.entities.remove(planeEntities);
+    clippingPlanes = [];
+  });
+  document.querySelector("#plancoupe").addEventListener('click', (e) => {
+    /*this.viewer.entities.remove(planeEntity);
+    this.viewer.entities.remove(planeEntities);*/
+    clippingPlanes = [];
+  });
 
 }
 
