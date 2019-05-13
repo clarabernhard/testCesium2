@@ -16,6 +16,7 @@ class Menu {
     this.globe = globe;
     this.terrain = terrain;
     this.viewer = Globe.viewer;
+    this.handler = Globe.handler;
 
     // Récuperer les éléments du menu de gauche
     this.leftPane = document.querySelector('#left-pane');
@@ -45,6 +46,7 @@ class Menu {
     this.surfaceList = document.querySelector('#surfaceList');
     this.pointList = document.querySelector('#pointList');
     this.volumeList = document.querySelector('#volumeList');
+    this.fileList = document.querySelector('#fileList');
 
     // Récuperer les checkboxes
     this.photoMaillageCheckbox = document.querySelector('#photoMaillage');
@@ -52,6 +54,8 @@ class Menu {
 
     // PLU
     this.pluCheckbox = document.querySelector('#plu');
+    this.ERCheckbox = document.querySelector('#ER');
+    this.margeCheckbox = document.querySelector('#marge');
     this.ensPaysagerCheckbox = document.querySelector('#ensPaysager');
     this.batiInteressantCheckbox = document.querySelector('#batiInteressant');
     this.batiExceptionnelCheckbox = document.querySelector('#batiExceptionnel');
@@ -92,8 +96,9 @@ class Menu {
     // plan de coupe
     this.coupeCheckbox = document.querySelector('#plancoupe');
 
-    // boutons supprimer
+    // boutons
     this.supprCheckbox = document.querySelector("#suppr");
+    this.addFile = document.querySelector("#boutonfile");
 
     // Créer le datepicker
     this.datepicker = $("#date")
@@ -111,6 +116,7 @@ class Menu {
     this.menuClic("#boutonconstruction", this.constructionContent);
     this.menuClic("#boutoncoupe", this.coupeContent);
     this.menuClic("#boutontime", this.timeContent);
+    this.newFile();
 
   }
 
@@ -148,23 +154,16 @@ class Menu {
     });
   }
 
-// Close the dropdown menu if the user clicks outside of it
-/*window.onclick = function(event) {
-  if (!event.target.matches('.w3-button')) {
-    var dropdowns = document.getElementsByClassName("w3-dropdown-content");
-    var i;
-    for (i = 0; i < dropdowns.length; i++) {
-      var openDropdown = dropdowns[i];
-      if (openDropdown.classList.contains('show')) {
-        openDropdown.classList.remove('show');
-      }
-    }
-  }
-}*/
-
   // Ajouter une source de données a la liste en donnant son nom "name" et la datasource "value"
   addDataSource(name, value){
     this.dataSources[name] = value;
+  }
+
+  newFile() {
+      this.addFile.addEventListener('click', (e) => {
+        this.fileList.classList.remove('hidden');
+        this.formulaireFichier();
+    });
   }
 
   // Créer tous les évènements
@@ -304,18 +303,41 @@ class Menu {
       this.showPlu(e.target.checked);
     });
 
-    this.ensPaysagerCheckbox.addEventListener('change', (e) => {
+    this.ERCheckbox.addEventListener('change', (e) => {
       let colors = {
-        'Ensemble paysager': '#063868'
+        'Emplacement_réservé': '#F32525'
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('ensPaysager', colors);
+        this.legendManager.addLegend('ER', colors);
       } else{
-        this.legendManager.removeLegend('ensPaysager');
+        this.legendManager.removeLegend('ER');
       }
 
-      this.show('ens_paysager', 'data/geojson/ens_paysager.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+      this.show('emplReserve', 'data/geojson/empl_reserve.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'type_prescription',
+        colors: colors,
+        alpha: 0.7
+      });
+
+    });
+
+    this.margeCheckbox.addEventListener('change', (e) => {
+      let colors = {
+        'Marge_voirie': '#966464',
+        'Marge_cours_eau': '#E58787',
+        'Marge_voie_ferree': '#760808',
+        'Marge_lisiere': '#DB4A15'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('margeRecul', colors);
+      } else{
+        this.legendManager.removeLegend('margeRecul');
+      }
+
+      this.show('margeRecul', 'data/geojson/marge_recul.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'sous_type',
         colors: colors,
@@ -324,9 +346,29 @@ class Menu {
 
     });
 
+    this.ensPaysagerCheckbox.addEventListener('change', (e) => {
+      let color = {
+        'Ensemble_paysager': '#063868'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('ensPaysager', color);
+      } else{
+        this.legendManager.removeLegend('ensPaysager');
+      }
+
+      this.show('ens_paysager', 'data/geojson/ens_paysager.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'sous_type',
+        colors: color,
+        alpha: 0.7
+      });
+
+    });
+
     this.batiInteressantCheckbox.addEventListener('change', (e) => {
       let colors = {
-        'Intéressant': '#11C7E9'
+        'Bati_intéressant': '#11C7E9'
       }
 
       if(e.target.checked){
@@ -346,7 +388,7 @@ class Menu {
 
     this.batiExceptionnelCheckbox.addEventListener('change', (e) => {
       let colors = {
-        'Exceptionnel': '#0C77D9'
+        'Bati_exceptionnel': '#0C77D9'
       }
 
       if(e.target.checked){
@@ -366,7 +408,7 @@ class Menu {
 
     this.continuiteCheckbox.addEventListener('change', (e) => {
       let color = {
-        'Continuité écologique': '#00741D'
+        'Continuité_écologique': '#00741D'
       }
 
       if(e.target.checked){
@@ -385,7 +427,7 @@ class Menu {
 
     this.planteCheckbox.addEventListener('change', (e) => {
       let color = {
-        'Espace planté': '#39BC56',
+        'Espace_planté': '#39BC56',
       }
 
       if(e.target.checked){
@@ -404,7 +446,7 @@ class Menu {
 
     this.jardinCheckbox.addEventListener('change', (e) => {
       let color = {
-        '07_jardin_devant': '#42B50C',
+        'Jardin_devant': '#42B50C',
       }
 
       if(e.target.checked){
@@ -425,7 +467,7 @@ class Menu {
 
     this.alignementCheckbox.addEventListener('change', (e) => {
       let color = {
-        '07_alignement_arbres': '#08BA2A',
+        'Alignement_arbres': '#08BA2A',
       }
 
       if(e.target.checked){
@@ -444,7 +486,7 @@ class Menu {
 
     this.arbreCheckbox.addEventListener('change', (e) => {
       let color = {
-        'Arbre': '#8AC467',
+        'Arbre_remarquable': '#8AC467',
       }
 
       if(e.target.checked){
@@ -455,7 +497,7 @@ class Menu {
 
       this.show('arbre', 'data/geojson/arbres.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
-        classificationField: 'type_prescription',
+        classificationField: 'name',
         markerSymbol: 'park'
         /*colors: color,
         alpha: 0.4*/
@@ -477,7 +519,7 @@ class Menu {
 
       this.show('trame_verte_bleue', 'data/geojson/tvb.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
-        classificationField: 'type',
+        classificationField: 'name',
         colors: color,
         alpha: 0.4
       });
@@ -487,7 +529,7 @@ class Menu {
 
     this.zhAvereesCheckbox.addEventListener('change', (e) => {
       let color = {
-        'Zone humide avérée': '#A551ED'
+        'Zone_humide_avérée': '#A551ED'
       }
 
       if(e.target.checked){
@@ -498,7 +540,7 @@ class Menu {
 
       this.show('zones_humides', 'data/geojson/zh_averees.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
-        classificationField: 'type',
+        classificationField: 'name',
         colors: color,
         alpha: 0.4
       });
@@ -506,7 +548,7 @@ class Menu {
 
     this.solPollueCheckbox.addEventListener('change', (e) => {
       let color = {
-        'Sol pollué': '#84560D'
+        'Sol_pollué': '#84560D'
       }
 
       if(e.target.checked){
@@ -525,7 +567,7 @@ class Menu {
 
     this.risqueTechnoCheckbox.addEventListener('change', (e) => {
       let color = {
-        'Technologique': '#D40606'
+        'Risque_technologique': '#D40606'
       }
 
       if(e.target.checked){
@@ -544,8 +586,8 @@ class Menu {
 
     this.ppriNappeCheckbox.addEventListener('change', (e) => {
       let color = {
-        '< 0 m (nappe débordante)': '#FF0000',
-        'de 0 à 1 m': '#CE6A27'
+        '<0m_(nappe_débordante)': '#FF0000',
+        '0-1m': '#CE6A27'
       }
 
       if(e.target.checked){
@@ -610,7 +652,7 @@ class Menu {
 
     this.reservoirACheckbox.addEventListener('change', (e) => {
       let color = {
-        'Réservoir arboré': '#A2A706'
+        'Réservoir_arboré': '#A2A706'
       }
 
       if(e.target.checked){
@@ -621,7 +663,7 @@ class Menu {
 
       this.show('tnu_reservoirA', 'data/geojson/tnu_reserv_arbore.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
-        classificationField: 'type',
+        classificationField: 'name',
         colors: color,
         alpha: 0.4
       });
@@ -629,7 +671,7 @@ class Menu {
 
     this.reservoirHCheckbox.addEventListener('change', (e) => {
       let color = {
-        'Réservoir herbacé': '#5FA706'
+        'Réservoir_herbacé': '#5FA706'
       }
 
       if(e.target.checked){
@@ -640,7 +682,7 @@ class Menu {
 
       this.show('tnu_reservoirH', 'data/geojson/tnu_reservoir_herbace.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
-        classificationField: 'type',
+        classificationField: 'name',
         colors: color,
         alpha: 0.4
       });
@@ -648,7 +690,7 @@ class Menu {
 
     this.corridorHCheckbox.addEventListener('change', (e) => {
       let color = {
-        'Corridor herbacé': '#06A783'
+        'Corridor_herbacé': '#06A783'
       }
 
       if(e.target.checked){
@@ -659,7 +701,7 @@ class Menu {
 
       this.show('tnu_corridorH', 'data/geojson/tnu_corridor_herbace.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
-        classificationField: 'type',
+        classificationField: 'name',
         colors: color,
         alpha: 0.4
       });
@@ -667,7 +709,7 @@ class Menu {
 
     this.corridorACheckbox.addEventListener('change', (e) => {
       let color = {
-        'Corridor arboré': '#D7C518'
+        'Corridor_arboré': '#D7C518'
       }
 
       if(e.target.checked){
@@ -678,13 +720,13 @@ class Menu {
 
       this.show('tnu_corridorA', 'data/geojson/tnu_corridor_arbore.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
-        classificationField: 'type',
+        classificationField: 'name',
         colors: color,
         alpha: 0.4
       });
     });
 
-    // HABITAT
+    // DIVERS
     this.monumentCheckbox.addEventListener('change', (e) => {
       let colors = {
         'classé': '#D1D716',
@@ -705,7 +747,6 @@ class Menu {
       });
 
     });
-
 
   }
 
@@ -811,6 +852,14 @@ class Menu {
 
     });
   }
+
+formulaireFichier(){
+  document.querySelector("#ajouter").addEventListener('click', (e) => {
+    var fichier = $('#fichier').val();
+
+    globe.loadGeoJson(fichier);
+  });
+}
 
   showPlu(show){
       this.show('plu', '../Cesium/data/geojson/contours_PLUI.geojson', Globe.prototype.loadGeoJson.bind(this.globe), show, {

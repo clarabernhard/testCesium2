@@ -21,7 +21,7 @@ html, body {
     top: 0;
     left: -440px;
     width: 440px;
-    height: 88%;
+    height: 100%;
     background-color: rgba(9, 12, 16, 0.60);
     padding: 5px 5px 0px 5px;
     border: 1px solid #000;
@@ -168,12 +168,26 @@ html, body {
    position: relative;
    z-index: 1;
    overflow-x: none;
-   width: 80%;
+   width: 70%;
    padding: 10px;
  }
 
- .ppri {
-   display: none;
+ .deroulant {
+   display: block;
+   width: 100%;
+   background-color: #636F79;
+   padding: 5px;
+   border-radius: 5px 5px 0 0;
+   text-align: center;
+   color: white;
+   cursor: pointer;
+   overflow-x: none;
+ }
+
+ #boutonfile {
+   position: relative;
+   left: 350px;
+   top: 5px;
  }
 
 
@@ -304,7 +318,8 @@ i {
   position: absolute;
   top: 7px;
   left: 180px;
-  /* lien à insérer pour l'image: <a href="https://icons8.com/icon/9247/partly-cloudy-day-filled">Partly Cloudy Day Filled icon by Icons8</a></a> */
+  /* lien à insérer pour l'image: <a href="https://icons8.com/icon/9247/partly-cloudy-day-filled">Partly Cloudy Day Filled icon by Icons8</a>
+  <a href="https://icons8.com/icon/11550/add-file">Add File icon by Icons8</a>*/
 }
 
 #time {

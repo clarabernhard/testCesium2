@@ -8,7 +8,7 @@
   <title>Cesium2</title>
   <link rel="stylesheet" href="../Cesium/lib/jQuery/jquery-ui.min.css" />
   <link rel="stylesheet" href="src/index.css" media="screen" />
-  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <!--<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">-->
   <script src="../Cesium/lib/Cesium/Cesium.js"></script>
 </head>
 <body>
@@ -109,6 +109,15 @@
       <button id="supprimercoupe">Supprimer</button> <br/>
     </div>
 
+    <div class="backdrop hidden" id="fileList">
+      <h2>Ajouter une couche</h2>
+      <form>
+        <!--<label for="test" class="btn">Ajouter</label>-->
+        <input id="fichier" type="file"> <br/>
+      </form>
+      <button id="ajouter">Ajouter</button>
+    </div>
+
   </div>
 
   <div id=right-pane>
@@ -123,18 +132,32 @@
     <div class="panel">
       <div id="menu-content"> MENU </div>
 
-      <div class="nowrap">
+      <div class="nowrap" id="photo">
         <input id="photoMaillage" type="checkbox" checked/>
         <label for="photoMaillage">Afficher le photomaillage</label>
       </div>
 
-      <button class="panel-title">REGLEMENTAIRE - PLU
+      <button class="button" id="boutonfile"><img src="src/img/icons8-add-file-50.png"></button>
+      <br/>
+      <br/>
+
+      <button class="panel-title">PLU
         <i class="arrow"></i>
       </button>
       <div class="panel-content">
         <div class="nowrap">
           <input id="plu" type="checkbox"/>
           <label for="plu">Zonage du PLU</label>
+        </div>
+
+        <div class="nowrap">
+          <input id="ER" type="checkbox"/>
+          <label for="ER">Emplacements réservés</label>
+        </div>
+
+        <div class="nowrap">
+          <input id="marge" type="checkbox"/>
+          <label for="marge">Marges de recul</label>
         </div>
 
         <div class="nowrap">
@@ -206,7 +229,7 @@
         <button class="deroulant">PPRI
           <i class="arrow"></i>
         </button>
-        <div class="ppri">
+        <div class="hidden">
           <div class="nowrap">
             <input id="ppriNappe" type="checkbox"/>
             <label for="ppriNappe">Profondeur de la nappe phréatique en période de hautes eaux centennales</label>
@@ -220,12 +243,11 @@
             <label for="ppriSub">Aléas inondation par submersion</label>
           </div>
         </div>
-        <br/> <br/>
 
         <button class="deroulant">Tissu naturel urbain
           <i class="arrow"></i>
         </button>
-        <div class="ppri">
+        <div class="hidden">
           <div class="nowrap">
             <input id="corridorH" type="checkbox"/>
             <label for="corridorH">Corridor herbacé</label>
@@ -246,7 +268,7 @@
 
       </div>
 
-      <button class="panel-title">HABITAT
+      <button class="panel-title">REGLEMENTAIRE
         <i class="arrow"></i>
       </button>
       <div class="panel-content">
@@ -255,21 +277,52 @@
           <input id="monument" type="checkbox"/>
           <label for="monument">Monuments historiques</label>
         </div>
+      </div>
 
-        <div class="nowrap">
-          <input id="batipublic" type="checkbox"/>
-          <label for="batipublic">Bâtiments public</label>
+      <button class="panel-title">DIVERS
+        <i class="arrow"></i>
+      </button>
+      <div class="hidden">
+        <button class="deroulant">Bâtiments publics
+          <i class="arrow"></i>
+        </button>
+        <div class="batiments">
+          <div class="nowrap">
+            <input id="administratif" type="checkbox"/>
+            <label for="administratif">Administratif</label>
+          </div>
+          <div class="nowrap">
+            <input id="religieux" type="checkbox"/>
+            <label for="religieux">Religieux</label>
+          </div>
+          <div class="nowrap">
+            <input id="culturel" type="checkbox"/>
+            <label for="culturel">Culturel</label>
+          </div>
+          <div class="nowrap">
+            <input id="enseignement" type="checkbox"/>
+            <label for="enseignement">Enseignement</label>
+          </div>
+          <div class="nowrap">
+            <input id="social" type="checkbox"/>
+            <label for="social">Social</label>
+          </div>
+          <div class="nowrap">
+            <input id="sante" type="checkbox"/>
+            <label for="sante">Santé</label>
+          </div>
+          <div class="nowrap">
+            <input id="sportif" type="checkbox"/>
+            <label for="sportif">Sportif</label>
+          </div>
+          <div class="nowrap">
+            <input id="historique" type="checkbox"/>
+            <label for="historique">Historique</label>
+          </div>
         </div>
-
       </div>
 
     </div>
-
-    <div id="bouton">
-      <!--<label for="test" class="btn">Ajouter</label>-->
-      <input id="fichier" type="file">
-    </div>
-
   </div>
 
   <div class= "menuClic" id="mesures">
