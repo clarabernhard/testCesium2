@@ -94,10 +94,12 @@ loadGeoJson(link, options = {}){
   let promisse = Cesium.GeoJsonDataSource.load(link, {
     clampToGround : true,
     markerSymbol: 'park'
+    markerColor: Cesium.Color.fromCssColorString('#007F24')
   });
   promisse.then((dataSource) => {
 
     this.viewer.dataSources.add(dataSource);
+
 
     if(options.classification && options.classificationField !== undefined){
       // Get the array of entities
@@ -183,7 +185,7 @@ addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe,
         new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 0.0, -1.0), 0.0)
       ],
     });
-return tileset.readyPromise.then(function() {
+//return tileset.readyPromise.then(function() {
     for (var i = 0; i < clippingPlanes.length; ++i) {
       var coords = proj4('EPSG:3948','EPSG:4326', [X, Y]);
       var a = Number(this.raf09.getGeoide(coords[1], coords[0]));
@@ -205,8 +207,8 @@ return tileset.readyPromise.then(function() {
       });
       planeEntities.push(planeEntity);
     }
-    return tileset;
-  });
+    /*return tileset;
+  });*/
 
   document.querySelector("#supprimercoupe").addEventListener('click', (e) => {
     this.viewer.entities.remove(planeEntity);

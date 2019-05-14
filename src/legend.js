@@ -8,14 +8,14 @@ class LegendManager {
         this.legendContainer = legendContainer;
     }
 
-    addLegend(id, values){
+    addLegend(id, values, choice){
         let legend = document.createElement('div');
         legend.id = id;
         legend.classList.add('legend');
         legend.classList.add('backdrop');
 
         Object.keys(values).forEach((key) => {
-            legend.appendChild(this.makeLegendItem(key, values[key]));
+            legend.appendChild(this.makeLegendItem(key, values[key], choice));
         });
 
         this.legendContainer.appendChild(legend);
@@ -30,9 +30,13 @@ class LegendManager {
         return this.legendContainer.querySelectorAll('#' + id).length != 0;
     }*/
 
-    makeLegendItem(label, color){
+    makeLegendItem(label, color, choice){
         let legendColor = document.createElement('span');
-        legendColor.classList.add('legend-color');
+        if(choice === 'line'){
+          legendColor.classList.add('legend-line');
+        } else if(choice === 'polygon') {
+          legendColor.classList.add('legend-color');
+        }
         legendColor.style = "background-color: " + color + ";";
 
         let legendText = document.createElement('span');

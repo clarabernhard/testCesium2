@@ -1,14 +1,5 @@
 "use strict";
 
-// Fonctions pour controler le loader
-let showLoader = function(){
-  document.querySelector('#loadingIndicator').classList.remove('hidden');
-}
-
-let hideLoader = function(){
-  document.querySelector('#loadingIndicator').classList.add('hidden');
-}
-
 // Gérer les interactions avec l'utilisateur (évènement sur le menu)
 class Menu {
 
@@ -18,27 +9,24 @@ class Menu {
     this.viewer = Globe.viewer;
     this.handler = Globe.handler;
 
+    // boutons de personnalisation
+    this.addFile = document.querySelector("#boutonfile");
+    this.config = document.querySelector("#config");
+    this.reset = document.querySelector("#reset");
+    this.configDefaut = document.querySelector("#configDefaut");
+    this.configPLU = document.querySelector("#configPLU");
+    this.configEco = document.querySelector("#configEco");
+
     // Récuperer les éléments du menu de gauche
     this.leftPane = document.querySelector('#left-pane');
     this.menu = document.querySelector('#menu');
     this.dropdown = document.getElementsByClassName("panel-title");
     this.deroulant = document.getElementsByClassName("deroulant");
 
-    // élements des boutons de la boite à outils
-    this.mesuresContent = document.querySelector('#mesures-content');
-    this.constructionContent = document.querySelector('#construction-content');
-    this.coupeContent = document.querySelector('#coupe-content');
-    this.timeContent = document.querySelector('#time-content');
-    this.mesuresDiv = document.querySelector('#mesures');
-    this.constructionDiv = document.querySelector('#construction');
-    this.coupeDiv = document.querySelector('#coupe');
-    this.timeDiv = document.querySelector('#time');
-
     // Créer un gestionnaire pour les légendes
     this.legendManager = new LegendManager(this.leftPane);
 
-    // Légendes qui s'affichent au clic des boîtes à outils associées
-    this.aideCheckbox = document.querySelector('.annotation');
+    // Formulaires
     this.distanceList = document.querySelector('#distanceList');
     this.aireList = document.querySelector('#aireList');
     this.planList = document.querySelector('#planList');
@@ -47,11 +35,13 @@ class Menu {
     this.pointList = document.querySelector('#pointList');
     this.volumeList = document.querySelector('#volumeList');
     this.fileList = document.querySelector('#fileList');
+    this.configList = document.querySelector('#configList');
 
-    // Récuperer les checkboxes
+    // annotation en bas à droite
+    this.aideCheckbox = document.querySelector('.annotation');
+
+    // Affichage des couches
     this.photoMaillageCheckbox = document.querySelector('#photoMaillage');
-    this.shadowCheckbox = document.querySelector('#shadows');
-
     // PLU
     this.pluCheckbox = document.querySelector('#plu');
     this.ERCheckbox = document.querySelector('#ER');
@@ -64,7 +54,6 @@ class Menu {
     this.jardinCheckbox = document.querySelector('#jardin');
     this.alignementCheckbox = document.querySelector('#alignement');
     this.arbreCheckbox = document.querySelector('#arbre');
-
     // Ecologie
     this.trameCheckbox = document.querySelector('#tvb');
     this.zhAvereesCheckbox = document.querySelector('#zhaverees');
@@ -77,28 +66,43 @@ class Menu {
     this.corridorACheckbox = document.querySelector('#corridorA');
     this.reservoirHCheckbox = document.querySelector('#reservoirH');
     this.reservoirACheckbox = document.querySelector('#reservoirA');
-
-    //Habitat
+    //Reglementaire
     this.monumentCheckbox = document.querySelector('#monument');
-    this.batiPublicCheckbox = document.querySelector('#batipublic');
+    //Divers
+    this.administratifCheckbox = document.querySelector('#administratif');
+    this.religieuxCheckbox = document.querySelector('#religieux');
+    this.culturelCheckbox = document.querySelector('#culturel');
+    this.enseignementCheckbox = document.querySelector('#enseignement');
+    this.socialCheckbox = document.querySelector('#social');
+    this.santeCheckbox = document.querySelector('#sante');
+    this.sportifCheckbox = document.querySelector('#sportif');
+    this.historiqueCheckbox = document.querySelector('#historique');
 
+    //Boite à outils
+    // boutons de la boite à outils
+    this.mesuresContent = document.querySelector('#mesures-content');
+    this.constructionContent = document.querySelector('#construction-content');
+    this.coupeContent = document.querySelector('#coupe-content');
+    this.timeContent = document.querySelector('#time-content');
+    this.mesuresDiv = document.querySelector('#mesures');
+    this.constructionDiv = document.querySelector('#construction');
+    this.coupeDiv = document.querySelector('#coupe');
+    this.timeDiv = document.querySelector('#time');
     // mesures
     this.coordsCheckbox = document.querySelector('#point');
     this.ligneCheckbox = document.querySelector('#ligne');
     this.surfaceCheckbox = document.querySelector('#surface');
-
     //construction
     this.cpointCheckbox = document.querySelector('#cpoint');
     this.cligneCheckbox = document.querySelector('#cligne');
     this.csurfaceCheckbox = document.querySelector('#csurface');
     this.volumeCheckbox = document.querySelector('#volume');
-
     // plan de coupe
     this.coupeCheckbox = document.querySelector('#plancoupe');
-
+    // ombres
+    this.shadowCheckbox = document.querySelector('#shadows');
     // boutons
     this.supprCheckbox = document.querySelector("#suppr");
-    this.addFile = document.querySelector("#boutonfile");
 
     // Créer le datepicker
     this.datepicker = $("#date")
@@ -109,6 +113,7 @@ class Menu {
     // Avec le nom de la source comme clé et la dataSource comme valeur
     this.dataSources = [];
 
+    // Evenements pour le menu de gauche
     this.openMenu();
     this.menuDeroulant(this.dropdown);
     this.menuDeroulant(this.deroulant);
@@ -116,7 +121,6 @@ class Menu {
     this.menuClic("#boutonconstruction", this.constructionContent);
     this.menuClic("#boutoncoupe", this.coupeContent);
     this.menuClic("#boutontime", this.timeContent);
-    this.newFile();
 
   }
 
@@ -159,15 +163,41 @@ class Menu {
     this.dataSources[name] = value;
   }
 
-  newFile() {
-      this.addFile.addEventListener('click', (e) => {
-        this.fileList.classList.remove('hidden');
-        this.formulaireFichier();
-    });
+  // Fonctions pour controler le loader
+  showLoader(){
+    document.querySelector('#loadingIndicator').classList.remove('hidden');
   }
 
-  // Créer tous les évènements
-  registerEvents(){
+  hideLoader(){
+    document.querySelector('#loadingIndicator').classList.add('hidden');
+  }
+
+  // enregistre toutes les actions sur les boutons (mneus de gauche + boite à outils)
+  evenementsCouches(){
+
+    this.addFile.addEventListener('click', (e) => {
+      this.fileList.classList.toggle('hidden');
+      this.formulaireFichier();
+    });
+
+    //configuration
+    this.config.addEventListener('click', (e) => {
+      this.configList.classList.toggle('hidden');
+    });
+    this.reset.addEventListener('click', (e) => {
+      hideElements();
+    });
+
+    this.configDefaut.addEventListener('click', (e) => {
+      showElements();
+    });
+    this.configPLU.addEventListener('click', (e) => {
+      initPLU();
+    });
+    this.configEco.addEventListener('click', (e) => {
+      initEco();
+    });
+
     this.photoMaillageCheckbox.addEventListener('change', (e) => {
       this.show('photoMaillage', 'data/Photomaillage/Cesium_1.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
     });
@@ -309,7 +339,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('ER', colors);
+        this.legendManager.addLegend('ER', colors, 'polygon');
       } else{
         this.legendManager.removeLegend('ER');
       }
@@ -332,7 +362,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('margeRecul', colors);
+        this.legendManager.addLegend('margeRecul', colors, 'line');
       } else{
         this.legendManager.removeLegend('margeRecul');
       }
@@ -352,7 +382,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('ensPaysager', color);
+        this.legendManager.addLegend('ensPaysager', color, 'polygon');
       } else{
         this.legendManager.removeLegend('ensPaysager');
       }
@@ -372,7 +402,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('batimentsInteressant', colors); // Création de la légende qui a l'ID 'batiments' avec ces couleurs
+        this.legendManager.addLegend('batimentsInteressant', colors, 'polygon'); // Création de la légende qui a l'ID 'batiments' avec ces couleurs
       } else{
         this.legendManager.removeLegend('batimentsInteressant'); // Suppression de la légende qui a l'ID 'batiments'
       }
@@ -381,7 +411,7 @@ class Menu {
         classification: true,
         classificationField: 'sous_type',
         colors: colors,
-        alpha: 0.4
+        alpha: 0.5
       });
 
     });
@@ -392,7 +422,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('batimentsExceptionnel', colors);
+        this.legendManager.addLegend('batimentsExceptionnel', colors, 'polygon');
       } else{
         this.legendManager.removeLegend('batimentsExceptionnel');
       }
@@ -412,7 +442,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('continuite', color);
+        this.legendManager.addLegend('continuite', color, 'polygon');
       } else{
         this.legendManager.removeLegend('continuite');
       }
@@ -421,7 +451,7 @@ class Menu {
         classification: true,
         classificationField: 'sous_type',
         colors: color,
-        alpha: 0.4
+        alpha: 0.5
       });
     });
 
@@ -431,7 +461,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('plante', color);
+        this.legendManager.addLegend('plante', color, 'polygon');
       } else{
         this.legendManager.removeLegend('plante');
       }
@@ -440,7 +470,7 @@ class Menu {
         classification: true,
         classificationField: 'sous_type',
         colors: color,
-        alpha: 0.4
+        alpha: 0.5
       });
     });
 
@@ -450,7 +480,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('jardin', color);
+        this.legendManager.addLegend('jardin', color, 'line');
       } else{
         this.legendManager.removeLegend('jardin');
       }
@@ -458,9 +488,7 @@ class Menu {
       this.show('jardin', 'data/geojson/jardin_devant.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'sous_type',
-        outline: true,
-        outlineColor: color,
-        outlineWidth: 5,
+        colors: color,
         alpha: 1
       });
     });
@@ -471,7 +499,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('aligne', color);
+        this.legendManager.addLegend('aligne', color, 'line');
       } else{
         this.legendManager.removeLegend('aligne');
       }
@@ -480,7 +508,7 @@ class Menu {
         classification: true,
         classificationField: 'sous_type',
         colors: color,
-        alpha: 0.4
+        alpha: 0.5
       });
     });
 
@@ -490,7 +518,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('arbre', color);
+        this.legendManager.addLegend('arbre', color, 'line');
       } else{
         this.legendManager.removeLegend('arbre');
       }
@@ -498,9 +526,8 @@ class Menu {
       this.show('arbre', 'data/geojson/arbres.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'name',
-        markerSymbol: 'park'
-        /*colors: color,
-        alpha: 0.4*/
+        colors: color,
+        alpha: 0.4
       });
     });
 
@@ -512,7 +539,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('trame', color);
+        this.legendManager.addLegend('trame', color, 'polygon');
       } else{
         this.legendManager.removeLegend('trame');
       }
@@ -533,7 +560,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('zh_averees', color);
+        this.legendManager.addLegend('zh_averees', color, 'polygon');
       } else{
         this.legendManager.removeLegend('zh_averees');
       }
@@ -552,7 +579,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('sol_pollue', color);
+        this.legendManager.addLegend('sol_pollue', color, 'polygon');
       } else{
         this.legendManager.removeLegend('sol_pollue');
       }
@@ -571,7 +598,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('risquetechno', color);
+        this.legendManager.addLegend('risquetechno', color, 'polygon');
       } else{
         this.legendManager.removeLegend('risquetechno');
       }
@@ -591,7 +618,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('nappe', color);
+        this.legendManager.addLegend('nappe', color, 'polygon');
       } else{
         this.legendManager.removeLegend('nappe');
       }
@@ -611,7 +638,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('remont', colors);
+        this.legendManager.addLegend('remont', colors, 'polygon');
       } else{
         this.legendManager.removeLegend('remont');
       }
@@ -637,7 +664,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('submersion', colors);
+        this.legendManager.addLegend('submersion', colors, 'polygon');
       } else{
         this.legendManager.removeLegend('submersion');
       }
@@ -656,7 +683,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('reservoirA', color);
+        this.legendManager.addLegend('reservoirA', color, 'polygon');
       } else{
         this.legendManager.removeLegend('reservoirA');
       }
@@ -675,7 +702,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('reservoirH', color);
+        this.legendManager.addLegend('reservoirH', color, 'polygon');
       } else{
         this.legendManager.removeLegend('reservoirH');
       }
@@ -694,7 +721,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('corridorH', color);
+        this.legendManager.addLegend('corridorH', color, 'polygon');
       } else{
         this.legendManager.removeLegend('corridorH');
       }
@@ -713,7 +740,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('corridorA', color);
+        this.legendManager.addLegend('corridorA', color, 'polygon');
       } else{
         this.legendManager.removeLegend('corridorA');
       }
@@ -734,7 +761,7 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('monuments_historiques', colors);
+        this.legendManager.addLegend('monuments_historiques', colors, 'polygon');
       } else{
         this.legendManager.removeLegend('monuments_historiques');
       }
@@ -743,7 +770,167 @@ class Menu {
         classification: true,
         classificationField: 'type_entite',
         colors: colors,
-        alpha: 0.4
+        alpha: 0.6
+      });
+
+    });
+
+    this.administratifCheckbox.addEventListener('change', (e) => {
+      let colors = {
+        'administratif': '#DEC01F'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('administratif', colors, 'polygon');
+      } else{
+        this.legendManager.removeLegend('administratif');
+      }
+
+      this.show('administratif', 'data/geojson/batipublic_administratif.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'categorie',
+        colors: colors,
+        alpha: 0.6
+      });
+
+    });
+
+    this.religieuxCheckbox.addEventListener('change', (e) => {
+      let colors = {
+        'religieux': '#5604C4'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('religieux', colors, 'polygon');
+      } else{
+        this.legendManager.removeLegend('religieux');
+      }
+
+      this.show('religieux', 'data/geojson/batipublic_religieux.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'categorie',
+        colors: colors,
+        alpha: 0.6
+      });
+
+    });
+
+    this.culturelCheckbox.addEventListener('change', (e) => {
+      let colors = {
+        'culturel': '#1FBDDE'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('culturel', colors, 'polygon');
+      } else{
+        this.legendManager.removeLegend('culturel');
+      }
+
+      this.show('culturel', 'data/geojson/batipublic_culturel.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'categorie',
+        colors: colors,
+        alpha: 0.6
+      });
+
+    });
+
+    this.socialCheckbox.addEventListener('change', (e) => {
+      let colors = {
+        'social': '#E36100'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('social', colors, 'polygon');
+      } else{
+        this.legendManager.removeLegend('social');
+      }
+
+      this.show('social', 'data/geojson/batipublic_social.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'categorie',
+        colors: colors,
+        alpha: 0.6
+      });
+
+    });
+
+    this.historiqueCheckbox.addEventListener('change', (e) => {
+      let colors = {
+        'historique': '#E3002B'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('historique', colors, 'polygon');
+      } else{
+        this.legendManager.removeLegend('historique');
+      }
+
+      this.show('historique', 'data/geojson/batipublic_historique.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'categorie',
+        colors: colors,
+        alpha: 0.6
+      });
+
+    });
+
+    this.santeCheckbox.addEventListener('change', (e) => {
+      let colors = {
+        'sante': '#10AA7E'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('sante', colors, 'polygon');
+      } else{
+        this.legendManager.removeLegend('sante');
+      }
+
+      this.show('sante', 'data/geojson/batipublic_sante.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'categorie',
+        colors: colors,
+        alpha: 0.6
+      });
+
+    });
+
+    this.sportifCheckbox.addEventListener('change', (e) => {
+      let colors = {
+        'sportif': '#0F4CEF'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('sportif', colors, 'polygon');
+      } else{
+        this.legendManager.removeLegend('sportif');
+      }
+
+      this.show('sportif', 'data/geojson/batipublic_sportif.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'categorie',
+        colors: colors,
+        alpha: 0.6
+      });
+
+    });
+
+    this.enseignementCheckbox.addEventListener('change', (e) => {
+      let colors = {
+        'enseignement': '#008B1F'
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('enseignement', colors, 'polygon');
+      } else{
+        this.legendManager.removeLegend('enseignement');
+      }
+
+      this.show('enseignement', 'data/geojson/batipublic_enseignement.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'categorie',
+        colors: colors,
+        alpha: 0.6
       });
 
     });
@@ -759,10 +946,10 @@ class Menu {
   show(name, link, loader, show, options = {}){
     if(show){
       if(this.dataSources[name] === undefined){
-        showLoader();
+        this.showLoader();
         loader(link, options).then((data) => {
           this.dataSources[name] = data;
-          hideLoader();
+          this.hideLoader();
         });
       } else{
         this.dataSources[name].show = true;

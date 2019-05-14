@@ -128,7 +128,6 @@ html, body {
  }
 
 .panel .panel-title{
-
   display: block;
   width: 100%;
   background-color: #909499;
@@ -163,15 +162,6 @@ html, body {
    overflow-x: none;
  }
 
- #menu #bouton {
-   display: block;
-   position: relative;
-   z-index: 1;
-   overflow-x: none;
-   width: 70%;
-   padding: 10px;
- }
-
  .deroulant {
    display: block;
    width: 100%;
@@ -185,11 +175,30 @@ html, body {
  }
 
  #boutonfile {
-   position: relative;
-   left: 350px;
-   top: 5px;
+   display: block;
+   position: absolute;
+   left: 340px;
+   top: 75px;
  }
 
+ #config {
+   display: block;
+   position: absolute;
+   left: 10px;
+   background-color: #ECECEC;
+   color: black;
+   width: 25%;
+ }
+  #reset {
+    display: block;
+    position: absolute;
+    left: 10px;
+    top: 110px;
+    background-color: #ECECEC;
+    color: black;
+    width: 25%;
+
+  }
 
 /* Style des légendes */
 .backdrop {
@@ -234,6 +243,15 @@ html, body {
     content: '';
     display: table;
     clear: both;
+}
+
+.legend .legend-line {
+  display: block;
+  height: 3px;
+  line-height: 25px;
+  width: 30%;
+  float: left;
+  margin-bottom: 5px;
 }
 
 .tab {
@@ -350,26 +368,40 @@ i {
 .aide {
   display: none;
   background-color: #FFFFFF;
-  position: absolute;
-
   font-size: small;
 }
 
 #mesures:hover #annotationM {
   display: block;
   width: 120px;
+  position: relative;
+  top: -10px;
+  left: 10px;
+  z-index: 2;
 }
 #construction:hover #annotationD {
   display: block;
   width: 110px;
+  position: relative;
+  top: -10px;
+  left: 10px;
+  z-index: 2;
 }
 #coupe:hover #annotationC {
   display: block;
-  width: 110px;
+  width: 105px;
+  position: relative;
+  top: -10px;
+  left: 10px;
+  z-index: 2;
 }
 #time:hover #annotationT {
   display: block;
   width: auto;
+  position: relative;
+  top: -10px;
+  left: 10px;
+  z-index: 2;
 }
 
 .menuClic {

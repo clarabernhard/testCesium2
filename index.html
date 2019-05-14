@@ -111,11 +111,16 @@
 
     <div class="backdrop hidden" id="fileList">
       <h2>Ajouter une couche</h2>
-      <form>
-        <!--<label for="test" class="btn">Ajouter</label>-->
-        <input id="fichier" type="file"> <br/>
-      </form>
-      <button id="ajouter">Ajouter</button>
+      <!--<label for="test" class="btn">Ajouter</label>-->
+      <p><input id="fichier" type="file" accept=".json,.kml"> </p>
+      <p><button id="ajouter">Ajouter</button> </p>
+    </div>
+
+    <div class="backdrop hidden" id="configList">
+      <h2>Choisissez votre configuration</h2>
+      <p><button id="configDefaut">Configuration par défaut</button></p>
+      <p><button id="configPLU">Configuration PLU</button></p>
+      <p><button id="configEco">Configuration écologie du territoire</button></p>
     </div>
 
   </div>
@@ -137,65 +142,67 @@
         <label for="photoMaillage">Afficher le photomaillage</label>
       </div>
 
+      <button class="button" id="config">Configuration</button>
+      <button class="button" id="reset">Réinitialiser</button>
+
       <button class="button" id="boutonfile"><img src="src/img/icons8-add-file-50.png"></button>
-      <br/>
-      <br/>
+      <br/><br/><br/><br/>
 
       <button class="panel-title">PLU
         <i class="arrow"></i>
       </button>
       <div class="panel-content">
-        <div class="nowrap">
+        <div class="nowrap hidden"id="pluDiv">
           <input id="plu" type="checkbox"/>
           <label for="plu">Zonage du PLU</label>
         </div>
 
-        <div class="nowrap">
+        <div class="nowrap hidden" id="ERDiv">
           <input id="ER" type="checkbox"/>
           <label for="ER">Emplacements réservés</label>
         </div>
 
-        <div class="nowrap">
+        <div class="nowrap hidden" id="margeDiv">
           <input id="marge" type="checkbox"/>
           <label for="marge">Marges de recul</label>
         </div>
 
-        <div class="nowrap">
+        <div class="nowrap hidden" id="ensPaysagerDiv">
           <input id="ensPaysager" type="checkbox"/>
           <label for="ensPaysager">Ensemble d'intérêt urbain et paysager</label>
         </div>
 
-        <div class="nowrap">
+        <div class="nowrap hidden" id="batiExceptionnelDiv">
           <input id="batiExceptionnel" type="checkbox"/>
           <label for="batiExceptionnel">Bâtiments exceptionnels</label>
         </div>
 
-        <div class="nowrap">
+        <div class="nowrap hidden" id="batiInteressantDiv">
           <input id="batiInteressant" type="checkbox"/>
           <label for="batiInteressant">Bâtiments intéressants</label>
         </div>
 
-        <div class="nowrap">
+        <div class="nowrap hidden" id="continuiteDiv">
           <input id="continuite" type="checkbox"/>
           <label for="continuite">Espaces contribuant aux continuités écologiques</label>
         </div>
 
-        <div class="nowrap">
+        <div class="nowrap hidden" id="planteDiv">
           <input id="plante" type="checkbox"/>
           <label for="plante">Espaces plantés à protéger ou à créer</label>
         </div>
 
-        <div class="nowrap">
+        <div class="nowrap hidden" id="jardinDiv">
           <input id="jardin" type="checkbox"/>
           <label for="jardin">Jardin de devant à conserver ou à créer</label>
         </div>
 
-        <div class="nowrap">
+        <div class="nowrap hidden" id="alignementDiv">
           <input id="alignement" type="checkbox"/>
           <label for="alignement">Alignement d'arbres à conserver ou à créer</label>
         </div>
 
-        <div class="nowrap">
+        <div class="nowrap hidden" id="arbreDiv">
           <input id="arbre" type="checkbox"/>
           <label for="arbre">Arbre ou groupe d'arbres à conserver ou à créer</label>
         </div>
@@ -206,27 +213,27 @@
         <i class="arrow"></i>
       </button>
       <div class="panel-content">
-        <div class="nowrap">
+        <div class="nowrap hidden" id="tvbDiv">
           <input id="tvb" type="checkbox"/>
           <label for="tvb">Trame verte et bleue</label>
         </div>
 
-        <div class="nowrap">
+        <div class="nowrap hidden" id="zhavereesDiv">
           <input id="zhaverees" type="checkbox"/>
           <label for="zhaverees">Zones humides avérées</label>
         </div>
 
-        <div class="nowrap">
+        <div class="nowrap hidden" id="pollueDiv">
           <input id="pollue" type="checkbox"/>
           <label for="pollue">Sol pollué</label>
         </div>
 
-        <div class="nowrap">
+        <div class="nowrap hidden" id="risquetechnoDiv">
           <input id="risquetechno" type="checkbox"/>
           <label for="risquetechno">Risques technologiques</label>
         </div>
 
-        <button class="deroulant">PPRI
+        <button class="deroulant hidden" id="ppriDiv">PPRI
           <i class="arrow"></i>
         </button>
         <div class="hidden">
@@ -244,7 +251,7 @@
           </div>
         </div>
 
-        <button class="deroulant">Tissu naturel urbain
+        <button class="deroulant hidden" id="tnuDiv">Tissu naturel urbain
           <i class="arrow"></i>
         </button>
         <div class="hidden">
@@ -272,8 +279,7 @@
         <i class="arrow"></i>
       </button>
       <div class="panel-content">
-
-        <div class="nowrap">
+        <div class="nowrap hidden" id="monumentDiv">
           <input id="monument" type="checkbox"/>
           <label for="monument">Monuments historiques</label>
         </div>
@@ -282,11 +288,11 @@
       <button class="panel-title">DIVERS
         <i class="arrow"></i>
       </button>
-      <div class="hidden">
-        <button class="deroulant">Bâtiments publics
+      <div class="panel-content">
+        <button class="deroulant hidden" id="batipublicDiv">Bâtiments publics
           <i class="arrow"></i>
         </button>
-        <div class="batiments">
+        <div class="hidden">
           <div class="nowrap">
             <input id="administratif" type="checkbox"/>
             <label for="administratif">Administratif</label>
@@ -319,9 +325,9 @@
             <input id="historique" type="checkbox"/>
             <label for="historique">Historique</label>
           </div>
-        </div>
-      </div>
 
+      </div>
+      </div>
     </div>
   </div>
 
@@ -413,6 +419,7 @@
   <script src="../Cesium/lib/jQuery/jquery-ui.min.js"></script>
   <script src="../Cesium/lib/proj4.js"></script>
 
+  <script src="src/config.js"></script>
   <script src="src/globe.js"></script>
   <script src="src/legend.js"></script>
   <script src="src/geocoder.js"></script>
