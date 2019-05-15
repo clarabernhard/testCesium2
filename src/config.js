@@ -16,6 +16,7 @@ this.trameDiv = document.querySelector('#tvbDiv');
 this.zhAvereesDiv = document.querySelector('#zhavereesDiv');
 this.solPollueDiv = document.querySelector('#pollueDiv');
 this.risqueTechnoDiv = document.querySelector('#risquetechnoDiv');
+this.arbresRemDiv = document.querySelector('#arbresRemDiv');
 this.ppriDiv = document.querySelector('#ppriDiv');
 this.tnuDiv = document.querySelector('#tnuDiv');
 
@@ -45,6 +46,7 @@ function hideElements() {
   this.zhAvereesDiv.classList.add('hidden');
   this.solPollueDiv.classList.add('hidden');
   this.risqueTechnoDiv.classList.add('hidden');
+  this.arbresRemDiv.classList.add('hidden');
   this.ppriDiv.classList.add('hidden');
   this.tnuDiv.classList.add('hidden');
 
@@ -75,6 +77,7 @@ function showElements() {
   this.zhAvereesDiv.classList.remove('hidden');
   this.solPollueDiv.classList.remove('hidden');
   this.risqueTechnoDiv.classList.remove('hidden');
+  this.arbresRemDiv.classList.remove('hidden');
   this.ppriDiv.classList.remove('hidden');
   this.tnuDiv.classList.remove('hidden');
 
@@ -104,6 +107,7 @@ function initPLU() {
     this.zhAvereesDiv.classList.add('hidden');
     this.solPollueDiv.classList.add('hidden');
     this.risqueTechnoDiv.classList.add('hidden');
+    this.arbresRemDiv.classList.add('hidden');
     this.ppriDiv.classList.add('hidden');
     this.tnuDiv.classList.add('hidden');
     //Reglementaire
@@ -132,6 +136,7 @@ function initEco() {
   this.zhAvereesDiv.classList.remove('hidden');
   this.solPollueDiv.classList.remove('hidden');
   this.risqueTechnoDiv.classList.remove('hidden');
+  this.arbresRemDiv.classList.remove('hidden');
   this.ppriDiv.classList.remove('hidden');
   this.tnuDiv.classList.remove('hidden');
   //Reglementaire

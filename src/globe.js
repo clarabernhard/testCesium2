@@ -92,8 +92,8 @@ loadKml(link, options = {clampToGround : true}){
 
 loadGeoJson(link, options = {}){
   let promisse = Cesium.GeoJsonDataSource.load(link, {
-    clampToGround : true,
-    markerSymbol: 'park'
+    clampToGround: true,
+    markerSymbol: 'park',
     markerColor: Cesium.Color.fromCssColorString('#007F24')
   });
   promisse.then((dataSource) => {

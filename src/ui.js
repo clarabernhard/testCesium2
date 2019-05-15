@@ -59,6 +59,7 @@ class Menu {
     this.zhAvereesCheckbox = document.querySelector('#zhaverees');
     this.solPollueCheckbox = document.querySelector('#pollue');
     this.risqueTechnoCheckbox = document.querySelector('#risquetechno');
+    this.arbreRemCheckbox = document.querySelector('#arbresRem');
     this.ppriNappeCheckbox = document.querySelector('#ppriNappe');
     this.ppriRemontCheckbox = document.querySelector('#ppriRemont');
     this.ppriSubCheckbox = document.querySelector('#ppriSub');
@@ -154,13 +155,19 @@ class Menu {
 
   menuClic(bouton, element) {
     document.querySelector(bouton).addEventListener('click', (e) => {
+      /*if (!e.target.matches(bouton)) {
+        if (element.classList.contains('show')) {
+          element.classList.remove('show');
+        }
+      }*/
       element.classList.toggle('show');
     });
-  }
+}
 
   // Ajouter une source de données a la liste en donnant son nom "name" et la datasource "value"
   addDataSource(name, value){
     this.dataSources[name] = value;
+
   }
 
   // Fonctions pour controler le loader
@@ -355,10 +362,10 @@ class Menu {
 
     this.margeCheckbox.addEventListener('change', (e) => {
       let colors = {
-        'Marge_voirie': '#966464',
-        'Marge_cours_eau': '#E58787',
+        'Marge_voirie': '#FF5D00',
+        'Marge_cours_eau': '#8B601F',
         'Marge_voie_ferree': '#760808',
-        'Marge_lisiere': '#DB4A15'
+        'Marge_lisiere': '#E18FB5'
       }
 
       if(e.target.checked){
@@ -367,7 +374,7 @@ class Menu {
         this.legendManager.removeLegend('margeRecul');
       }
 
-      this.show('margeRecul', 'data/geojson/marge_recul.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+      this.show('margeRecul', 'data/geojson/marge_surf.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'sous_type',
         colors: colors,
@@ -485,7 +492,7 @@ class Menu {
         this.legendManager.removeLegend('jardin');
       }
 
-      this.show('jardin', 'data/geojson/jardin_devant.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+      this.show('jardin', 'data/geojson/jardin_surf.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'sous_type',
         colors: color,
@@ -495,7 +502,7 @@ class Menu {
 
     this.alignementCheckbox.addEventListener('change', (e) => {
       let color = {
-        'Alignement_arbres': '#08BA2A',
+        'Alignement_arbres': '#C6BC00',
       }
 
       if(e.target.checked){
@@ -504,7 +511,7 @@ class Menu {
         this.legendManager.removeLegend('aligne');
       }
 
-      this.show('alignement', 'data/geojson/alignement_arbres.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+      this.show('alignement', 'data/geojson/alignement_surf.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'sous_type',
         colors: color,
@@ -514,7 +521,7 @@ class Menu {
 
     this.arbreCheckbox.addEventListener('change', (e) => {
       let color = {
-        'Arbre_remarquable': '#8AC467',
+        'Arbre_PLU': '#8AC467',
       }
 
       if(e.target.checked){
@@ -551,8 +558,6 @@ class Menu {
         alpha: 0.4
       });
     });
-
-
 
     this.zhAvereesCheckbox.addEventListener('change', (e) => {
       let color = {
@@ -606,6 +611,25 @@ class Menu {
       this.show('risque_techno', 'data/geojson/risque_techno.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'sous_type',
+        colors: color,
+        alpha: 0.4
+      });
+    });
+
+    this.arbreRemCheckbox.addEventListener('change', (e) => {
+      let color = {
+        'Arbre_remarquable': '#8AC467',
+      }
+
+      if(e.target.checked){
+        this.legendManager.addLegend('arbreRem', color, 'polygon');
+      } else{
+        this.legendManager.removeLegend('arbreRem');
+      }
+
+      this.show('arbreRem', 'data/geojson/arbres_rem.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+        classification: true,
+        classificationField: 'name',
         colors: color,
         alpha: 0.4
       });
@@ -1043,6 +1067,7 @@ class Menu {
 formulaireFichier(){
   document.querySelector("#ajouter").addEventListener('click', (e) => {
     var fichier = $('#fichier').val();
+    //var fichier = "file://S:/Commun/SIG3D/2019/PROJETS_2019/19027_PFE_INSA/FME/exports/bati_exceptionnel.json";
 
     globe.loadGeoJson(fichier);
   });
