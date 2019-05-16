@@ -207,8 +207,8 @@ addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe,
       });
       planeEntities.push(planeEntity);
     }
-    /*return tileset;
-  });*/
+    //return tileset;
+  //});
 
   document.querySelector("#supprimercoupe").addEventListener('click', (e) => {
     this.viewer.entities.remove(planeEntity);
@@ -271,12 +271,12 @@ planeUpdate(plane, couleurCoupe) {
 }
 
 //outil construction
-createPoint(worldPosition, largeur, couleur) {
+createPoint(worldPosition, largeur) {
   var point = this.viewer.entities.add({
     position : worldPosition,
     point : {
-      color : Cesium.Color.fromCssColorString(couleur),
-      pixelSize : largeur,
+      color : Cesium.Color.TRANSPARENT,
+      pixelSize : 1,
       heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
     }
   });
@@ -338,9 +338,9 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
   var volume = [];
   var surface = [];
   var dpoint = [];
-  var dline;
-  var dline2;
-  var dsurface;
+  var dline = [];
+  var dline2 = [];
+  var dsurface = [];
 
   var activeShapePoints = [];
   var figures = [];
@@ -357,7 +357,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
         if(activeShapePoints.length === 0) {
           // on ajoute 2 fois un point au début pour permettre l'affichage de la ligne/surface
           // le dernier point correspond au point flottant du mouvement de la souris
-          floatingPoint = globe.createPoint(earthPosition, largeur, couleur);
+          floatingPoint = globe.createPoint(earthPosition);
           activeShapePoints.push(earthPosition);
           activeShapePoints.push(earthPosition);
           var dynamicPositions = new Cesium.CallbackProperty(function () {
@@ -365,10 +365,10 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
           }, false);
           largeur = parseFloat(largeur);
           transparence = parseFloat(transparence);
-          couleur = couleur.toString();
+          //couleur = couleur.toString();
           if(choice === 'point') {
             floatingPoint = globe.createBillboard(earthPosition);
-            activeShape = globe.createPoint(dynamicPositions, largeur, couleur);
+            activeShape = globe.createPoint(dynamicPositions);
             activeShape = globe.createBillboard(dynamicPositions);
           } else if(choice === 'polygon') {
             activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence);
@@ -388,10 +388,10 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
         } else {
           activeShapePoints.push(earthPosition);
           if(choice === 'point'){
-            point.push(globe.createPoint(earthPosition, largeur, couleur));
+            point.push(globe.createPoint(earthPosition));
             billboard.push(globe.createBillboard(earthPosition));
           } else {
-            dpoint.push(globe.createPoint(earthPosition, largeur, couleur));
+            dpoint.push(globe.createPoint(earthPosition));
           }
         }
       }
@@ -417,15 +417,17 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
     this.handler.setInputAction(function(event) {
       largeur = parseFloat(largeur);
       transparence = parseFloat(transparence);
-      couleur = couleur.toString();
+      //couleur = couleur.toString();
       // on supprime le dernier point flottant
       activeShapePoints.pop();
       if(choice2 === 'construction'){
         if(choice === 'point') {
-          point.push(globe.createPoint(activeShapePoints, largeur, couleur));
+          point.push(globe.createPoint(activeShapePoints));
           billboard.push(globe.createBillboard(activeShapePoints));
         } else if(choice === 'line') {
+          console.log(line);
           line.push(globe.drawLine(activeShapePoints, largeur, couleur, transparence, true));
+          console.log(line);
         } else if( choice === 'polygon') {
           surface.push(globe.drawPolygon(activeShapePoints, couleur, transparence));
         } else if( choice === 'volume') {
@@ -434,10 +436,10 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
         }
       } else if(choice2 === 'mesure'){
         if(choice === 'line') {
-          dline = globe.drawLine(activeShapePoints, largeur, couleur, transparence, false);
-          dline2 = globe.drawLine(activeShapePoints, largeur, '#000000', '0.5', true);
+          dline.push(globe.drawLine(activeShapePoints, largeur, couleur, transparence, false));
+          dline2.push(globe.drawLine(activeShapePoints, largeur, '#000000', '0.5', true));
         } else if( choice === 'polygon') {
-          dsurface = globe.drawPolygon(activeShapePoints, couleur, transparence);
+          dsurface.push(globe.drawPolygon(activeShapePoints, couleur, transparence));
         }
       }
       globe.viewer.entities.remove(floatingPoint);
@@ -461,35 +463,72 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
       }
     });
     document.querySelector("#supprimerligne").addEventListener('click', (e) => {
-      for(var i = 0; i < line.length; i++){
+      for(var i = 0; i < dpoint.length; i++){
         this.viewer.entities.remove(dpoint[i]);
         this.viewer.entities.remove(line[i]);
       }
+
     });
     document.querySelector("#supprimersurf").addEventListener('click', (e) => {
-      for(var i = 0; i < surface.length; i++){
+      for(var i = 0; i < dpoint.length; i++){
         this.viewer.entities.remove(dpoint[i]);
         this.viewer.entities.remove(surface[i]);
       }
     });
     document.querySelector("#supprimervol").addEventListener('click', (e) => {
-      for(var i = 0; i < volume.length; i++){
+      for(var i = 0; i < dpoint.length; i++){
         this.viewer.entities.remove(dpoint[i]);
         this.viewer.entities.remove(volume[i]);
       }
     });
+    document.querySelector("#annulerpoint").addEventListener('click', (e) => {
+      var i = point.length-1;
+      this.viewer.entities.remove(point[i]);
+      this.viewer.entities.remove(billboard[i]);
+      point.pop();
+      billboard.pop();
+    });
+    document.querySelector("#annulerligne").addEventListener('click', (e) => {
+      var i = line.length-1;
+      this.viewer.entities.remove(line[i]);
+      for(var i = 0; i < dpoint.length; i++){
+        this.viewer.entities.remove(dpoint[i]);
+      }
+      line.pop();
+    });
+    document.querySelector("#annulersurf").addEventListener('click', (e) => {
+      var i = surface.length-1;
+      this.viewer.entities.remove(surface[i]);
+      for(var i = 0; i < dpoint.length; i++){
+        this.viewer.entities.remove(dpoint[i]);
+      }
+      surface.pop();
+    });
+    document.querySelector("#annulervol").addEventListener('click', (e) => {
+      var i = volume.length-1;
+      this.viewer.entities.remove(volume[i]);
+      for(var i = 0; i < dpoint.length; i++){
+        this.viewer.entities.remove(dpoint[i]);
+      }
+      volume.pop();
+    });
     document.querySelector("#ligne").addEventListener('click', (e) => {
+      console.log(dline, dline2);
       activeShapePoints = [];
-      this.viewer.entities.remove(dpoint[i]);
-      this.viewer.entities.remove(dline);
-      this.viewer.entities.remove(dline2);
+      for(var i = 0; i < dline.length; i++){
+        this.viewer.entities.remove(dpoint[i]);
+        this.viewer.entities.remove(dline[i]);
+        this.viewer.entities.remove(dline2[i]);
+      }
     });
     document.querySelector("#surface").addEventListener('click', (e) => {
       activeShapePoints = [];
-      this.viewer.entities.remove(dpoint[i]);
-      this.viewer.entities.remove(dsurface);
+      for(var i = 0; i < dsurface.length; i++){
+        this.viewer.entities.remove(dpoint[i]);
+        this.viewer.entities.remove(dsurface[i]);
+      }
     });
-}
+  }
 
 measureDistance(activeShapePoints)  {
   var coordsX = [];

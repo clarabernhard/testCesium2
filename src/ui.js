@@ -261,10 +261,13 @@ class Menu {
       var choice = 'point';
       var choice2 = 'construction';
       var transparence;
+      var couleur;
+      var largeur;
+      var hauteurVol;
 
       if(e.target.checked){
         this.pointList.classList.remove('hidden');
-        this.formulairePoint(choice, choice2);
+        globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
       } else{
         this.pointList.classList.add('hidden');
         globe.supprSouris();
@@ -424,7 +427,7 @@ class Menu {
     });
 
     this.batiExceptionnelCheckbox.addEventListener('change', (e) => {
-      let colors = {
+      /*let colors = {
         'Bati_exceptionnel': '#0C77D9'
       }
 
@@ -439,7 +442,8 @@ class Menu {
         classificationField: 'sous_type',
         colors: colors,
         alpha: 0.6
-      });
+      });*/
+      globe.loadGeoJson('data/geojson/bati_exceptionnel.json');
 
     });
 
@@ -1018,18 +1022,6 @@ class Menu {
       var couleur = $('#couleursurf').val();
       var transparence = $('#transparencesurf').val();
 
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
-
-    });
-  }
-
-  formulairePoint(choice, choice2){
-    var transparence;
-    var hauteurVol;
-
-    document.querySelector("#envoyerpoint").addEventListener('click', (e) => {
-      var largeur = $('#largeurpoint').val();
-      var couleur = $('#couleurpoint').val();
       globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
 
     });

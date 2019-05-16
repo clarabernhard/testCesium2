@@ -37,18 +37,14 @@
 
     <div class="backdrop hidden" id="aireList">
       <h2>Mesures de surface</h2>
-      <p>Aire (m²): <span id="aire"></span></p>
+      <p>Surface (m²): <span id="aire"></span></p>
       <button class="nouv">Nouvelle mesure</button>
     </div>
 
     <div class="backdrop hidden" id="pointList">
-      <form>
-        <h2>Propriétés du point</h2>
-        <p>Taille (pixels):<input id="largeurpoint" type="text" size="3" value="5"/> </p>
-        <p>Couleur : <input id="couleurpoint" type="text" size="6" value="#FFFFFF"/></p><br/>
-        <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a><br/>
-      </form>
+      <h2>Ajout de point</h2>
       <button id="envoyerpoint">Ajouter</button>
+      <button id="annulerpoint">Annuler</button>
       <button id="supprimerpoint">Supprimer</button>
       <p>Cliquez sur 'ajouter' pour commencer à dessiner</p>
     </div>
@@ -62,6 +58,7 @@
         <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparence" type="text" size="3" value="1"/> </p>
       </form>
       <button id="envoyerligne">Ajouter</button>
+      <button id="annulerligne">Annuler</button>
       <button id="supprimerligne">Supprimer</button>
       <p>Cliquez sur 'ajouter' pour commencer à dessiner</p>
     </div>
@@ -74,6 +71,7 @@
         <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparencesurf" type="text" size="3" value="0.6"/> </p>
       </form>
       <button id="envoyersurf">Ajouter</button>
+      <button id="annulersurf">Annuler</button>
       <button id="supprimersurf">Supprimer</button>
       <p>Cliquez sur 'ajouter' pour commencer à dessiner</p>
     </div>
@@ -81,12 +79,13 @@
     <div class="backdrop hidden" id="volumeList">
       <form>
         <h2>Propriétés du volume</h2>
-        <p>Hauteur (m):<input id="hauteurvol" type="text" size="6" value="200"/> </p>
+        <p>Altitude (m):<input id="hauteurvol" type="text" size="6" value="200"/> </p>
         <p>Couleur : <input id="couleurvol" type="text" size="6" value="#FFFFFF"/><br/> </p>
         <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
         <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparencevol" type="text" size="3" value="1"/> </p>
       </form>
       <button id="envoyervol">Ajouter</button>
+      <button id="annulervol">Annuler</button>
       <button id="supprimervol">Supprimer</button>
       <p>Cliquez sur 'ajouter' pour commencer à dessiner</p>
     </div>
@@ -98,7 +97,7 @@
           X :<input id="X" type="text" size="12" value="2050200"/> <br/>
           Y :<input id="Y" type="text" size="12" value="7275400"/> <br/>
         </p>
-        <p>Hauteur (m):<input id="hauteurcoupe" type="text" size="6" value="200"/> </p>
+        <p>Altitude (m):<input id="hauteurcoupe" type="text" size="6" value="200"/> </p>
         <p>Longeur (m):<input id="longueurcoupe" type="text" size="6" value="200"/> </p>
         <p>Largeur (m):<input id="largeurcoupe" type="text" size="6" value="200"/> </p>
         <p>Couleur : <input id="couleurcoupe" type="text" size="6" value="#FFFFFF"/><br/> </p>
@@ -106,6 +105,7 @@
       </form>
       <p>Différence de hauteur (m): <span id="alticoupe"></span></p>
       <button id="envoyercoupe">Ajouter</button>
+      <button id="annulercoupe">Annuler</button>
       <button id="supprimercoupe">Supprimer</button> <br/>
     </div>
 
@@ -353,7 +353,7 @@
 
       <div class="nowrap">
         <input id="surface" type="checkbox"/>
-        <label for="surface">Aire</label>
+        <label for="surface">Surface</label>
       </div>
 
     </div>
