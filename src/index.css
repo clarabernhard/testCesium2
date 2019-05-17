@@ -203,7 +203,7 @@ html, body {
 /* Style des légendes */
 .backdrop {
     position: relative;
-    display: block;
+    display: inline-block;
     background: rgba(42, 42, 42, 0.7);
     border-radius: 5px;
     border: 1px solid #444;
@@ -223,20 +223,23 @@ html, body {
 
 /* Style de la legende */
 .legend .legend-color, .legend .legend-text{
-    display: block;
+    display: inline-block;
     height: 25px;
     line-height: 25px;
     width: 30%;
     float: left;
     margin-bottom: 5px;
+    text-align: center;
 }
 
 .legend .legend-text{
     padding-left: 5px;
+    text-align: center;
 }
 
 .legend .legend-element:first-child{
     margin-top: 5px;
+    text-align: center;
 }
 
 .legend .legend-element:after{
@@ -248,15 +251,25 @@ html, body {
 .legend .legend-line {
   display: block;
   height: 3px;
-  line-height: 25px;
+  line-height: 3px;
   width: 30%;
   float: left;
   margin-bottom: 5px;
+  text-align: center;
 }
 
 .tab {
   display:inline-block;
   width: 50px;
+}
+
+.showcouleur {
+  display: inline-block;
+  line-height: 20px;
+  width: 20px;
+  color: rgba(0,0,0,0);
+  /*background-color: #FF0000;*/
+
 }
 
 

@@ -177,9 +177,9 @@ showCoords(show){
 
 
 // Afficher ou enlever le plan de coupe
-addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, tileset) {
+addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, planeEntities) {
 
-    var planeEntities = [];
+
     var clippingPlanes = new Cesium.ClippingPlaneCollection({
       planes : [
         new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 0.0, -1.0), 0.0)
@@ -206,19 +206,30 @@ addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe,
         }
       });
       planeEntities.push(planeEntity);
+      console.log(planeEntities);
     }
     //return tileset;
   //});
 
   document.querySelector("#supprimercoupe").addEventListener('click', (e) => {
-    this.viewer.entities.remove(planeEntity);
+    //this.viewer.entities.remove(planeEntity);
     this.viewer.entities.remove(planeEntities);
+    clippingPlanes = [];
+  });
+  document.querySelector("#annulercoupe").addEventListener('click', (e) => {
+    var annul = planeEntities.length-1;
+    console.log(annul);
+    //this.viewer.entities.remove(planeEntity);
+    this.viewer.entities.remove(planeEntities[annul]);
+    planeEntities.pop();
+    console.log(planeEntities);
     clippingPlanes = [];
   });
   document.querySelector("#plancoupe").addEventListener('click', (e) => {
     /*this.viewer.entities.remove(planeEntity);
     this.viewer.entities.remove(planeEntities);*/
     clippingPlanes = [];
+    this.supprSouris();
   });
 
 }
@@ -331,19 +342,17 @@ drawVolume(positionData, couleur, transparence, hauteurVol) {
   return shape;
 }
 
-updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
-  var point = [];
+updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, dline, dline2, dsurface) {
+  /*var point = [];
   var billboard = [];
   var line = [];
   var volume = [];
   var surface = [];
-  var dpoint = [];
   var dline = [];
   var dline2 = [];
-  var dsurface = [];
+  var dsurface = [];*/
 
   var activeShapePoints = [];
-  var figures = [];
   var activeShape;
   var floatingPoint;
 
@@ -391,7 +400,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
             point.push(globe.createPoint(earthPosition));
             billboard.push(globe.createBillboard(earthPosition));
           } else {
-            dpoint.push(globe.createPoint(earthPosition));
+            point.push(globe.createPoint(earthPosition));
           }
         }
       }
@@ -425,7 +434,6 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
           point.push(globe.createPoint(activeShapePoints));
           billboard.push(globe.createBillboard(activeShapePoints));
         } else if(choice === 'line') {
-          console.log(line);
           line.push(globe.drawLine(activeShapePoints, largeur, couleur, transparence, true));
           console.log(line);
         } else if( choice === 'polygon') {
@@ -463,21 +471,21 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
       }
     });
     document.querySelector("#supprimerligne").addEventListener('click', (e) => {
-      for(var i = 0; i < dpoint.length; i++){
-        this.viewer.entities.remove(dpoint[i]);
+      for(var i = 0; i < point.length; i++){
+        this.viewer.entities.remove(point[i]);
         this.viewer.entities.remove(line[i]);
       }
 
     });
     document.querySelector("#supprimersurf").addEventListener('click', (e) => {
-      for(var i = 0; i < dpoint.length; i++){
-        this.viewer.entities.remove(dpoint[i]);
+      for(var i = 0; i < point.length; i++){
+        this.viewer.entities.remove(point[i]);
         this.viewer.entities.remove(surface[i]);
       }
     });
     document.querySelector("#supprimervol").addEventListener('click', (e) => {
-      for(var i = 0; i < dpoint.length; i++){
-        this.viewer.entities.remove(dpoint[i]);
+      for(var i = 0; i < point.length; i++){
+        this.viewer.entities.remove(point[i]);
         this.viewer.entities.remove(volume[i]);
       }
     });
@@ -490,33 +498,39 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
     });
     document.querySelector("#annulerligne").addEventListener('click', (e) => {
       var i = line.length-1;
+      console.log(line.length-1);
+      console.log(line);
       this.viewer.entities.remove(line[i]);
-      for(var i = 0; i < dpoint.length; i++){
-        this.viewer.entities.remove(dpoint[i]);
+      for(var i = 0; i < point.length; i++){
+        this.viewer.entities.remove(point[i]);
       }
       line.pop();
+      point=[];
+      console.log(line);
     });
     document.querySelector("#annulersurf").addEventListener('click', (e) => {
       var i = surface.length-1;
       this.viewer.entities.remove(surface[i]);
-      for(var i = 0; i < dpoint.length; i++){
-        this.viewer.entities.remove(dpoint[i]);
+      for(var i = 0; i < point.length; i++){
+        this.viewer.entities.remove(point[i]);
       }
       surface.pop();
+      point=[];
     });
     document.querySelector("#annulervol").addEventListener('click', (e) => {
       var i = volume.length-1;
       this.viewer.entities.remove(volume[i]);
-      for(var i = 0; i < dpoint.length; i++){
-        this.viewer.entities.remove(dpoint[i]);
+      for(var i = 0; i < point.length; i++){
+        this.viewer.entities.remove(point[i]);
       }
       volume.pop();
+      point=[];
     });
     document.querySelector("#ligne").addEventListener('click', (e) => {
       console.log(dline, dline2);
       activeShapePoints = [];
       for(var i = 0; i < dline.length; i++){
-        this.viewer.entities.remove(dpoint[i]);
+        this.viewer.entities.remove(point[i]);
         this.viewer.entities.remove(dline[i]);
         this.viewer.entities.remove(dline2[i]);
       }
@@ -524,7 +538,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol) {
     document.querySelector("#surface").addEventListener('click', (e) => {
       activeShapePoints = [];
       for(var i = 0; i < dsurface.length; i++){
-        this.viewer.entities.remove(dpoint[i]);
+        this.viewer.entities.remove(point[i]);
         this.viewer.entities.remove(dsurface[i]);
       }
     });

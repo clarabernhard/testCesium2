@@ -227,9 +227,17 @@ class Menu {
       var choice = 'line';
       var choice2 = 'mesure';
       var hauteurVol;
+      var point = [];
+      var billboard = [];
+      var line = [];
+      var volume = [];
+      var surface = [];
+      var dline = [];
+      var dline2 = [];
+      var dsurface = [];
 
       if(e.target.checked){
-        globe.updateShape(choice, choice2, 3, '#FF0000', 1, hauteurVol);
+        globe.updateShape(choice, choice2, 3, '#FF0000', 1, hauteurVol, point, billboard, line, surface, dline, dline2, dsurface);
         this.distanceList.classList.remove('hidden');
         this.aideCheckbox.classList.remove('hidden');
       } else{
@@ -244,9 +252,17 @@ class Menu {
       var choice = 'polygon';
       var choice2 = 'mesure';
       var hauteurVol;
+      var point = [];
+      var billboard = [];
+      var line = [];
+      var volume = [];
+      var surface = [];
+      var dline = [];
+      var dline2 = [];
+      var dsurface = [];
 
       if(e.target.checked){
-        globe.updateShape(choice, choice2, 3, '#1ABFD0', 0.4, hauteurVol);
+        globe.updateShape(choice, choice2, 3, '#1ABFD0', 0.4, hauteurVol, point, billboard, line, surface, dline, dline2, dsurface);
         this.aireList.classList.remove('hidden');
         this.aideCheckbox.classList.remove('hidden');
       } else{
@@ -264,10 +280,18 @@ class Menu {
       var couleur;
       var largeur;
       var hauteurVol;
+      var point = [];
+      var billboard = [];
+      var line = [];
+      var volume = [];
+      var surface = [];
+      var dline = [];
+      var dline2 = [];
+      var dsurface = [];
 
       if(e.target.checked){
         this.pointList.classList.remove('hidden');
-        globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
+        globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, dline, dline2, dsurface);
       } else{
         this.pointList.classList.add('hidden');
         globe.supprSouris();
@@ -1004,63 +1028,102 @@ class Menu {
 
   // formulaires
   formulaireLigne(choice, choice2){
+    var point = [];
+    var billboard = [];
+    var line = [];
+    var volume = [];
+    var surface = [];
+    var dline = [];
+    var dline2 = [];
+    var dsurface = [];
+
     var hauteurVol;
+    let showCouleur = document.querySelector("#showcouleurligne");
+
     document.querySelector("#envoyerligne").addEventListener('click', (e) => {
       var largeur = $('#largeur').val();
       var couleur = $('#couleur').val();
       var transparence = $('#transparence').val();
-
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
+      showCouleur.style.backgroundColor = couleur;
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, dline, dline2, dsurface);
 
     });
   }
 
   formulaireSurface(choice, choice2){
+    var point = [];
+    var billboard = [];
+    var line = [];
+    var volume = [];
+    var surface = [];
+    var dline = [];
+    var dline2 = [];
+    var dsurface = [];
+
     var hauteurVol;
     var largeur = 3;
+    let showCouleur = document.querySelector("#showcouleursurf");
+
     document.querySelector("#envoyersurf").addEventListener('click', (e) => {
       var couleur = $('#couleursurf').val();
       var transparence = $('#transparencesurf').val();
-
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
+      showCouleur.style.backgroundColor = couleur;
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, dline, dline2, dsurface);
 
     });
   }
 
   formulaireVolume(choice, choice2){
+    var point = [];
+    var billboard = [];
+    var line = [];
+    var volume = [];
+    var surface = [];
+    var dline = [];
+    var dline2 = [];
+    var dsurface = [];
+
     var largeur = 3;
+    let showCouleur = document.querySelector("#showcouleurvol");
 
     document.querySelector("#envoyervol").addEventListener('click', (e) => {
       var hauteurVol = $('#hauteurvol').val();
       var couleur = $('#couleurvol').val();
       var transparence = $('#transparencevol').val();
-
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol);
+      showCouleur.style.backgroundColor = couleur;
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, dline, dline2, dsurface);
 
     });
   }
 
   // lire les valeurs rentrées par l'utilisateur
-  formulairePlan(tileset){
-    var tileset;
+  formulairePlan(){
+    let showCouleur = document.querySelector("#showcouleurcoupe");
+    var planeEntities = [];
+
     document.querySelector("#envoyercoupe").addEventListener('click', (e) => {
       var X = $('#X').val();
       var Y = $('#Y').val();
-      var hauteurCoupe = $('#hauteurcoupe').val();
-      var longueurCoupe = $('#longueurcoupe').val();
-      var largeurCoupe = $('#largeurcoupe').val();
-      var couleurCoupe = $('#couleurcoupe').val();
-
-      globe.addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, tileset);
+      var hauteur = $('#hauteurcoupe').val();
+      var longueur = $('#longueurcoupe').val();
+      var largeur = $('#largeurcoupe').val();
+      var couleur = $('#couleurcoupe').val();
+      showCouleur.style.backgroundColor = couleur;
+      globe.addClippingPlanes(X, Y, hauteur, longueur, largeur, couleur, planeEntities);
 
     });
   }
 
 formulaireFichier(){
   document.querySelector("#ajouter").addEventListener('click', (e) => {
-    var fichier = $('#fichier').val();
+    var fichier = $('#fichier').prop('files')[0];
     //var fichier = "file://S:/Commun/SIG3D/2019/PROJETS_2019/19027_PFE_INSA/FME/exports/bati_exceptionnel.json";
+    var reader = new FileReader();
 
+    reader.addEventListener('load', function() {
+            alert('Contenu du fichier "' + fichier.name + '" :\n\n' + reader.result);
+        });
+    reader.readAsText(fichier);
     globe.loadGeoJson(fichier);
   });
 }

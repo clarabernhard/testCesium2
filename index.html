@@ -53,26 +53,29 @@
       <form>
         <h2>Propriétés de la ligne</h2>
         <p>Largeur ligne (pixels):<input id="largeur" type="text" size="3" value="3"/> </p>
-        <p>Couleur : <input id="couleur" type="text" size="6" value="#FF0000"/><br/> </p>
-        <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
+        <p>Couleur : <input id="couleur" type="text" size="6" value="#FF0000"/>
+          <span class="showcouleur" id="showcouleurligne">id</span>
+        </p>
+        <a href="https://www.webfx.com/web-design/color-picker/" target="_blank" onclick="window.open('https://www.webfx.com/web-design/color-picker/','name','width=600,height=400')">Choisissez votre couleur ici</a>
         <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparence" type="text" size="3" value="1"/> </p>
       </form>
       <button id="envoyerligne">Ajouter</button>
       <button id="annulerligne">Annuler</button>
-      <button id="supprimerligne">Supprimer</button>
+      <button class="supprimerfigure">Supprimer</button>
       <p>Cliquez sur 'ajouter' pour commencer à dessiner</p>
     </div>
 
     <div class="backdrop hidden" id="surfaceList">
       <form>
         <h2>Propriétés de la surface</h2>
-        <p>Couleur : <input id="couleursurf" type="text" size="6" value="#F1B559"/><br/> </p>
-        <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
+        <p>Couleur : <input id="couleursurf" type="text" size="6" value="#F1B559"/>
+        <span class="showcouleur" id="showcouleursurf">id</span> </p>
+        <a href="https://www.webfx.com/web-design/color-picker/" target="_blank" onclick="window.open('https://www.webfx.com/web-design/color-picker/','name','width=600,height=400')">Choisissez votre couleur ici</a>
         <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparencesurf" type="text" size="3" value="0.6"/> </p>
       </form>
       <button id="envoyersurf">Ajouter</button>
       <button id="annulersurf">Annuler</button>
-      <button id="supprimersurf">Supprimer</button>
+      <button class="supprimerfigure">Supprimer</button>
       <p>Cliquez sur 'ajouter' pour commencer à dessiner</p>
     </div>
 
@@ -80,13 +83,14 @@
       <form>
         <h2>Propriétés du volume</h2>
         <p>Altitude (m):<input id="hauteurvol" type="text" size="6" value="200"/> </p>
-        <p>Couleur : <input id="couleurvol" type="text" size="6" value="#FFFFFF"/><br/> </p>
-        <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
+        <p>Couleur : <input id="couleurvol" type="text" size="6" value="#FFFFFF"/>
+        <span class="showcouleur" id="showcouleurvol">id</span> </p>
+        <a href="https://www.webfx.com/web-design/color-picker/" target="_blank" onclick="window.open('https://www.webfx.com/web-design/color-picker/','name','width=600,height=400')">Choisissez votre couleur ici</a>
         <p>Transparence (de 0 = transparent à 1 = opaque) :<input id="transparencevol" type="text" size="3" value="1"/> </p>
       </form>
       <button id="envoyervol">Ajouter</button>
       <button id="annulervol">Annuler</button>
-      <button id="supprimervol">Supprimer</button>
+      <button class="supprimerfigure">Supprimer</button>
       <p>Cliquez sur 'ajouter' pour commencer à dessiner</p>
     </div>
 
@@ -100,8 +104,9 @@
         <p>Altitude (m):<input id="hauteurcoupe" type="text" size="6" value="200"/> </p>
         <p>Longeur (m):<input id="longueurcoupe" type="text" size="6" value="200"/> </p>
         <p>Largeur (m):<input id="largeurcoupe" type="text" size="6" value="200"/> </p>
-        <p>Couleur : <input id="couleurcoupe" type="text" size="6" value="#FFFFFF"/><br/> </p>
-        <a href="https://www.webfx.com/web-design/color-picker/" target="_blank">Choisissez votre couleur ici</a>
+        <p>Couleur : <input id="couleurcoupe" type="text" size="6" value="#FFFFFF"/>
+        <span class="showcouleur" id="showcouleurcoupe">id</span> </p>
+        <a href="https://www.webfx.com/web-design/color-picker/" target="_blank" onclick="window.open('https://www.webfx.com/web-design/color-picker/','name','width=600,height=400')">Choisissez votre couleur ici</a>
       </form>
       <p>Différence de hauteur (m): <span id="alticoupe"></span></p>
       <button id="envoyercoupe">Ajouter</button>
