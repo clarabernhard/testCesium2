@@ -134,6 +134,47 @@ loadGeoJson(link, options = {}){
   return promisse;
 }
 
+loadBox(link, options={}) {
+  var promise = Cesium.GeoJsonDataSource.load(link, {
+		clampToGround : false,
+		//extrudedHeight : 300.0,
+		width : 10.0,
+		cornerType: Cesium.CornerType.MITERED,
+		material : Cesium.Color.GREEN
+});
+console.log('adding data');
+promise.then((dataSource) => {
+	this.viewer.dataSources.add(dataSource);
+	//Get the array of entities
+	var entities = dataSource.entities.values;
+
+	for (var i = 0; i < entities.length; i++)
+	{
+		//Set the height and the material of each polyline
+		var entity = entities[i];
+
+		entity.polylineVolume = new Cesium.PolylineVolumeGraphics({
+			positions: entity.polyline.positions,
+			shape: [
+				new Cesium.Cartesian2( 0.3, entity.properties.Height),
+				new Cesium.Cartesian2( 0.3,  0.0),
+				new Cesium.Cartesian2(-0.3, entity.properties.Height),
+				new Cesium.Cartesian2(-0.3,  0.0)
+			],
+			material: Cesium.Color.RED
+		});
+			entity.polyline.material = Cesium.Color.YELLOW;
+			entity.polylineVolume.material = Cesium.Color.YELLOW;
+
+	}
+
+}).otherwise(function(error){
+		//Display any errors encountered while loading.
+		window.alert(error);
+});
+return promise;
+}
+
 // Fonction pour afficher les ombres
 shadow(enabled){
   this.viewer.shadows = enabled;
@@ -177,7 +218,7 @@ showCoords(show){
 
 
 // Afficher ou enlever le plan de coupe
-addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, planeEntities) {
+addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, planeEntities, clippingPlanes) {
 
 
     var clippingPlanes = new Cesium.ClippingPlaneCollection({
@@ -186,7 +227,8 @@ addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe,
       ],
     });
 //return tileset.readyPromise.then(function() {
-    for (var i = 0; i < clippingPlanes.length; ++i) {
+console.log(clippingPlanes.length)
+    for (var i = 0; i < clippingPlanes.length; i=+1) {
       var coords = proj4('EPSG:3948','EPSG:4326', [X, Y]);
       var a = Number(this.raf09.getGeoide(coords[1], coords[0]));
 
@@ -206,32 +248,30 @@ addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe,
         }
       });
       planeEntities.push(planeEntity);
-      console.log(planeEntities);
+      console.log('coucou');
     }
     //return tileset;
   //});
 
+}
+
+annulCoupe(entity, clippingPlanes){
+  document.querySelector("#annulercoupe").addEventListener('click', (e) => {
+    var annul = entity.length-1;
+    this.viewer.entities.remove(entity[annul]);
+    entity.pop();
+    clippingPlanes = [];
+  });
+}
+supprCoupe(entity, clippingPlanes){
   document.querySelector("#supprimercoupe").addEventListener('click', (e) => {
     //this.viewer.entities.remove(planeEntity);
-    this.viewer.entities.remove(planeEntities);
+    for(var i = 0; i < entity.length; i++){
+    this.viewer.entities.remove(entity[i]);
+  }
+    entity = [];
     clippingPlanes = [];
   });
-  document.querySelector("#annulercoupe").addEventListener('click', (e) => {
-    var annul = planeEntities.length-1;
-    console.log(annul);
-    //this.viewer.entities.remove(planeEntity);
-    this.viewer.entities.remove(planeEntities[annul]);
-    planeEntities.pop();
-    console.log(planeEntities);
-    clippingPlanes = [];
-  });
-  document.querySelector("#plancoupe").addEventListener('click', (e) => {
-    /*this.viewer.entities.remove(planeEntity);
-    this.viewer.entities.remove(planeEntities);*/
-    clippingPlanes = [];
-    this.supprSouris();
-  });
-
 }
 
 // Fonction qui permet de gérer les mouvements du plan de coupe
@@ -342,16 +382,7 @@ drawVolume(positionData, couleur, transparence, hauteurVol) {
   return shape;
 }
 
-updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, dline, dline2, dsurface) {
-  /*var point = [];
-  var billboard = [];
-  var line = [];
-  var volume = [];
-  var surface = [];
-  var dline = [];
-  var dline2 = [];
-  var dsurface = [];*/
-
+updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface) {
   var activeShapePoints = [];
   var activeShape;
   var floatingPoint;
@@ -464,73 +495,9 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
       activeShapePoints = [];
     });
 
-    document.querySelector("#supprimerpoint").addEventListener('click', (e) => {
-      for(var i = 0; i < point.length; i++){
-        this.viewer.entities.remove(point[i]);
-        this.viewer.entities.remove(billboard[i]);
-      }
-    });
-    document.querySelector("#supprimerligne").addEventListener('click', (e) => {
-      for(var i = 0; i < point.length; i++){
-        this.viewer.entities.remove(point[i]);
-        this.viewer.entities.remove(line[i]);
-      }
-
-    });
-    document.querySelector("#supprimersurf").addEventListener('click', (e) => {
-      for(var i = 0; i < point.length; i++){
-        this.viewer.entities.remove(point[i]);
-        this.viewer.entities.remove(surface[i]);
-      }
-    });
-    document.querySelector("#supprimervol").addEventListener('click', (e) => {
-      for(var i = 0; i < point.length; i++){
-        this.viewer.entities.remove(point[i]);
-        this.viewer.entities.remove(volume[i]);
-      }
-    });
-    document.querySelector("#annulerpoint").addEventListener('click', (e) => {
-      var i = point.length-1;
-      this.viewer.entities.remove(point[i]);
-      this.viewer.entities.remove(billboard[i]);
-      point.pop();
-      billboard.pop();
-    });
-    document.querySelector("#annulerligne").addEventListener('click', (e) => {
-      var i = line.length-1;
-      console.log(line.length-1);
-      console.log(line);
-      this.viewer.entities.remove(line[i]);
-      for(var i = 0; i < point.length; i++){
-        this.viewer.entities.remove(point[i]);
-      }
-      line.pop();
-      point=[];
-      console.log(line);
-    });
-    document.querySelector("#annulersurf").addEventListener('click', (e) => {
-      var i = surface.length-1;
-      this.viewer.entities.remove(surface[i]);
-      for(var i = 0; i < point.length; i++){
-        this.viewer.entities.remove(point[i]);
-      }
-      surface.pop();
-      point=[];
-    });
-    document.querySelector("#annulervol").addEventListener('click', (e) => {
-      var i = volume.length-1;
-      this.viewer.entities.remove(volume[i]);
-      for(var i = 0; i < point.length; i++){
-        this.viewer.entities.remove(point[i]);
-      }
-      volume.pop();
-      point=[];
-    });
     document.querySelector("#ligne").addEventListener('click', (e) => {
-      console.log(dline, dline2);
       activeShapePoints = [];
       for(var i = 0; i < dline.length; i++){
-        this.viewer.entities.remove(point[i]);
         this.viewer.entities.remove(dline[i]);
         this.viewer.entities.remove(dline2[i]);
       }
@@ -538,9 +505,24 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
     document.querySelector("#surface").addEventListener('click', (e) => {
       activeShapePoints = [];
       for(var i = 0; i < dsurface.length; i++){
-        this.viewer.entities.remove(point[i]);
         this.viewer.entities.remove(dsurface[i]);
       }
+    });
+  }
+
+  annulFigure(element, figure) {
+    document.querySelector(element).addEventListener('click', (e) => {
+      var lastLine = figure.pop();
+      this.viewer.entities.remove(lastLine);
+    });
+  }
+
+  supprFigure(element, figure) {
+    document.querySelector(element).addEventListener('click', (e) => {
+      for(var i = 0; i < figure.length; i++){
+        this.viewer.entities.remove(figure[i]);
+      }
+      figure = [];
     });
   }
 

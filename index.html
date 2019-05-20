@@ -43,10 +43,9 @@
 
     <div class="backdrop hidden" id="pointList">
       <h2>Ajout de point</h2>
-      <button id="envoyerpoint">Ajouter</button>
       <button id="annulerpoint">Annuler</button>
       <button id="supprimerpoint">Supprimer</button>
-      <p>Cliquez sur 'ajouter' pour commencer à dessiner</p>
+      <p>Cliquez sur le photomaillage pour commencer à dessiner</p>
     </div>
 
     <div class="backdrop hidden" id="ligneList">
@@ -61,7 +60,7 @@
       </form>
       <button id="envoyerligne">Ajouter</button>
       <button id="annulerligne">Annuler</button>
-      <button class="supprimerfigure">Supprimer</button>
+      <button id="supprimerligne">Supprimer</button>
       <p>Cliquez sur 'ajouter' pour commencer à dessiner</p>
     </div>
 
@@ -75,7 +74,7 @@
       </form>
       <button id="envoyersurf">Ajouter</button>
       <button id="annulersurf">Annuler</button>
-      <button class="supprimerfigure">Supprimer</button>
+      <button id="supprimersurf">Supprimer</button>
       <p>Cliquez sur 'ajouter' pour commencer à dessiner</p>
     </div>
 
@@ -90,7 +89,7 @@
       </form>
       <button id="envoyervol">Ajouter</button>
       <button id="annulervol">Annuler</button>
-      <button class="supprimerfigure">Supprimer</button>
+      <button id="supprimervol">Supprimer</button>
       <p>Cliquez sur 'ajouter' pour commencer à dessiner</p>
     </div>
 
@@ -117,7 +116,7 @@
     <div class="backdrop hidden" id="fileList">
       <h2>Ajouter une couche</h2>
       <!--<label for="test" class="btn">Ajouter</label>-->
-      <p><input id="fichier" type="file" accept=".json,.kml"> </p>
+      <p><input id="fichier" type="file" accept=".geojson,.kml"> </p>
       <p><button id="ajouter">Ajouter</button> </p>
     </div>
 
@@ -145,6 +144,10 @@
       <div class="nowrap" id="photo">
         <input id="photoMaillage" type="checkbox" checked/>
         <label for="photoMaillage">Afficher le photomaillage</label>
+      </div>
+      <div class="nowrap" id="test">
+        <input id="boite" type="checkbox"/>
+        <label for="boite">Test boite</label>
       </div>
 
       <button class="button" id="config">Configuration</button>

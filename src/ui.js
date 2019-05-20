@@ -42,6 +42,7 @@ class Menu {
 
     // Affichage des couches
     this.photoMaillageCheckbox = document.querySelector('#photoMaillage');
+    this.boiteCheckbox = document.querySelector('#boite');
     // PLU
     this.pluCheckbox = document.querySelector('#plu');
     this.ERCheckbox = document.querySelector('#ER');
@@ -228,22 +229,24 @@ class Menu {
       var choice2 = 'mesure';
       var hauteurVol;
       var point = [];
-      var billboard = [];
-      var line = [];
-      var volume = [];
-      var surface = [];
       var dline = [];
       var dline2 = [];
-      var dsurface = [];
+      var surface;
+      var billboard;
+      var line;
+      var volume;
+      var dsurface;
+
 
       if(e.target.checked){
-        globe.updateShape(choice, choice2, 3, '#FF0000', 1, hauteurVol, point, billboard, line, surface, dline, dline2, dsurface);
+        globe.updateShape(choice, choice2, 3, '#FF0000', 1, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
         this.distanceList.classList.remove('hidden');
         this.aideCheckbox.classList.remove('hidden');
       } else{
         this.distanceList.classList.add('hidden');
         this.aideCheckbox.classList.add('hidden');
         globe.supprSouris();
+
       }
 
     });
@@ -253,16 +256,16 @@ class Menu {
       var choice2 = 'mesure';
       var hauteurVol;
       var point = [];
-      var billboard = [];
-      var line = [];
-      var volume = [];
-      var surface = [];
-      var dline = [];
-      var dline2 = [];
       var dsurface = [];
+      var surface;
+      var billboard;
+      var line;
+      var volume;
+      var dline;
+      var dline2;
 
       if(e.target.checked){
-        globe.updateShape(choice, choice2, 3, '#1ABFD0', 0.4, hauteurVol, point, billboard, line, surface, dline, dline2, dsurface);
+        globe.updateShape(choice, choice2, 3, '#1ABFD0', 0.4, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
         this.aireList.classList.remove('hidden');
         this.aideCheckbox.classList.remove('hidden');
       } else{
@@ -270,7 +273,6 @@ class Menu {
         this.aideCheckbox.classList.add('hidden');
         globe.supprSouris();
       }
-
     });
 
     this.cpointCheckbox.addEventListener('change', (e) => {
@@ -282,21 +284,22 @@ class Menu {
       var hauteurVol;
       var point = [];
       var billboard = [];
-      var line = [];
-      var volume = [];
-      var surface = [];
-      var dline = [];
-      var dline2 = [];
-      var dsurface = [];
+      var dsurface;
+      var surface;
+      var line;
+      var volume;
+      var dline;
+      var dline2;
 
       if(e.target.checked){
         this.pointList.classList.remove('hidden');
-        globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, dline, dline2, dsurface);
+        globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
       } else{
         this.pointList.classList.add('hidden');
         globe.supprSouris();
       }
-
+      globe.annulFigure('#annulerpoint', billboard);
+      globe.supprFigure('#supprimerpoint', billboard);
     });
 
     this.cligneCheckbox.addEventListener('change', (e) => {
@@ -350,9 +353,10 @@ class Menu {
     this.coupeCheckbox.addEventListener('change', (e) => {
       if(e.target.checked){
         this.planList.classList.remove('hidden');
-        this.formulairePlan(terrain);
-      } else{
+        this.formulairePlan();
+      } else {
         this.planList.classList.add('hidden');
+        globe.supprSouris();
       }
     });
 
@@ -987,6 +991,27 @@ class Menu {
 
     });
 
+    this.boiteCheckbox.addEventListener('change', (e) => {
+      //globe.loadBox('data/geojson/BoitePLU.json');
+      //globe.loadGeoJson('data/geojson/BoitePLU.json');
+      let color = undefined;
+      if(e.target.checked){
+          color = {
+              conditions: [
+                  ["true", "rgba(128, 0, 128, 0.5)"]
+
+              ]
+          };
+          this.dataSources.batiments.style = new Cesium.Cesium3DTileStyle({
+              show: e.target.checked,
+              color: color
+          });
+        }
+
+      this.show('batiments', 'data/BoitePLUCesium/tileset.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
+
+    });
+
   }
 
   /*
@@ -1029,13 +1054,13 @@ class Menu {
   // formulaires
   formulaireLigne(choice, choice2){
     var point = [];
-    var billboard = [];
     var line = [];
-    var volume = [];
-    var surface = [];
-    var dline = [];
-    var dline2 = [];
-    var dsurface = [];
+    var billboard;
+    var volume;
+    var surface;
+    var dline;
+    var dline2;
+    var dsurface;
 
     var hauteurVol;
     let showCouleur = document.querySelector("#showcouleurligne");
@@ -1045,20 +1070,22 @@ class Menu {
       var couleur = $('#couleur').val();
       var transparence = $('#transparence').val();
       showCouleur.style.backgroundColor = couleur;
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, dline, dline2, dsurface);
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
 
     });
+    globe.annulFigure('#annulerligne', line);
+    globe.supprFigure('#supprimerligne', line);
   }
 
   formulaireSurface(choice, choice2){
     var point = [];
-    var billboard = [];
-    var line = [];
-    var volume = [];
     var surface = [];
-    var dline = [];
-    var dline2 = [];
-    var dsurface = [];
+    var billboard;
+    var line;
+    var volume;
+    var dline;
+    var dline2;
+    var dsurface;
 
     var hauteurVol;
     var largeur = 3;
@@ -1068,20 +1095,23 @@ class Menu {
       var couleur = $('#couleursurf').val();
       var transparence = $('#transparencesurf').val();
       showCouleur.style.backgroundColor = couleur;
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, dline, dline2, dsurface);
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
 
     });
+    globe.annulFigure('#annulersurf', surface);
+    globe.supprFigure('#supprimersurf', surface);
+
   }
 
   formulaireVolume(choice, choice2){
     var point = [];
-    var billboard = [];
-    var line = [];
     var volume = [];
-    var surface = [];
-    var dline = [];
-    var dline2 = [];
-    var dsurface = [];
+    var surface;
+    var billboard;
+    var line;
+    var dline;
+    var dline2;
+    var dsurface;
 
     var largeur = 3;
     let showCouleur = document.querySelector("#showcouleurvol");
@@ -1091,15 +1121,18 @@ class Menu {
       var couleur = $('#couleurvol').val();
       var transparence = $('#transparencevol').val();
       showCouleur.style.backgroundColor = couleur;
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, dline, dline2, dsurface);
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
 
     });
+    globe.annulFigure('#annulervol', volume);
+    globe.supprFigure('#supprimervol', volume);
   }
 
   // lire les valeurs rentrées par l'utilisateur
   formulairePlan(){
     let showCouleur = document.querySelector("#showcouleurcoupe");
     var planeEntities = [];
+    var clippingPlanes = [];
 
     document.querySelector("#envoyercoupe").addEventListener('click', (e) => {
       var X = $('#X').val();
@@ -1109,9 +1142,12 @@ class Menu {
       var largeur = $('#largeurcoupe').val();
       var couleur = $('#couleurcoupe').val();
       showCouleur.style.backgroundColor = couleur;
-      globe.addClippingPlanes(X, Y, hauteur, longueur, largeur, couleur, planeEntities);
+      globe.addClippingPlanes(X, Y, hauteur, longueur, largeur, couleur, planeEntities, clippingPlanes);
 
     });
+    globe.annulCoupe(planeEntities, clippingPlanes);
+    globe.supprCoupe(planeEntities, clippingPlanes);
+
   }
 
 formulaireFichier(){
@@ -1124,7 +1160,9 @@ formulaireFichier(){
             alert('Contenu du fichier "' + fichier.name + '" :\n\n' + reader.result);
         });
     reader.readAsText(fichier);
-    globe.loadGeoJson(fichier);
+    var jsonObj = reader.result;
+    //Cesium.GeoJsonDataSource.load(fichier);
+    globe.loadGeoJson(jsonObj);
   });
 }
 
