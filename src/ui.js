@@ -994,7 +994,7 @@ class Menu {
     this.boiteCheckbox.addEventListener('change', (e) => {
       //globe.loadBox('data/geojson/BoitePLU.json');
       //globe.loadGeoJson('data/geojson/BoitePLU.json');
-      let color = undefined;
+      /*let color = undefined;
       if(e.target.checked){
           color = {
               conditions: [
@@ -1006,7 +1006,7 @@ class Menu {
               show: e.target.checked,
               color: color
           });
-        }
+        }*/
 
       this.show('batiments', 'data/BoitePLUCesium/tileset.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
 
