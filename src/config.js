@@ -24,6 +24,7 @@ this.tnuDiv = document.querySelector('#tnuDiv');
 this.monumentDiv = document.querySelector('#monumentDiv');
 
 //Divers
+this.velumDiv = document.querySelector('#velumDiv');
 this.batipublicDiv = document.querySelector('#batipublicDiv');
 
 function hideElements() {
@@ -54,6 +55,7 @@ function hideElements() {
   this.monumentDiv.classList.add('hidden');
 
   //Divers
+  this.velumDiv.classList.add('hidden');
   this.batipublicDiv.classList.add('hidden');
 
 }
@@ -85,6 +87,7 @@ function showElements() {
   this.monumentDiv.classList.remove('hidden');
 
   //Divers
+  this.velumDiv.classList.remove('hidden');
   this.batipublicDiv.classList.remove('hidden');
 
 }
@@ -113,6 +116,7 @@ function initPLU() {
     //Reglementaire
     this.monumentDiv.classList.remove('hidden');
     //Divers
+    this.velumDiv.classList.add('hidden');
     this.batipublicDiv.classList.add('hidden');
 
   }
@@ -142,6 +146,7 @@ function initEco() {
   //Reglementaire
   this.monumentDiv.classList.add('hidden');
   //Divers
+  this.velumDiv.classList.add('hidden');
   this.batipublicDiv.classList.remove('hidden');
 
 }

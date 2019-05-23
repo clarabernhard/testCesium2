@@ -42,7 +42,6 @@ class Menu {
 
     // Affichage des couches
     this.photoMaillageCheckbox = document.querySelector('#photoMaillage');
-    this.boiteCheckbox = document.querySelector('#boite');
     // PLU
     this.pluCheckbox = document.querySelector('#plu');
     this.ERCheckbox = document.querySelector('#ER');
@@ -71,6 +70,7 @@ class Menu {
     //Reglementaire
     this.monumentCheckbox = document.querySelector('#monument');
     //Divers
+    this.velumCheckbox = document.querySelector('#velum');
     this.administratifCheckbox = document.querySelector('#administratif');
     this.religieuxCheckbox = document.querySelector('#religieux');
     this.culturelCheckbox = document.querySelector('#culturel');
@@ -991,25 +991,9 @@ class Menu {
 
     });
 
-    this.boiteCheckbox.addEventListener('change', (e) => {
-      //globe.loadBox('data/geojson/BoitePLU.json');
-      //globe.loadGeoJson('data/geojson/BoitePLU.json');
-      /*let color = undefined;
-      if(e.target.checked){
-          color = {
-              conditions: [
-                  ["true", "rgba(128, 0, 128, 0.5)"]
+    this.velumCheckbox.addEventListener('change', (e) => {
 
-              ]
-          };
-          this.dataSources.batiments.style = new Cesium.Cesium3DTileStyle({
-              show: e.target.checked,
-              color: color
-          });
-        }*/
-
-      this.show('batiments', 'data/BoitePLUCesium/tileset.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
-
+      this.show('enseignement', 'data/Velum3D/tileset.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
     });
 
   }
