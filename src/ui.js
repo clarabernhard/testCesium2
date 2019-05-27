@@ -992,8 +992,43 @@ class Menu {
     });
 
     this.velumCheckbox.addEventListener('change', (e) => {
+      //this.show('velum', 'data/Velum3D/tileset.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
+      let legendColors = {
+        'HT': '#FF1307',
+        'ET': '#FF0A21',
+        'NR': '#E8650F'
+      }
 
-      this.show('enseignement', 'data/Velum3D/tileset.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
+      this.legendManager.addLegend('velumCouleur', legendColors, 'polygon');
+
+      let color = undefined;
+      if(e.target.checked){
+        var velum = globe.load3DTiles('data/Velum3D/tileset.json');
+          color = {
+              conditions: [
+                  ["${HT}", "color('#FF1307')"],
+                  ["${ET}", "color('#FF0A21')"],
+                  ["${NR}", "color('#E8650F')"]
+              ]
+          };
+          // Construire et appliquer le style au tileset
+          velum.style = new Cesium.Cesium3DTileStyle({
+              color: color
+          });
+      } else{
+          this.legendManager.removeLegend('velumCouleur');
+          color = {
+              conditions: [
+                  ["true", "rgb(128, 128, 128)"]
+              ]
+          };
+          velum.style = new Cesium.Cesium3DTileStyle({
+              color: color
+          });
+          velum.show = false;
+      }
+
+
     });
 
   }
@@ -1148,6 +1183,39 @@ formulaireFichier(){
     //Cesium.GeoJsonDataSource.load(fichier);
     globe.loadGeoJson(jsonObj);
   });
+}
+
+couleurVelum($velum){
+    if(!this.legendManager.hasLegend('velumCouleur')){
+        this.legendManager.addLegend('velumCouleur', {
+            'HT': '#FF1307',
+            'ET': '#FF0A21',
+            'NR': '#E8650F'
+        });
+    }
+
+    let color = undefined;
+    if($velum.checked){
+        color = {
+            conditions: [
+                ["HT", "color('#FF1307')"],
+                ["ET", "color('#FF0A21')"],
+                ["NR", "color('#E8650F')"]
+            ]
+        };
+    } else{
+        this.legendManager.removeLegend('velumCouleur');
+        color = {
+            conditions: [
+                ["true", "rgb(128, 128, 128)"]
+            ]
+        };
+    }
+
+    // Construire et appliquer le style au tileset
+    this.dataSources.velum.style = new Cesium.Cesium3DTileStyle({
+        color: color
+    });
 }
 
   showPlu(show){
