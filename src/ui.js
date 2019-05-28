@@ -165,20 +165,14 @@ class Menu {
     });
 }
 
-  // Ajouter une source de données a la liste en donnant son nom "name" et la datasource "value"
-  addDataSource(name, value){
-    this.dataSources[name] = value;
+// Fonctions pour controler le loader
+showLoader(){
+  document.querySelector('#loadingIndicator').classList.remove('hidden');
+}
 
-  }
-
-  // Fonctions pour controler le loader
-  showLoader(){
-    document.querySelector('#loadingIndicator').classList.remove('hidden');
-  }
-
-  hideLoader(){
-    document.querySelector('#loadingIndicator').classList.add('hidden');
-  }
+hideLoader(){
+  document.querySelector('#loadingIndicator').classList.add('hidden');
+}
 
   // enregistre toutes les actions sur les boutons (mneus de gauche + boite à outils)
   evenementsCouches(){
@@ -237,7 +231,6 @@ class Menu {
       var volume;
       var dsurface;
 
-
       if(e.target.checked){
         globe.updateShape(choice, choice2, 3, '#FF0000', 1, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
         this.distanceList.classList.remove('hidden');
@@ -246,9 +239,7 @@ class Menu {
         this.distanceList.classList.add('hidden');
         this.aideCheckbox.classList.add('hidden');
         globe.supprSouris();
-
       }
-
     });
 
     this.surfaceCheckbox.addEventListener('change', (e) => {
@@ -350,14 +341,8 @@ class Menu {
 
     });
 
-    this.coupeCheckbox.addEventListener('change', (e) => {
-      if(e.target.checked){
-        this.planList.classList.remove('hidden');
-        this.formulairePlan();
-      } else {
-        this.planList.classList.add('hidden');
-        globe.supprSouris();
-      }
+    this.coupeCheckbox.addEventListener('change', function(e){
+      this.clicCoupe(e.target.checked));
     });
 
     this.supprCheckbox.addEventListener('click', function() {
@@ -382,7 +367,7 @@ class Menu {
         this.legendManager.removeLegend('ER');
       }
 
-      this.show('emplReserve', 'data/geojson/empl_reserve.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+      this.show('ER', 'data/geojson/empl_reserve.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
         classification: true,
         classificationField: 'type_prescription',
         colors: colors,
@@ -455,7 +440,7 @@ class Menu {
     });
 
     this.batiExceptionnelCheckbox.addEventListener('change', (e) => {
-      /*let colors = {
+      let colors = {
         'Bati_exceptionnel': '#0C77D9'
       }
 
@@ -470,8 +455,8 @@ class Menu {
         classificationField: 'sous_type',
         colors: colors,
         alpha: 0.6
-      });*/
-      globe.loadGeoJson('data/geojson/bati_exceptionnel.json');
+      });
+      //globe.loadGeoJson('data/geojson/bati_exceptionnel.json');
 
     });
 
@@ -998,7 +983,6 @@ class Menu {
         'ET': '#FF0A21',
         'NR': '#E8650F'
       }
-
       this.legendManager.addLegend('velumCouleur', legendColors, 'polygon');
 
       let color = undefined;
@@ -1033,6 +1017,10 @@ class Menu {
 
   }
 
+  // Ajouter une source de données a la liste en donnant son nom "name" et la datasource "value"
+  addDataSource(name, value){
+    this.dataSources[name] = value;
+  }
   /*
   * Afficher ou masquer la source de données "name" en fonction de la valeur de "show"
   * Si elle n'a pas enore été affiché, la fonction va télécharger les données avec le lien "link" passé en parametre
@@ -1040,20 +1028,21 @@ class Menu {
   * "Options" est un paramètre optionel (un objet) qui sera passé en deuxième paramètre de la fonction "loader"
   */
   show(name, link, loader, show, options = {}){
-    if(show){
-      if(this.dataSources[name] === undefined){
-        this.showLoader();
-        loader(link, options).then((data) => {
-          this.dataSources[name] = data;
-          this.hideLoader();
-        });
+      if(show){
+          if(this.dataSources[name] === undefined){
+              this.showLoader();
+              loader(link, options).then((data) => {
+                  this.dataSources[name] = data;
+                  this.hideLoader();
+              });
+          } else{
+              this.dataSources[name].show = true;
+          }
       } else{
-        this.dataSources[name].show = true;
+          if(this.dataSources[name] !== undefined){
+              this.dataSources[name].show = false;
+          }
       }
-    } else{
-        this.dataSources[name].show = false;
-        this.dataSources.pop();
-    }
   }
 
   // Mise a jour de la timeline lorsque l'utilisateur choisit une date dans le calendrier
@@ -1145,6 +1134,16 @@ class Menu {
     });
     globe.annulFigure('#annulervol', volume);
     globe.supprFigure('#supprimervol', volume);
+  }
+
+  clicCoupe(show) {
+    if(show){
+      this.planList.classList.remove('hidden');
+      this.formulairePlan();
+    } else {
+      this.planList.classList.add('hidden');
+      globe.supprSouris();
+    }
   }
 
   // lire les valeurs rentrées par l'utilisateur

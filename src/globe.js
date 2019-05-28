@@ -17,6 +17,8 @@ class Globe {
       this.raf09 = raf090;
     });
 
+    this.collection = new Cesium.DataSourceCollection();
+
     // insère les logos en bas
     this.viewer.bottomContainer.innerHTML = '<img src="src/img/logo/logo-strasbourg.png" alt="Logo strasbourg" />\
     <img src="src/img/logo/europe-sengage.jpg" alt="Logo strasbourg" />\
@@ -466,7 +468,6 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
           billboard.push(globe.createBillboard(activeShapePoints));
         } else if(choice === 'line') {
           line.push(globe.drawLine(activeShapePoints, largeur, couleur, transparence, true));
-          console.log(line);
         } else if( choice === 'polygon') {
           surface.push(globe.drawPolygon(activeShapePoints, couleur, transparence));
         } else if( choice === 'volume') {
@@ -519,10 +520,9 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
 
   supprFigure(element, figure) {
     document.querySelector(element).addEventListener('click', (e) => {
-      for(var i = 0; i < figure.length; i++){
+      for(var i = 0; i < figure.length+1; i++){
         this.viewer.entities.remove(figure[i]);
       }
-      figure = [];
     });
   }
 
