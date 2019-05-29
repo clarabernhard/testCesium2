@@ -46,6 +46,9 @@ class Globe {
 
     // plan de coupe
     this.altitude = document.querySelector('#alticoupe');
+    this.coupeX = document.querySelector('#X');
+    this.coupeY = document.querySelector('#Y');
+
 
     /*var elevation = new Cesium.WebMapServiceImageryProvider({
     url : 'http://wxs.ign.fr/pvwmk1wgxoei8orp7rd1re78/geoportail/r/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap',
@@ -218,42 +221,54 @@ showCoords(show){
   }
 }
 
+clicCoords(){
+  let scene = this.viewer.scene;
+  var coords = [];
+  this.handler.setInputAction(function(event) {
+    let cartesian = scene.pickPosition(event.position);
+    if (Cesium.defined(cartesian)) {
+      let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+      let longitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(7);
+      let latitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(7);
+      let height = cartographic.height.toFixed(3);
+
+    }
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+  var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
+  var X = coords[0];
+  var Y = coords[1];
+  var a =  Number(this.raf09.getGeoide(latitude, longitude));
+
+  this.coupeX.innerHTML = X;
+  this.coupeY.innerHTML = Y;
+  return([a, longitude, latitude, height]);
+}
+
 
 // Afficher ou enlever le plan de coupe
-addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, planeEntities, clippingPlanes) {
+addClippingPlanes(longitude, latitude, height, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, planeEntities, clippingPlanes) {
+  let scene = this.viewer.scene;
+  var clippingPlanes = new Cesium.ClippingPlaneCollection({
+    planes : [
+      new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 0.0, -1.0), 0.0)
+    ],
+  });
 
-
-    var clippingPlanes = new Cesium.ClippingPlaneCollection({
-      planes : [
-        new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 0.0, -1.0), 0.0)
-      ],
+  for (var i = 0; i < clippingPlanes.length; i=+1) {
+    var plane = clippingPlanes.get(i);
+    var planeEntity = this.viewer.entities.add({
+      position : Cesium.Cartesian3.fromDegrees(longitude, latitude, alti),
+      plane : {
+        dimensions : new Cesium.Cartesian2(longueurCoupe, largeurCoupe),
+        material : Cesium.Color.fromCssColorString(couleurCoupe).withAlpha(0.4),
+        plane : new Cesium.CallbackProperty(this.planeUpdate(plane, couleurCoupe), false),
+        outline : true,
+        outlineColor : Cesium.Color.WHITE
+      }
     });
-//return tileset.readyPromise.then(function() {
-console.log(clippingPlanes.length)
-    for (var i = 0; i < clippingPlanes.length; i=+1) {
-      var coords = proj4('EPSG:3948','EPSG:4326', [X, Y]);
-      var a = Number(this.raf09.getGeoide(coords[1], coords[0]));
-
-      var y = coords[1];
-      var x = coords[0];
-      var z = (Number(hauteurCoupe) + a);
-
-      var plane = clippingPlanes.get(i);
-      var planeEntity = this.viewer.entities.add({
-        position : Cesium.Cartesian3.fromDegrees(x, y, z),
-        plane : {
-          dimensions : new Cesium.Cartesian2(longueurCoupe, largeurCoupe),
-          material : Cesium.Color.fromCssColorString(couleurCoupe).withAlpha(0.4),
-          plane : new Cesium.CallbackProperty(this.planeUpdate(plane, couleurCoupe), false),
-          outline : true,
-          outlineColor : Cesium.Color.WHITE
-        }
-      });
-      planeEntities.push(planeEntity);
-      console.log('coucou');
-    }
-    //return tileset;
-  //});
+    planeEntities.push(planeEntity);
+  }
 
 }
 
@@ -287,7 +302,8 @@ planeUpdate(plane, couleurCoupe) {
 
   // Select plane when mouse down
   this.handler.setInputAction(function(movement) {
-    var pickedObject = scene.pick(movement.position);
+    var pickedObject = scene.pickPosition(movement.position);
+    //var earthPosition = scene.pickPosition(movement.position);
     if (Cesium.defined(pickedObject) && Cesium.defined(pickedObject.id) && Cesium.defined(pickedObject.id.plane)) {
       selectedPlane = pickedObject.id.plane;
       selectedPlane.material = Cesium.Color.fromCssColorString(couleurCoupe).withAlpha(0.4);
@@ -315,15 +331,33 @@ planeUpdate(plane, couleurCoupe) {
     globe.altitude.innerHTML = targetY;
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
-
-
   return function () {
     plane.distance = targetY;
     return plane;
   };
 }
 
-//outil construction
+addBox(){
+  let scene = this.viewer.scene;
+
+  this.handler.setInputAction(function(event) {
+    let cartesian = scene.pickPosition(event.position);
+    if (Cesium.defined(cartesian)) {
+      let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+      let longitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(7);
+      let latitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(7);
+      let height = cartographic.height.toFixed(3);
+    }
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+  var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
+  var X = coords[0];
+  var Y = coords[1];
+  var Z = (Number(height) - Number(this.raf09.getGeoide(latitude, longitude)));
+
+}
+
+//outils dessin
 createPoint(worldPosition, largeur) {
   var point = this.viewer.entities.add({
     position : worldPosition,
@@ -384,6 +418,18 @@ drawVolume(positionData, couleur, transparence, hauteurVol) {
   return shape;
 }
 
+drawBox(positionData) {
+  var shape = this.viewer.entities.add({
+    position : positionData,
+    box : {
+      dimensions : new Cesium.Cartesian3(1400.0, 1400.0, 2800.0),
+      fill: true,
+      material: Cesium.Color.TRANSPARENT
+    }
+  });
+  return shape;
+}
+
 updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface) {
   var activeShapePoints = [];
   var activeShape;
@@ -407,7 +453,6 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
           }, false);
           largeur = parseFloat(largeur);
           transparence = parseFloat(transparence);
-          //couleur = couleur.toString();
           if(choice === 'point') {
             floatingPoint = globe.createBillboard(earthPosition);
             activeShape = globe.createPoint(dynamicPositions);
@@ -459,7 +504,6 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
     this.handler.setInputAction(function(event) {
       largeur = parseFloat(largeur);
       transparence = parseFloat(transparence);
-      //couleur = couleur.toString();
       // on supprime le dernier point flottant
       activeShapePoints.pop();
       if(choice2 === 'construction'){

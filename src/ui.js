@@ -101,6 +101,7 @@ class Menu {
     this.volumeCheckbox = document.querySelector('#volume');
     // plan de coupe
     this.coupeCheckbox = document.querySelector('#plancoupe');
+    this.decoupeCheckbox = document.querySelector('#decoupe');
     // ombres
     this.shadowCheckbox = document.querySelector('#shadows');
     // boutons
@@ -123,6 +124,95 @@ class Menu {
     this.menuClic("#boutonconstruction", this.constructionContent);
     this.menuClic("#boutoncoupe", this.coupeContent);
     this.menuClic("#boutontime", this.timeContent);
+
+    //Variables pour les formulaires
+    var point = [];
+    var volume = [];
+    var surface = [];
+    var billboard = [];
+    var line = [];
+    var dline = [];
+    var dline2 = [];
+    var dsurface = [];
+    var planeEntities = [];
+    var clippingPlanes = [];
+
+    //Evenements pour les boutons des formulaires
+    document.querySelector("#envoyerligne").addEventListener('click', (e) => {
+      var choice = 'line';
+      var choice2 = 'construction';
+      var hauteurVol;
+      let showCouleur = document.querySelector("#showcouleurligne");
+      var largeur = $('#largeur').val();
+      var couleur = $('#couleur').val();
+      var transparence = $('#transparence').val();
+      showCouleur.style.backgroundColor = couleur;
+
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
+
+    });
+
+    document.querySelector("#envoyersurf").addEventListener('click', (e) => {
+      var choice = 'polygon';
+      var choice2 = 'construction';
+      var hauteurVol;
+      var largeur = 3;
+      let showCouleur = document.querySelector("#showcouleursurf");
+
+      var couleur = $('#couleursurf').val();
+      var transparence = $('#transparencesurf').val();
+      showCouleur.style.backgroundColor = couleur;
+
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
+
+    });
+
+    document.querySelector("#envoyervol").addEventListener('click', (e) => {
+      var choice = 'volume';
+      var choice2 = 'construction';
+      var largeur = 3;
+      let showCouleur = document.querySelector("#showcouleurvol");
+
+      var hauteurVol = $('#hauteurvol').val();
+      var couleur = $('#couleurvol').val();
+      var transparence = $('#transparencevol').val();
+      showCouleur.style.backgroundColor = couleur;
+
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
+
+    });
+
+    document.querySelector("#clic").addEventListener('click', (e) => {
+      var tab = [];
+      tab = globe.clicCoords();
+    });
+
+    document.querySelector("#envoyercoupe").addEventListener('click', (e) => {
+      let showCouleur = document.querySelector("#showcouleurcoupe");
+      var hauteur = $('#hauteurcoupe').val();
+      var longueur = $('#longueurcoupe').val();
+      var largeur = $('#largeurcoupe').val();
+      var couleur = $('#couleurcoupe').val();
+      showCouleur.style.backgroundColor = couleur;
+
+      extrud = hauteur + tab[0];
+      height = tab[3];
+      var alti = Number(height) + extrud;
+
+      globe.addClippingPlanes(tab[1], tab[2], alti, longueur, largeur, couleur, planeEntities, clippingPlanes);
+    });
+
+    //Evenements pour la suppression / anunulation des dessins
+    globe.annulFigure('#annulerpoint', billboard);
+    globe.supprFigure('#supprimerpoint', billboard);
+    globe.annulFigure('#annulerligne', line);
+    globe.supprFigure('#supprimerligne', line);
+    globe.annulFigure('#annulersurf', surface);
+    globe.supprFigure('#supprimersurf', surface);
+    globe.annulFigure('#annulervol', volume);
+    globe.supprFigure('#supprimervol', volume);
+    globe.annulCoupe(planeEntities, clippingPlanes);
+    globe.supprCoupe(planeEntities, clippingPlanes);
 
   }
 
@@ -174,7 +264,7 @@ hideLoader(){
   document.querySelector('#loadingIndicator').classList.add('hidden');
 }
 
-  // enregistre toutes les actions sur les boutons (mneus de gauche + boite à outils)
+  // enregistre toutes les actions sur les boutons (menus de gauche + boite à outils)
   evenementsCouches(){
 
     this.addFile.addEventListener('click', (e) => {
@@ -247,13 +337,13 @@ hideLoader(){
       var choice2 = 'mesure';
       var hauteurVol;
       var point = [];
-      var dsurface = [];
+      var dline;
+      var dline2;
       var surface;
       var billboard;
       var line;
       var volume;
-      var dline;
-      var dline2;
+      var dsurface = [];
 
       if(e.target.checked){
         globe.updateShape(choice, choice2, 3, '#1ABFD0', 0.4, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
@@ -274,13 +364,13 @@ hideLoader(){
       var largeur;
       var hauteurVol;
       var point = [];
-      var billboard = [];
-      var dsurface;
-      var surface;
-      var line;
-      var volume;
       var dline;
       var dline2;
+      var surface;
+      var billboard = [];
+      var line;
+      var volume;
+      var dsurface;
 
       if(e.target.checked){
         this.pointList.classList.remove('hidden');
@@ -289,16 +379,11 @@ hideLoader(){
         this.pointList.classList.add('hidden');
         globe.supprSouris();
       }
-      globe.annulFigure('#annulerpoint', billboard);
-      globe.supprFigure('#supprimerpoint', billboard);
+
     });
 
     this.cligneCheckbox.addEventListener('change', (e) => {
-      var choice = 'line';
-      var choice2 = 'construction';
-
       if(e.target.checked){
-        this.formulaireLigne(choice, choice2);
         this.ligneList.classList.remove('hidden');
         this.aideCheckbox.classList.remove('hidden');
       } else{
@@ -310,11 +395,7 @@ hideLoader(){
     });
 
     this.csurfaceCheckbox.addEventListener('change', (e) => {
-      var choice = 'polygon';
-      var choice2 = 'construction';
-
       if(e.target.checked){
-        this.formulaireSurface(choice, choice2);
         this.surfaceList.classList.remove('hidden');
         this.aideCheckbox.classList.remove('hidden');
       } else{
@@ -322,15 +403,10 @@ hideLoader(){
         this.aideCheckbox.classList.add('hidden');
         globe.supprSouris();
       }
-
     });
 
     this.volumeCheckbox.addEventListener('change', (e) => {
-      var choice = 'volume';
-      var choice2 = 'construction';
-
       if(e.target.checked){
-        this.formulaireVolume(choice, choice2);
         this.volumeList.classList.remove('hidden');
         this.aideCheckbox.classList.remove('hidden');
       } else{
@@ -338,11 +414,38 @@ hideLoader(){
         this.aideCheckbox.classList.add('hidden');
         globe.supprSouris();
       }
-
     });
 
-    this.coupeCheckbox.addEventListener('change', function(e){
-      this.clicCoupe(e.target.checked));
+    this.coupeCheckbox.addEventListener('change', (e) => {
+      if(e.target.checked){
+        this.planList.classList.remove('hidden');
+      } else {
+        this.planList.classList.add('hidden');
+        globe.supprSouris();
+      }
+    });
+
+    this.decoupeCheckbox.addEventListener('change', (e) => {
+      var choice = 'box';
+      var choice2 = 'construction';
+      var transparence;
+      var couleur;
+      var largeur;
+      var hauteurVol;
+      var point = [];
+      var dline;
+      var dline2;
+      var surface;
+      var billboard;
+      var line;
+      var volume;
+      var dsurface;
+
+      if(e.target.checked){
+        globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
+      } else {
+        globe.supprSouris();
+      }
     });
 
     this.supprCheckbox.addEventListener('click', function() {
@@ -1059,115 +1162,7 @@ hideLoader(){
     this.globe.viewer.timeline.zoomTo(startTime, stopTime); // Définit la portion visible de la timeline
   }
 
-  // formulaires
-  formulaireLigne(choice, choice2){
-    var point = [];
-    var line = [];
-    var billboard;
-    var volume;
-    var surface;
-    var dline;
-    var dline2;
-    var dsurface;
-
-    var hauteurVol;
-    let showCouleur = document.querySelector("#showcouleurligne");
-
-    document.querySelector("#envoyerligne").addEventListener('click', (e) => {
-      var largeur = $('#largeur').val();
-      var couleur = $('#couleur').val();
-      var transparence = $('#transparence').val();
-      showCouleur.style.backgroundColor = couleur;
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
-
-    });
-    globe.annulFigure('#annulerligne', line);
-    globe.supprFigure('#supprimerligne', line);
-  }
-
-  formulaireSurface(choice, choice2){
-    var point = [];
-    var surface = [];
-    var billboard;
-    var line;
-    var volume;
-    var dline;
-    var dline2;
-    var dsurface;
-
-    var hauteurVol;
-    var largeur = 3;
-    let showCouleur = document.querySelector("#showcouleursurf");
-
-    document.querySelector("#envoyersurf").addEventListener('click', (e) => {
-      var couleur = $('#couleursurf').val();
-      var transparence = $('#transparencesurf').val();
-      showCouleur.style.backgroundColor = couleur;
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
-
-    });
-    globe.annulFigure('#annulersurf', surface);
-    globe.supprFigure('#supprimersurf', surface);
-
-  }
-
-  formulaireVolume(choice, choice2){
-    var point = [];
-    var volume = [];
-    var surface;
-    var billboard;
-    var line;
-    var dline;
-    var dline2;
-    var dsurface;
-
-    var largeur = 3;
-    let showCouleur = document.querySelector("#showcouleurvol");
-
-    document.querySelector("#envoyervol").addEventListener('click', (e) => {
-      var hauteurVol = $('#hauteurvol').val();
-      var couleur = $('#couleurvol').val();
-      var transparence = $('#transparencevol').val();
-      showCouleur.style.backgroundColor = couleur;
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
-
-    });
-    globe.annulFigure('#annulervol', volume);
-    globe.supprFigure('#supprimervol', volume);
-  }
-
-  clicCoupe(show) {
-    if(show){
-      this.planList.classList.remove('hidden');
-      this.formulairePlan();
-    } else {
-      this.planList.classList.add('hidden');
-      globe.supprSouris();
-    }
-  }
-
-  // lire les valeurs rentrées par l'utilisateur
-  formulairePlan(){
-    let showCouleur = document.querySelector("#showcouleurcoupe");
-    var planeEntities = [];
-    var clippingPlanes = [];
-
-    document.querySelector("#envoyercoupe").addEventListener('click', (e) => {
-      var X = $('#X').val();
-      var Y = $('#Y').val();
-      var hauteur = $('#hauteurcoupe').val();
-      var longueur = $('#longueurcoupe').val();
-      var largeur = $('#largeurcoupe').val();
-      var couleur = $('#couleurcoupe').val();
-      showCouleur.style.backgroundColor = couleur;
-      globe.addClippingPlanes(X, Y, hauteur, longueur, largeur, couleur, planeEntities, clippingPlanes);
-
-    });
-    globe.annulCoupe(planeEntities, clippingPlanes);
-    globe.supprCoupe(planeEntities, clippingPlanes);
-
-  }
-
+//Formulaire
 formulaireFichier(){
   document.querySelector("#ajouter").addEventListener('click', (e) => {
     var fichier = $('#fichier').prop('files')[0];

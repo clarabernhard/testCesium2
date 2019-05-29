@@ -97,10 +97,11 @@
       <h2>Propriétés du plan de coupe</h2>
       <form>
         <p>Coordonnées du point central : <br/>
-          X :<input id="X" type="text" size="12" value="2050200"/> <br/>
-          Y :<input id="Y" type="text" size="12" value="7275400"/> <br/>
+          <button id="clic">Cliquez sur le photomaillage</button><br/>
+          X :<input id="X" type="text" size="12"/> <br/>
+          Y :<input id="Y" type="text" size="12"/> <br/>
         </p>
-        <p>Altitude (m):<input id="hauteurcoupe" type="text" size="6" value="200"/> </p>
+        <p>Hauteur (m):<input id="hauteurcoupe" type="text" size="6" value="20"/> </p>
         <p>Longeur (m):<input id="longueurcoupe" type="text" size="6" value="200"/> </p>
         <p>Largeur (m):<input id="largeurcoupe" type="text" size="6" value="200"/> </p>
         <p>Couleur : <input id="couleurcoupe" type="text" size="6" value="#FFFFFF"/>
@@ -406,6 +407,11 @@
       <div class="nowrap">
         <input id="plancoupe" type="checkbox"/>
         <label for="plancoupe">Plan de coupe horizontal</label>
+      </div>
+
+      <div class="nowrap">
+        <input id="decoupe" type="checkbox"/>
+        <label for="decoupe">Découpe dans le maillage</label>
       </div>
 
     </div>
