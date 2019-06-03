@@ -48,6 +48,7 @@ class Globe {
     this.altitude = document.querySelector('#alticoupe');
     this.coupeX = document.querySelector('#X');
     this.coupeY = document.querySelector('#Y');
+    this.coupeZ = document.querySelector('#hauteurcoupe');
 
 
     /*var elevation = new Cesium.WebMapServiceImageryProvider({
@@ -173,9 +174,6 @@ promise.then((dataSource) => {
 
 	}
 
-}).otherwise(function(error){
-		//Display any errors encountered while loading.
-		window.alert(error);
 });
 return promise;
 }
@@ -221,9 +219,43 @@ showCoords(show){
   }
 }
 
-clicCoords(){
+// ajouter le plan de coupe horizontal
+addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, planeEntities, clippingPlanes) {
+    var clippingPlanes = new Cesium.ClippingPlaneCollection({
+      planes : [
+        new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 0.0, -1.0), 0.0)
+      ],
+    });
+
+    for (var i = 0; i < clippingPlanes.length; i=+1) {
+      var coords = proj4('EPSG:3948','EPSG:4326', [Number(X), Number(Y)]);
+      var a = Number(this.raf09.getGeoide(coords[1], coords[0]));
+
+      var y = coords[1];
+      var x = coords[0];
+      var z = (Number(hauteurCoupe) + a);
+
+      var plane = clippingPlanes.get(i);
+      var planeEntity = this.viewer.entities.add({
+        position : Cesium.Cartesian3.fromDegrees(x, y, z),
+        plane : {
+          dimensions : new Cesium.Cartesian2(longueurCoupe, largeurCoupe),
+          material : Cesium.Color.fromCssColorString(couleurCoupe).withAlpha(0.4),
+          plane : new Cesium.CallbackProperty(this.planeUpdate(plane, couleurCoupe), false),
+          outline : true,
+          outlineColor : Cesium.Color.WHITE
+        }
+      });
+      planeEntities.push(planeEntity);
+    }
+
+}
+
+// Récupérer les coordonnées au clic et les afficher dans le formulaire du plan de coupe horizontal
+coordCoupe(){
   let scene = this.viewer.scene;
-  var coords = [];
+  this.handler.globe = this;
+
   this.handler.setInputAction(function(event) {
     let cartesian = scene.pickPosition(event.position);
     if (Cesium.defined(cartesian)) {
@@ -232,44 +264,12 @@ clicCoords(){
       let latitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(7);
       let height = cartographic.height.toFixed(3);
 
+      var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
+      document.getElementById("X").value = (coords[0].toFixed(4));
+      document.getElementById("Y").value = (coords[1].toFixed(4));
+      document.getElementById("hauteurcoupe").value = ((Number(height) - Number(globe.raf09.getGeoide(latitude, longitude))).toFixed(3));
     }
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
-  var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
-  var X = coords[0];
-  var Y = coords[1];
-  var a =  Number(this.raf09.getGeoide(latitude, longitude));
-
-  this.coupeX.innerHTML = X;
-  this.coupeY.innerHTML = Y;
-  return([a, longitude, latitude, height]);
-}
-
-
-// Afficher ou enlever le plan de coupe
-addClippingPlanes(longitude, latitude, height, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, planeEntities, clippingPlanes) {
-  let scene = this.viewer.scene;
-  var clippingPlanes = new Cesium.ClippingPlaneCollection({
-    planes : [
-      new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 0.0, -1.0), 0.0)
-    ],
-  });
-
-  for (var i = 0; i < clippingPlanes.length; i=+1) {
-    var plane = clippingPlanes.get(i);
-    var planeEntity = this.viewer.entities.add({
-      position : Cesium.Cartesian3.fromDegrees(longitude, latitude, alti),
-      plane : {
-        dimensions : new Cesium.Cartesian2(longueurCoupe, largeurCoupe),
-        material : Cesium.Color.fromCssColorString(couleurCoupe).withAlpha(0.4),
-        plane : new Cesium.CallbackProperty(this.planeUpdate(plane, couleurCoupe), false),
-        outline : true,
-        outlineColor : Cesium.Color.WHITE
-      }
-    });
-    planeEntities.push(planeEntity);
-  }
-
 }
 
 annulCoupe(entity, clippingPlanes){
@@ -280,6 +280,7 @@ annulCoupe(entity, clippingPlanes){
     clippingPlanes = [];
   });
 }
+
 supprCoupe(entity, clippingPlanes){
   document.querySelector("#supprimercoupe").addEventListener('click', (e) => {
     //this.viewer.entities.remove(planeEntity);
@@ -302,7 +303,7 @@ planeUpdate(plane, couleurCoupe) {
 
   // Select plane when mouse down
   this.handler.setInputAction(function(movement) {
-    var pickedObject = scene.pickPosition(movement.position);
+    var pickedObject = scene.pick(movement.position);
     //var earthPosition = scene.pickPosition(movement.position);
     if (Cesium.defined(pickedObject) && Cesium.defined(pickedObject.id) && Cesium.defined(pickedObject.id.plane)) {
       selectedPlane = pickedObject.id.plane;
@@ -657,6 +658,82 @@ getHauteur(activeShapePoints, hauteurVol){
     var z = (Number(hauteurVol) + a);
     return z;
 
+}
+
+createHole(tileset) {
+  var dig_array = [];
+  var scene = this.viewer.scene;
+  this.handler.globe = this;
+
+  this.handler.setInputAction(function(event) {
+    var max_lon, min_lon, max_lat, min_lat;
+    if(dig_array.length < 4)
+    {
+      var earthPosition = scene.pickPosition(event.position);
+      var longitudeString = Cesium.Cartographic.fromCartesian(earthPosition).longitude*Cesium.Math.DEGREES_PER_RADIAN;
+      var latitudeString = Cesium.Cartographic.fromCartesian(earthPosition).latitude*Cesium.Math.DEGREES_PER_RADIAN;
+
+      var points = globe.viewer.scene.primitives.add(new Cesium.PointPrimitiveCollection());
+      points.add({
+        position : earthPosition,
+        color : Cesium.Color.GRAY
+      });
+
+      dig_array.push(longitudeString);
+      dig_array.push(latitudeString);
+    }
+    if(dig_array.length === 4)
+    {
+      var dig_point = [];
+      var wall_point = [];
+
+      if((parseFloat(dig_array[0]) > parseFloat(dig_array[2])) || (parseFloat(dig_array[0]) === parseFloat(dig_array[2]))){
+        max_lon = parseFloat(dig_array[0]); min_lon = parseFloat(dig_array[2]);
+      } else {
+        max_lon = parseFloat(dig_array[2]); min_lon = parseFloat(dig_array[0]);
+      } if((parseFloat(dig_array[1]) > parseFloat(dig_array[3])) || (parseFloat(dig_array[1]) === parseFloat(dig_array[3]))){
+        max_lat = parseFloat(dig_array[1]); min_lat = parseFloat(dig_array[3]);
+      } else {
+        max_lat = parseFloat(dig_array[3]); min_lat = parseFloat(dig_array[1]);
+      }
+
+      dig_point.push(new Cesium.Cartesian3.fromDegrees(min_lon,max_lat));
+      dig_point.push(new Cesium.Cartesian3.fromDegrees(min_lon,min_lat));
+      dig_point.push(new Cesium.Cartesian3.fromDegrees(max_lon,min_lat));
+      dig_point.push(new Cesium.Cartesian3.fromDegrees(max_lon,max_lat));
+      globe.holePlanes(dig_point, tileset);
+    }
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+}
+
+holePlanes(dig_point, tileset) {
+  var pts = dig_point;
+  var pointsLength = pts.length;
+  var clippingPlanes = [];
+
+  for (var i = 0; i < pointsLength; ++i) {
+    var nextIndex = (i + 1) % pointsLength;
+    var midpoint = Cesium.Cartesian3.add(pts[i], pts[nextIndex], new Cesium.Cartesian3());
+    midpoint = Cesium.Cartesian3.multiplyByScalar(midpoint, 0.5, midpoint);
+    var up = Cesium.Cartesian3.normalize(midpoint, new Cesium.Cartesian3());
+    var right = Cesium.Cartesian3.subtract(pts[nextIndex], midpoint, new Cesium.Cartesian3());
+    right = Cesium.Cartesian3.normalize(right, right);
+    var normal = Cesium.Cartesian3.cross(right, up, new Cesium.Cartesian3());
+    normal = Cesium.Cartesian3.normalize(normal, normal);
+    var originCenteredPlane = new Cesium.Plane(normal, 0.0);
+    var distance = Cesium.Plane.getPointDistance(originCenteredPlane, midpoint);
+    clippingPlanes.push(new Cesium.ClippingPlane(normal, distance));
+  }
+  this.viewer.scene.globe.clippingPlanes = new Cesium.ClippingPlaneCollection({
+    planes : clippingPlanes,
+    edgeColor: Cesium.Color.WHITE,
+  });
+
+  tileset.clippingPlanes = new Cesium.ClippingPlaneCollection({
+    planes : clippingPlanes,
+    edgeColor: Cesium.Color.WHITE,
+    //modelMatrix: Cesium.Matrix4.inverse(tileset.root.computedTransform, new Cesium.Matrix4())
+  });
 }
 
 supprSouris(){

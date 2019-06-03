@@ -1,5 +1,5 @@
 // PLU
-this.pluDiv = document.querySelector('#pluDiv');
+
 this.ERDiv = document.querySelector('#ERDiv');
 this.margeDiv = document.querySelector('#margeDiv');
 this.ensPaysagerDiv = document.querySelector('#ensPaysagerDiv');
@@ -30,7 +30,7 @@ this.batipublicDiv = document.querySelector('#batipublicDiv');
 function hideElements() {
   // cacher les éléments ligne par ligne
   // PLU
-  this.pluDiv.classList.add('hidden');
+
   this.ERDiv.classList.add('hidden');
   this.margeDiv.classList.add('hidden');
   this.ensPaysagerDiv.classList.add('hidden');
@@ -62,7 +62,7 @@ function hideElements() {
 
 function showElements() {
   // PLU
-  this.pluDiv.classList.remove('hidden');
+
   this.ERDiv.classList.remove('hidden');
   this.margeDiv.classList.remove('hidden');
   this.ensPaysagerDiv.classList.remove('hidden');
@@ -94,7 +94,7 @@ function showElements() {
 
 function initPLU() {
     // PLU
-    this.pluDiv.classList.remove('hidden');
+
     this.ERDiv.classList.remove('hidden');
     this.margeDiv.classList.remove('hidden');
     this.ensPaysagerDiv.classList.remove('hidden');
@@ -124,7 +124,7 @@ function initPLU() {
 
 function initEco() {
   // PLU
-  this.pluDiv.classList.add('hidden');
+
   this.ERDiv.classList.add('hidden');
   this.margeDiv.classList.remove('hidden');
   this.ensPaysagerDiv.classList.add('hidden');

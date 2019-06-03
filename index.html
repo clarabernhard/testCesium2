@@ -97,11 +97,11 @@
       <h2>Propriétés du plan de coupe</h2>
       <form>
         <p>Coordonnées du point central : <br/>
-          <button id="clic">Cliquez sur le photomaillage</button><br/>
           X :<input id="X" type="text" size="12"/> <br/>
           Y :<input id="Y" type="text" size="12"/> <br/>
         </p>
-        <p>Hauteur (m):<input id="hauteurcoupe" type="text" size="6" value="20"/> </p>
+        <p>Altitude (m):<input id="hauteurcoupe" type="text" size="6"/> </p>
+        <p>Cliquez sur le photomaillage pour rentrer les coordonnées </p>
         <p>Longeur (m):<input id="longueurcoupe" type="text" size="6" value="200"/> </p>
         <p>Largeur (m):<input id="largeurcoupe" type="text" size="6" value="200"/> </p>
         <p>Couleur : <input id="couleurcoupe" type="text" size="6" value="#FFFFFF"/>
@@ -157,10 +157,6 @@
         <i class="arrow"></i>
       </button>
       <div class="panel-content">
-        <div class="nowrap hidden"id="pluDiv">
-          <input id="plu" type="checkbox"/>
-          <label for="plu">Zonage du PLU</label>
-        </div>
 
         <div class="nowrap hidden" id="ERDiv">
           <input id="ER" type="checkbox"/>
