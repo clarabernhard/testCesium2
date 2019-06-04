@@ -6,6 +6,9 @@ class Menu {
   constructor(globe){
     this.globe = globe;
     this.terrain = terrain;
+    console.log(terrain);
+    this.tileset = tileset;
+    console.log(tileset);
     this.viewer = Globe.viewer;
     this.handler = Globe.handler;
 
@@ -36,6 +39,7 @@ class Menu {
     this.volumeList = document.querySelector('#volumeList');
     this.fileList = document.querySelector('#fileList');
     this.configList = document.querySelector('#configList');
+    this.decoupeList = document.querySelector('#decoupeList');
 
     // annotation en bas à droite
     this.aideCheckbox = document.querySelector('.annotation');
@@ -135,6 +139,7 @@ class Menu {
     var dsurface = [];
     var planeEntities = [];
     var clippingPlanes = [];
+    var box = [];
 
     //Evenements pour les boutons des formulaires
     document.querySelector("#envoyerligne").addEventListener('click', (e) => {
@@ -182,7 +187,6 @@ class Menu {
     });
 
     document.querySelector("#envoyercoupe").addEventListener('click', (e) => {
-      //globe.supprSouris();
       let showCouleur = document.querySelector("#showcouleurcoupe");
       var X = $('#X').val();
       var Y = $('#Y').val();
@@ -195,6 +199,14 @@ class Menu {
       globe.addClippingPlanes(X, Y, hauteur, longueur, largeur, couleur, planeEntities, clippingPlanes);
     });
 
+    document.querySelector("#envoyerdecoupe").addEventListener('click', (e) => {
+      var longueur = $('#longueurdecoupe').val();
+      var largeur = $('#largeurdecoupe').val();
+      var orientation = $('#orientationdecoupe').val();
+
+      globe.createBox(box, longueur, largeur, orientation, tileset);
+    });
+
     //Evenements pour la suppression / anunulation des dessins
     globe.annulFigure('#annulerpoint', billboard);
     globe.supprFigure('#supprimerpoint', billboard);
@@ -204,9 +216,10 @@ class Menu {
     globe.supprFigure('#supprimersurf', surface);
     globe.annulFigure('#annulervol', volume);
     globe.supprFigure('#supprimervol', volume);
+    globe.annulFigure('#annulerdecoupe', box);
+    globe.supprFigure('#supprimerdecoupe', box);
     globe.annulCoupe(planeEntities, clippingPlanes);
     globe.supprCoupe(planeEntities, clippingPlanes);
-
   }
 
   openMenu(){
@@ -419,14 +432,15 @@ hideLoader(){
       }
     });
 
-    /*this.decoupeCheckbox.addEventListener('change', (e) => {
+    this.decoupeCheckbox.addEventListener('change', (e) => {
       if(e.target.checked){
-        globe.createHole(terrain);
+        this.decoupeList.classList.remove('hidden');
       } else {
+        this.decoupeList.classList.add('hidden');
         globe.supprSouris();
       }
 
-    });*/
+    });
 
     this.supprCheckbox.addEventListener('click', function() {
       globe.supprEntities();

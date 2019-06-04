@@ -81,7 +81,7 @@
     <div class="backdrop hidden" id="volumeList">
       <form>
         <h2>Propriétés du volume</h2>
-        <p>Altitude (m):<input id="hauteurvol" type="text" size="6" value="200"/> </p>
+        <p>Hauteur (m):<input id="hauteurvol" type="text" size="6" value="20"/> </p>
         <p>Couleur : <input id="couleurvol" type="text" size="6" value="#FFFFFF"/>
         <span class="showcouleur" id="showcouleurvol">id</span> </p>
         <a href="https://www.webfx.com/web-design/color-picker/" target="_blank" onclick="window.open('https://www.webfx.com/web-design/color-picker/','name','width=600,height=400')">Choisissez votre couleur ici</a>
@@ -102,7 +102,7 @@
         </p>
         <p>Altitude (m):<input id="hauteurcoupe" type="text" size="6"/> </p>
         <p>Cliquez sur le photomaillage pour rentrer les coordonnées </p>
-        <p>Longeur (m):<input id="longueurcoupe" type="text" size="6" value="200"/> </p>
+        <p>Longueur (m):<input id="longueurcoupe" type="text" size="6" value="200"/> </p>
         <p>Largeur (m):<input id="largeurcoupe" type="text" size="6" value="200"/> </p>
         <p>Couleur : <input id="couleurcoupe" type="text" size="6" value="#FFFFFF"/>
         <span class="showcouleur" id="showcouleurcoupe">id</span> </p>
@@ -112,6 +112,19 @@
       <button id="envoyercoupe">Ajouter</button>
       <button id="annulercoupe">Annuler</button>
       <button id="supprimercoupe">Supprimer</button> <br/>
+    </div>
+
+    <div class="backdrop hidden" id="decoupeList">
+      <form>
+        <h2>Découpe dans le photomaillage</h2>
+        <p>Longueur :<input id="longueurdecoupe" type="text" size="6" value="200"/> </p>
+        <p>Largeur :<input id="largeurdecoupe" type="text" size="6" value="200"/> </p>
+        <p>Orientation :<input id="orientationdecoupe" type="text" size="6" value="0"/> </p>
+      </form>
+      <button id="envoyerdecoupe">Ajouter</button>
+      <button id="annulerdecoupe">Annuler</button>
+      <button id="supprimerdecoupe">Supprimer</button>
+      <p>Cliquez sur 'ajouter' puis sur le photomaillage pour ajouter la découpe</p>
     </div>
 
     <div class="backdrop hidden" id="fileList">

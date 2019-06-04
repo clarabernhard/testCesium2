@@ -17,7 +17,8 @@ proj4.defs([
 let globe = new Globe('cesiumContainer', new Geocoder("http://adict.strasbourg.eu/addok/search"));
 
 // Charger le photo mailage --> appelle la fonction créée dans la classe globe
-let terrain = globe.load3DTiles('data/Photomaillage/Cesium_1.json');
+let tileset = globe.load3DTiles('data/Photomaillage/Cesium_1.json');
+var terrain = globe.add3DTiles(tileset);
 
 
 // Zoomer sur le photo mailage et configurer le bouton "home" pour qu'il vole au même endroit
@@ -33,11 +34,11 @@ terrain.then(function(dataSource){
     cesiumEvent.addDataSource("photoMaillage", dataSource)
 });
 
-document.querySelector('#decoupe').addEventListener('change', (e) => {
+/*document.querySelector('#decoupe').addEventListener('change', (e) => {
   if(e.target.checked){
     globe.createHole(terrain);
   } else {
     globe.supprSouris();
   }
 
-});
+});*/

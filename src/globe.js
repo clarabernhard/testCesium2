@@ -78,13 +78,19 @@ setHome(tileset){
 
 load3DTiles(link, options = {}){
   // Chargement du photo maillage au format 3D tiles
-  let tileset = this.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+  let tileset = new Cesium.Cesium3DTileset({
     url : link, // URL vers le ficher JSON "racine"
     maximumScreenSpaceError : 1,
     maximumNumberOfLoadedTiles : 1000 // Nombre maximum de dalles chargées simultanément
-  }));
+  });
 
-  return tileset.readyPromise;
+
+  return tileset;
+}
+
+add3DTiles(tileset) {
+  var tilesetPrimitive = this.viewer.scene.primitives.add(tileset);
+  return tilesetPrimitive;
 }
 
 loadKml(link, options = {clampToGround : true}){
@@ -102,6 +108,8 @@ loadGeoJson(link, options = {}){
     markerSymbol: 'park',
     markerColor: Cesium.Color.fromCssColorString('#007F24')
   });
+  this.viewer.scene.globe.depthTestAgainstTerrain = true;
+  this.viewer.scene.logarithmicDepthBuffer = false;
   promisse.then((dataSource) => {
 
     this.viewer.dataSources.add(dataSource);
@@ -285,8 +293,8 @@ supprCoupe(entity, clippingPlanes){
   document.querySelector("#supprimercoupe").addEventListener('click', (e) => {
     //this.viewer.entities.remove(planeEntity);
     for(var i = 0; i < entity.length; i++){
-    this.viewer.entities.remove(entity[i]);
-  }
+      this.viewer.entities.remove(entity[i]);
+    }
     entity = [];
     clippingPlanes = [];
   });
@@ -336,26 +344,6 @@ planeUpdate(plane, couleurCoupe) {
     plane.distance = targetY;
     return plane;
   };
-}
-
-addBox(){
-  let scene = this.viewer.scene;
-
-  this.handler.setInputAction(function(event) {
-    let cartesian = scene.pickPosition(event.position);
-    if (Cesium.defined(cartesian)) {
-      let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-      let longitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(7);
-      let latitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(7);
-      let height = cartographic.height.toFixed(3);
-    }
-  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
-  var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
-  var X = coords[0];
-  var Y = coords[1];
-  var Z = (Number(height) - Number(this.raf09.getGeoide(latitude, longitude)));
-
 }
 
 //outils dessin
@@ -419,27 +407,63 @@ drawVolume(positionData, couleur, transparence, hauteurVol) {
   return shape;
 }
 
-drawBox(positionData) {
-  var shape = this.viewer.entities.add({
-    position : positionData,
-    box : {
-      dimensions : new Cesium.Cartesian3(1400.0, 1400.0, 2800.0),
-      fill: true,
-      material: Cesium.Color.TRANSPARENT
+createBox(box, longueur, largeur, orientation, tileset) {
+  var scene = this.viewer.scene;
+
+  var test = this.viewer.scene.globe;
+  this.handler.globe = this;
+
+  this.handler.setInputAction(function(event) {
+    var earthPosition = scene.pickPosition(event.position);
+    if(Cesium.defined(earthPosition)) {
+      var shape = globe.viewer.entities.add({
+        position : earthPosition,
+        orientation: new Cesium.Quaternion.fromHeadingPitchRoll(new Cesium.HeadingPitchRoll(orientation, 0, 0)),
+        box : {
+          dimensions : new Cesium.Cartesian3(longueur, largeur, 1400.0),
+          /*outline: true,
+          outlineColor: Cesium.Color.WHITE,*/
+          fill: true,
+          material: Cesium.Color.TRANSPARENT
+        }
+      });
     }
-  });
-  return shape;
+    test.depthTestAgainstTerrain = true;
+    test.clippingPlanes = new Cesium.ClippingPlaneCollection({
+      modelMatrix : shape.computeModelMatrix(Cesium.JulianDate.now()),
+      planes : [
+        new Cesium.ClippingPlane(new Cesium.Cartesian3( 1.0,  0.0, 0.0), -700),
+        new Cesium.ClippingPlane(new Cesium.Cartesian3(-1.0,  0.0, 0.0), -700),
+        new Cesium.ClippingPlane(new Cesium.Cartesian3( 0.0,  1.0, 0.0), -700),
+        new Cesium.ClippingPlane(new Cesium.Cartesian3( 0.0, -1.0, 0.0), -700)
+      ],
+      edgeColor: Cesium.Color.WHITE,
+    });
+
+    tileset.clippingPlanes = new Cesium.ClippingPlaneCollection({
+      planes : [
+        new Cesium.ClippingPlane(new Cesium.Cartesian3( 1.0,  0.0, 0.0), -700),
+        new Cesium.ClippingPlane(new Cesium.Cartesian3(-1.0,  0.0, 0.0), -700),
+        new Cesium.ClippingPlane(new Cesium.Cartesian3( 0.0,  1.0, 0.0), -700),
+        new Cesium.ClippingPlane(new Cesium.Cartesian3( 0.0, -1.0, 0.0), -700)
+      ],
+      edgeColor: Cesium.Color.WHITE,
+      modelMatrix: Cesium.Matrix4.inverse(tileset.root.computedTransform, new Cesium.Matrix4())
+    });
+
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
 }
 
 updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface) {
   var activeShapePoints = [];
   var activeShape;
   var floatingPoint;
+  var z;
 
   var scene = this.viewer.scene;
   this.handler.globe = this;
 
-    //this.viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
     this.handler.setInputAction(function(event) {
       var earthPosition = scene.pickPosition(event.position);
       if(Cesium.defined(earthPosition)) {
@@ -461,7 +485,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
           } else if(choice === 'polygon') {
             activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence);
           } else if(choice === 'volume') {
-            var z = globe.getHauteur(activeShapePoints, hauteurVol);
+            z = globe.getHauteur(activeShapePoints, hauteurVol);
             activeShape = globe.drawVolume(dynamicPositions, couleur, transparence, z);
           } else if(choice === 'line') {
             if(choice2 === 'mesure') {
@@ -486,6 +510,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
       if(choice === 'polygon'&& choice2 === 'mesure') {
         globe.measureSurface(activeShapePoints);
       }
+
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
     this.handler.setInputAction(function(event) {
@@ -507,6 +532,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
       transparence = parseFloat(transparence);
       // on supprime le dernier point flottant
       activeShapePoints.pop();
+
       if(choice2 === 'construction'){
         if(choice === 'point') {
           point.push(globe.createPoint(activeShapePoints));
@@ -516,7 +542,6 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
         } else if( choice === 'polygon') {
           surface.push(globe.drawPolygon(activeShapePoints, couleur, transparence));
         } else if( choice === 'volume') {
-          var z = globe.getHauteur(activeShapePoints, hauteurVol);
           volume.push(globe.drawVolume(activeShapePoints, couleur, transparence, z));
         }
       } else if(choice2 === 'mesure'){
@@ -649,18 +674,15 @@ measureSurface(activeShapePoints) {
 
 getHauteur(activeShapePoints, hauteurVol){
     var cartesian = new Cesium.Cartesian3(activeShapePoints[0].x, activeShapePoints[0].y, activeShapePoints[0].z);
-
     let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-    let longitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(7);
-    let latitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(7);
+    let alti = cartographic.height.toFixed(3);
 
-    var a = Number(this.raf09.getGeoide(latitude, longitude));
-    var z = (Number(hauteurVol) + a);
+    var z = (Number(hauteurVol) + Number(alti));
     return z;
 
 }
 
-createHole(tileset) {
+/*createHole(tileset) {
   var dig_array = [];
   var scene = this.viewer.scene;
   this.handler.globe = this;
@@ -734,7 +756,7 @@ holePlanes(dig_point, tileset) {
     edgeColor: Cesium.Color.WHITE,
     //modelMatrix: Cesium.Matrix4.inverse(tileset.root.computedTransform, new Cesium.Matrix4())
   });
-}
+}*/
 
 supprSouris(){
   this.handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
