@@ -5,10 +5,9 @@ class Menu {
 
   constructor(globe){
     this.globe = globe;
-    this.terrain = terrain;
-    console.log(terrain);
-    this.tileset = tileset;
-    console.log(tileset);
+    this.terrain = terrain; // format entités
+    this.tileset = tileset; // format 3DTileset
+
     this.viewer = Globe.viewer;
     this.handler = Globe.handler;
 
@@ -104,6 +103,7 @@ class Menu {
     this.volumeCheckbox = document.querySelector('#volume');
     // plan de coupe
     this.coupeCheckbox = document.querySelector('#plancoupe');
+    this.coupeVertiCheckbox = document.querySelector('#plancoupeverti');
     this.decoupeCheckbox = document.querySelector('#decoupe');
     // ombres
     this.shadowCheckbox = document.querySelector('#shadows');
@@ -187,6 +187,8 @@ class Menu {
     });
 
     document.querySelector("#envoyercoupe").addEventListener('click', (e) => {
+      var orientation1 = 0.0;
+      var orientation2 = -1.0;
       let showCouleur = document.querySelector("#showcouleurcoupe");
       var X = $('#X').val();
       var Y = $('#Y').val();
@@ -196,16 +198,15 @@ class Menu {
       var couleur = $('#couleurcoupe').val();
       showCouleur.style.backgroundColor = couleur;
 
-      globe.addClippingPlanes(X, Y, hauteur, longueur, largeur, couleur, planeEntities, clippingPlanes);
+      globe.addClippingPlanes(orientation1, orientation2, X, Y, hauteur, longueur, largeur, couleur, planeEntities, clippingPlanes);
     });
 
-    document.querySelector("#envoyerdecoupe").addEventListener('click', (e) => {
+    /*document.querySelector("#envoyerdecoupe").addEventListener('click', (e) => {
       var longueur = $('#longueurdecoupe').val();
       var largeur = $('#largeurdecoupe').val();
       var orientation = $('#orientationdecoupe').val();
-
-      globe.createBox(box, longueur, largeur, orientation, tileset);
-    });
+      globe.createHole();
+    });*/
 
     //Evenements pour la suppression / anunulation des dessins
     globe.annulFigure('#annulerpoint', billboard);
@@ -216,8 +217,8 @@ class Menu {
     globe.supprFigure('#supprimersurf', surface);
     globe.annulFigure('#annulervol', volume);
     globe.supprFigure('#supprimervol', volume);
-    globe.annulFigure('#annulerdecoupe', box);
-    globe.supprFigure('#supprimerdecoupe', box);
+    /*globe.annulFigure('#annulerdecoupe', box);
+    globe.supprFigure('#supprimerdecoupe', box);*/
     globe.annulCoupe(planeEntities, clippingPlanes);
     globe.supprCoupe(planeEntities, clippingPlanes);
   }
@@ -432,14 +433,26 @@ hideLoader(){
       }
     });
 
+    this.coupeVertiCheckbox.addEventListener('change', (e) => {
+      if(e.target.checked){
+        var orientation1 = 1.0;
+        var orientation2 = 0.0;
+        globe.addClippingPlanes(orientation1, orientation2, X, Y, hauteur, longueur, largeur, couleur, planeEntities, clippingPlanes);
+      } else {
+
+        globe.supprSouris();
+        tileset.clippingPlanes.detroy();
+      }
+    });
+
     this.decoupeCheckbox.addEventListener('change', (e) => {
       if(e.target.checked){
-        this.decoupeList.classList.remove('hidden');
+        globe.createHole();
+        //this.decoupeList.classList.remove('hidden');
       } else {
-        this.decoupeList.classList.add('hidden');
+        //this.decoupeList.classList.add('hidden');
         globe.supprSouris();
       }
-
     });
 
     this.supprCheckbox.addEventListener('click', function() {

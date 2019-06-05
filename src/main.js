@@ -33,12 +33,3 @@ cesiumEvent.evenementsCouches();
 terrain.then(function(dataSource){
     cesiumEvent.addDataSource("photoMaillage", dataSource)
 });
-
-/*document.querySelector('#decoupe').addEventListener('change', (e) => {
-  if(e.target.checked){
-    globe.createHole(terrain);
-  } else {
-    globe.supprSouris();
-  }
-
-});*/
