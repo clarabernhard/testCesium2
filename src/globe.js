@@ -32,6 +32,9 @@ class Globe {
 
     // variable qui stocke les évenements liés à la souris
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
+
+    // Recuperer la fonction par defaut lors d'un clic gauche
+    this.defaultLeftClick = this.viewer.screenSpaceEventHandler.getInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
     //this.leftClick = this.viewer.cesiumWidget.screenSpaceEventHandler.setInputAction(Cesium.ScreenSpaceEventTypeLEFT_CLICK);
 
     // mesures de coords
@@ -83,7 +86,7 @@ setHome(tileset){
 }
 
 // permet d'enregister le tileset au format 3DTiles
-load3DTiles(link, options = {}){
+loadPhotomaillage(link, options = {}){
   // Chargement du photo maillage au format 3D tiles
   let tileset = new Cesium.Cesium3DTileset({
     url : link, // URL vers le ficher JSON "racine"
@@ -95,9 +98,21 @@ load3DTiles(link, options = {}){
 }
 
 // ajoute le tileset sous forme d'entités
-add3DTiles(tileset) {
+addPhotomaillage(tileset) {
   var tilesetPrimitive = this.viewer.scene.primitives.add(tileset);
   return tilesetPrimitive.readyPromise;
+}
+
+// permet de charger des 3DTiles en gardant une structure asynchrone (voir fonction show dans la classe UI)
+load3DTiles(link, options = {}){
+  // Chargement du photo maillage au format 3D tiles
+  let tileset = this.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+    url : link, // URL vers le ficher JSON "racine"
+    maximumScreenSpaceError : 1,
+    maximumNumberOfLoadedTiles : 1000 // Nombre maximum de dalle chargées simultanément
+  }));
+
+  return tileset.readyPromise;
 }
 
 loadKml(link, options = {clampToGround : true}){
@@ -155,44 +170,6 @@ loadGeoJson(link, options = {}){
   return promisse;
 }
 
-loadBox(link, options={}) {
-  var promise = Cesium.GeoJsonDataSource.load(link, {
-		clampToGround : false,
-		//extrudedHeight : 300.0,
-		width : 10.0,
-		cornerType: Cesium.CornerType.MITERED,
-		material : Cesium.Color.GREEN
-});
-console.log('adding data');
-promise.then((dataSource) => {
-	this.viewer.dataSources.add(dataSource);
-	//Get the array of entities
-	var entities = dataSource.entities.values;
-
-	for (var i = 0; i < entities.length; i++)
-	{
-		//Set the height and the material of each polyline
-		var entity = entities[i];
-
-		entity.polylineVolume = new Cesium.PolylineVolumeGraphics({
-			positions: entity.polyline.positions,
-			shape: [
-				new Cesium.Cartesian2( 0.3, entity.properties.Height),
-				new Cesium.Cartesian2( 0.3,  0.0),
-				new Cesium.Cartesian2(-0.3, entity.properties.Height),
-				new Cesium.Cartesian2(-0.3,  0.0)
-			],
-			material: Cesium.Color.RED
-		});
-			entity.polyline.material = Cesium.Color.YELLOW;
-			entity.polylineVolume.material = Cesium.Color.YELLOW;
-
-	}
-
-});
-return promise;
-}
-
 // Fonction pour afficher les ombres
 shadow(enabled){
   this.viewer.shadows = enabled;
@@ -236,6 +213,7 @@ showCoords(show){
 
 // ajouter le plan de coupe horizontal
 addClippingPlanes(orientation1, orientation2, X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, planeEntities, clippingPlanes) {
+
     //tileset.clippingPlanes = new Cesium.ClippingPlaneCollection({
     var clippingPlanes = new Cesium.ClippingPlaneCollection({
       planes : [
@@ -245,12 +223,12 @@ addClippingPlanes(orientation1, orientation2, X, Y, hauteurCoupe, longueurCoupe,
 
 
     if (!Cesium.Matrix4.equals(tileset.root.transform, Cesium.Matrix4.IDENTITY)) {
-            // The clipping plane is initially positioned at the tileset's root transform.
-            // Apply an additional matrix to center the clipping plane on the bounding sphere center.
-            var transformCenter = Cesium.Matrix4.getTranslation(tileset.root.transform, new Cesium.Cartesian3());
-            var height = Cesium.Cartesian3.distance(transformCenter, tileset.boundingSphere.center);
-            clippingPlanes.modelMatrix = Cesium.Matrix4.fromTranslation(new Cesium.Cartesian3(0.0, 0.0, height));
-        }
+      // The clipping plane is initially positioned at the tileset's root transform.
+      // Apply an additional matrix to center the clipping plane on the bounding sphere center.
+      var transformCenter = Cesium.Matrix4.getTranslation(tileset.root.transform, new Cesium.Cartesian3());
+      var height = Cesium.Cartesian3.distance(transformCenter, tileset.boundingSphere.center);
+      clippingPlanes.modelMatrix = Cesium.Matrix4.fromTranslation(new Cesium.Cartesian3(0.0, 0.0, height));
+    }
 
     for (var i = 0; i < clippingPlanes.length; i=+1) {
       var coords = proj4('EPSG:3948','EPSG:4326', [Number(X), Number(Y)]);
@@ -276,7 +254,8 @@ addClippingPlanes(orientation1, orientation2, X, Y, hauteurCoupe, longueurCoupe,
 }
 
 // Récupérer les coordonnées au clic et les afficher dans le formulaire du plan de coupe horizontal
-coordCoupe(){
+coordCoupe(element1, element2, element3){
+
   let scene = this.viewer.scene;
   this.handler.globe = this;
 
@@ -289,9 +268,9 @@ coordCoupe(){
       let height = cartographic.height.toFixed(3);
 
       var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
-      document.getElementById("X").value = (coords[0].toFixed(4));
-      document.getElementById("Y").value = (coords[1].toFixed(4));
-      document.getElementById("hauteurcoupe").value = ((Number(height) - Number(globe.raf09.getGeoide(latitude, longitude))).toFixed(3));
+      document.getElementById(element1).value = (coords[0].toFixed(4));
+      document.getElementById(element2).value = (coords[1].toFixed(4));
+      document.getElementById(element3).value = ((Number(height) - Number(globe.raf09.getGeoide(latitude, longitude))).toFixed(3));
     }
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
@@ -650,10 +629,14 @@ getHauteur(activeShapePoints, hauteurVol){
 
 }
 
-/*createHole() {
+createHole(union, choice) {
   var dig_point = [];
+  var coordsX = [];
+  var coordsY = [];
+  var aire = 0;
   var scene = this.viewer.scene;
   this.handler.globe = this;
+  var points = globe.viewer.scene.primitives.add(new Cesium.PointPrimitiveCollection());
 
   this.handler.setInputAction(function(event) {
     var earthPosition = scene.pickPosition(event.position);
@@ -661,7 +644,10 @@ getHauteur(activeShapePoints, hauteurVol){
     let longitudeString = Cesium.Math.toDegrees(cartographic.longitude);
     let latitudeString = Cesium.Math.toDegrees(cartographic.latitude);
 
-    var points = globe.viewer.scene.primitives.add(new Cesium.PointPrimitiveCollection());
+    var coords = proj4('EPSG:4326','EPSG:3948', [longitudeString, latitudeString]);
+    coordsX.push(coords[0]);
+    coordsY.push(coords[1]);
+
     points.add({
       position : earthPosition,
       color : Cesium.Color.WHITE
@@ -672,71 +658,26 @@ getHauteur(activeShapePoints, hauteurVol){
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
   this.handler.setInputAction(function(event) {
-    globe.holePlanes(dig_point);
+    for (let i=0; i < coordsX.length; i+=1) {
+      var a = (coordsX[(i+1) % coordsX.length] - coordsX[i]);
+      var b = (coordsY[(i+1) % coordsX.length] + coordsY[i] - (2 * coordsY[0]));
+      var c = ((Number(a) * Number(b))/2);
+      aire = (Number(aire) + Number(c)).toFixed(3);
+    }
+
+    if(aire > 0) {
+      globe.holePlanes(dig_point, union, choice);
+    } else if(aire < 0) {
+      dig_point = dig_point.reverse();
+      globe.holePlanes(dig_point, union, choice);
+    }
+    points.removeAll();
   }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
-}*/
-
-createHole() {
-  var dig_array = [];
-  var dig_point = [];
-  var max_lon, min_lon, max_lat, min_lat;
-  var scene = this.viewer.scene;
-  this.handler.globe = this;
-
-  this.handler.setInputAction(function(event) {
-
-    if(dig_array.length < 4)
-    {
-      var earthPosition = globe.viewer.camera.pickEllipsoid(event.position);
-      var longitudeString = Cesium.Cartographic.fromCartesian(earthPosition).longitude*Cesium.Math.DEGREES_PER_RADIAN;
-      var latitudeString = Cesium.Cartographic.fromCartesian(earthPosition).latitude*Cesium.Math.DEGREES_PER_RADIAN;
-
-      var points = globe.viewer.scene.primitives.add(new Cesium.PointPrimitiveCollection());
-      points.add({
-        position : earthPosition,
-        color : Cesium.Color.GRAY
-      });
-
-      dig_array.push(longitudeString);
-      dig_array.push(latitudeString);
-    }
-    if(dig_array.length === 4)
-    {
-
-      if((parseFloat(dig_array[0]) > parseFloat(dig_array[2])) || (parseFloat(dig_array[0]) === parseFloat(dig_array[2]))){
-        max_lon = parseFloat(dig_array[0]);
-        min_lon = parseFloat(dig_array[2]);
-      }
-      else {
-        max_lon = parseFloat(dig_array[2]);
-        min_lon = parseFloat(dig_array[0]);
-      }
-      if((parseFloat(dig_array[1]) > parseFloat(dig_array[3])) || (parseFloat(dig_array[1]) === parseFloat(dig_array[3]))){
-        max_lat = parseFloat(dig_array[1]);
-        min_lat = parseFloat(dig_array[3]);
-      }
-      else {
-        max_lat = parseFloat(dig_array[3]);
-        min_lat = parseFloat(dig_array[1]);
-      }
-
-      dig_point.push(new Cesium.Cartesian3.fromDegrees(min_lon,max_lat));
-      dig_point.push(new Cesium.Cartesian3.fromDegrees(min_lon,min_lat));
-      dig_point.push(new Cesium.Cartesian3.fromDegrees(max_lon,min_lat));
-      dig_point.push(new Cesium.Cartesian3.fromDegrees(max_lon,max_lat));
-
-
-    }
-  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
-  this.handler.setInputAction(function(event) {
-    globe.holePlanes(dig_point);
-  }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 }
 
+holePlanes(dig_point, union, choice) {
 
-holePlanes(dig_point) {
   var pts = dig_point;
   var pointsLength = pts.length;
   var clippingPlanes = [];
@@ -745,35 +686,42 @@ holePlanes(dig_point) {
     var nextIndex = (i + 1) % pointsLength;
     var midpoint = Cesium.Cartesian3.add(pts[i], pts[nextIndex], new Cesium.Cartesian3());
     midpoint = Cesium.Cartesian3.multiplyByScalar(midpoint, 0.5, midpoint);
-    console.log(midpoint);
     var up = Cesium.Cartesian3.normalize(midpoint, new Cesium.Cartesian3());
     var right = Cesium.Cartesian3.subtract(pts[nextIndex], midpoint, new Cesium.Cartesian3());
     right = Cesium.Cartesian3.normalize(right, right);
     var normal = Cesium.Cartesian3.cross(right, up, new Cesium.Cartesian3());
     normal = Cesium.Cartesian3.normalize(normal, normal);
+    normal = Cesium.Cartesian3.multiplyByScalar(normal, -1, normal);
     var originCenteredPlane = new Cesium.Plane(normal, 0.0);
-    var center = new Cesium.Cartesian3();
-    console.log(center);
 
-    var distance = -Number((Math.sqrt((midpoint.x*midpoint.x) + (midpoint.y*midpoint.y) + (midpoint.y*midpoint.y))/10000));
+    if(choice === 'dessin'){
+      var distance = -Cesium.Plane.getPointDistance(originCenteredPlane, midpoint);
+      clippingPlanes.push(new Cesium.ClippingPlane(normal, distance));
+      console.log('dessin');
+    } else if(choice === 'suppr') {
+      var distance = 100;
+      clippingPlanes.push(new Cesium.ClippingPlane(normal, distance));
+      console.log('suppr');
+    }
 
-    //var distance = Cesium.Plane.getPointDistance(originCenteredPlane, center);
-    console.log(distance);
-    //var distance = -150;
-    clippingPlanes.push(new Cesium.ClippingPlane(normal, distance));
   }
-  this.viewer.scene.globe.depthTestAgainstTerrain = true;
-  this.viewer.scene.globe.clippingPlanes = new Cesium.ClippingPlaneCollection({
-    planes : clippingPlanes,
-    edgeColor: Cesium.Color.WHITE,
-    //modelMatrix: Cesium.Matrix4.inverse(tileset.root.computedTransform, new Cesium.Matrix4())
-  });
 
+  // pour couper le globe
+  this.viewer.scene.globe.depthTestAgainstTerrain = true;
+  /*this.viewer.scene.globe.clippingPlanes = new Cesium.ClippingPlaneCollection({
+    planes : clippingPlanes,
+    unionClippingRegions : union,
+    edgeColor: Cesium.Color.WHITE,
+  });*/
+
+  // pour couper le photomaillage
   tileset.clippingPlanes = new Cesium.ClippingPlaneCollection({
     planes : clippingPlanes,
+    unionClippingRegions : union, //si true: coupe tout ce qui est à l'extérieur de la zone cliquée
     edgeColor: Cesium.Color.WHITE,
-    modelMatrix: Cesium.Matrix4.inverse(tileset.root.computedTransform, new Cesium.Matrix4())
+    modelMatrix: Cesium.Matrix4.inverse(tileset._initialClippingPlanesOriginMatrix, new Cesium.Matrix4())
   });
+
 }
 
 supprSouris(){
@@ -785,5 +733,67 @@ supprSouris(){
 supprEntities(){
   this.viewer.entities.removeAll();
 }
+
+// fonction qui permet de cliquer les attributs sur le 3DTiles
+handleBatimentClick(enabled, tileset){
+  var scene = this.viewer.scene;
+  this.handler.globe = this;
+
+  // Informations sur le batiment séléctionné
+  let selected = {
+    feature: undefined,
+    originalColor: new Cesium.Color(),
+    selectedEntity: new Cesium.Entity() // Une entité qui contient les attributs du batiments selectionné
+  };
+
+  if (Cesium.PostProcessStageLibrary.isSilhouetteSupported(this.viewer.scene)) {
+    // Créer la bordure verte
+    /*let silhouetteGreen = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
+    silhouetteGreen.uniforms.color = Cesium.Color.LIME;
+    silhouetteGreen.uniforms.length = 0.01;
+    silhouetteGreen.selected = [];
+    // Enregistrer les bordures dans cesium
+    this.viewer.scene.postProcessStages.add(Cesium.PostProcessStageLibrary.createSilhouetteStage([silhouetteGreen]));*/
+
+    this.handler.setInputAction(function(event) {
+      // Supprimer toutes les bordures verte
+      //silhouetteGreen.selected = [];
+      // Récuperer la forme sur laquelle on a cliqué
+      let pickedFeature = scene.pick(event.position);
+      // Si on clique sur un element qui n'appartient pas à tileset on ne met pas de bordure verte
+      if (!Cesium.defined(pickedFeature) || !Cesium.defined(pickedFeature.content) || pickedFeature.content._tileset != tileset) {
+        selected.feature = undefined;
+        this.defaultLeftClick(event);
+        return;
+      }
+      // Ajouter le bord vert sur la forme selectionnée
+      /*if (pickedFeature !== silhouetteGreen.selected[0]) {
+        silhouetteGreen.selected = [pickedFeature];*/
+
+        selected.feature = pickedFeature;
+        selected.selectedEntity.name = pickedFeature.getProperty('name');
+        selected.selectedEntity.description = '<table class="cesium-infoBox-defaultTable"><tbody>';
+
+        // Générer les lignes du tableau
+        let propertyNames = pickedFeature.getPropertyNames();
+        for(let i = 0; i < propertyNames.length; i++){
+          selected.selectedEntity.description += '<tr><th>' + propertyNames[i] + '</th><td>' + pickedFeature.getProperty(propertyNames[i]) + '</td></tr>';
+        }
+        selected.selectedEntity.description += '</tbody></table>';
+
+        // Afficher le tableau en haut à droite
+        globe.viewer.selectedEntity = selected.selectedEntity;
+      //}
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+    // Quitter la fonction pour desactiver la selection de batiments
+    if(!enabled){
+      silhouetteGreen.selected = [];
+      return;
+    }
+  }
+}
+
+
 
 }

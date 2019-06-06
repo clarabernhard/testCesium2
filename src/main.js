@@ -17,8 +17,8 @@ proj4.defs([
 let globe = new Globe('cesiumContainer', new Geocoder("http://adict.strasbourg.eu/addok/search"));
 
 // Charger le photo mailage --> appelle la fonction créée dans la classe globe
-let tileset = globe.load3DTiles('data/Photomaillage/Cesium_1.json');
-var terrain = globe.add3DTiles(tileset);
+let tileset = globe.loadPhotomaillage('data/Photomaillage/Cesium_1.json');
+var terrain = globe.addPhotomaillage(tileset);
 
 
 // Zoomer sur le photo mailage et configurer le bouton "home" pour qu'il vole au même endroit

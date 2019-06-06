@@ -34,10 +34,14 @@ class LegendManager {
         let legendColor = document.createElement('span');
         if(choice === 'line'){
           legendColor.classList.add('legend-line');
+          legendColor.style = "background-color: " + color + ";";
         } else if(choice === 'polygon') {
           legendColor.classList.add('legend-color');
+          legendColor.style = "background-color: " + color + ";";
+        } else if(choice === 'point') {
+          legendColor.innerHTML = "<img src='https://img.icons8.com/color/48/000000/deciduous-tree.png'>";
         }
-        legendColor.style = "background-color: " + color + ";";
+
 
         let legendText = document.createElement('span');
         legendText.classList.add('legend-text');
