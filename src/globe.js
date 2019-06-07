@@ -28,7 +28,8 @@ class Globe {
     // insère les logos en bas
     this.viewer.bottomContainer.innerHTML = '<img src="src/img/logo/logo-strasbourg.png" alt="Logo strasbourg" />\
     <img src="src/img/logo/europe-sengage.jpg" alt="Logo strasbourg" />\
-    <img src="src/img/logo/logo-ue.jpg" alt="Logo strasbourg" />';
+    <img src="src/img/logo/logo-ue.jpg" alt="Logo strasbourg" />\
+    <span style="color: #BEC8D1;font-size:small;"> Icons created by : <a style="color: #BEC8D1;font-size:small;" href="https://icons8.com" target="_blank" > https://icons8.com </span>';
 
     // variable qui stocke les évenements liés à la souris
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
@@ -82,6 +83,26 @@ setHome(tileset){
     this.viewer.flyTo(tileset, {
       offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-35), 1750)
     });
+  });
+}
+
+flyUp() {
+  this.viewer.camera.setView({
+    orientation: {
+      heading : Cesium.Math.toRadians(0.0), // east, default value is 0.0 (north)
+      pitch : Cesium.Math.toRadians(-90),    // default value (looking down)
+      roll : 0.0                             // default value
+    }
+  });
+}
+
+flyLeft() {
+  this.viewer.camera.setView({
+    orientation: {
+      heading : Cesium.Math.toRadians(-180.0), // east, default value is 0.0 (north)
+      pitch : Cesium.Math.toRadians(0),    // default value (looking down)
+      roll : 0.0                             // default value
+    }
   });
 }
 
@@ -219,16 +240,18 @@ addClippingPlanes(orientation1, orientation2, X, Y, hauteurCoupe, longueurCoupe,
       planes : [
         new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, orientation1, orientation2), 0.0)
       ],
+      //modelMatrix: Cesium.Matrix4.inverse(tileset.root.computedTransform, new Cesium.Matrix4())
+      //modelMatrix: Cesium.Matrix4.inverse(tileset._initialClippingPlanesOriginMatrix, new Cesium.Matrix4()),
     });
 
 
-    if (!Cesium.Matrix4.equals(tileset.root.transform, Cesium.Matrix4.IDENTITY)) {
+    /*if (!Cesium.Matrix4.equals(tileset.root.transform, Cesium.Matrix4.IDENTITY)) {
       // The clipping plane is initially positioned at the tileset's root transform.
       // Apply an additional matrix to center the clipping plane on the bounding sphere center.
       var transformCenter = Cesium.Matrix4.getTranslation(tileset.root.transform, new Cesium.Cartesian3());
       var height = Cesium.Cartesian3.distance(transformCenter, tileset.boundingSphere.center);
       clippingPlanes.modelMatrix = Cesium.Matrix4.fromTranslation(new Cesium.Cartesian3(0.0, 0.0, height));
-    }
+    }*/
 
     for (var i = 0; i < clippingPlanes.length; i=+1) {
       var coords = proj4('EPSG:3948','EPSG:4326', [Number(X), Number(Y)]);
@@ -307,7 +330,6 @@ planeUpdate(plane, couleurCoupe) {
   // Select plane when mouse down
   this.handler.setInputAction(function(movement) {
     var pickedObject = scene.pick(movement.position);
-    //var earthPosition = scene.pickPosition(movement.position);
     if (Cesium.defined(pickedObject) && Cesium.defined(pickedObject.id) && Cesium.defined(pickedObject.id.plane)) {
       selectedPlane = pickedObject.id.plane;
       selectedPlane.material = Cesium.Color.fromCssColorString(couleurCoupe).withAlpha(0.4);
@@ -608,29 +630,30 @@ measureSurface(activeShapePoints) {
   }
 
   if(coordsX.length > 2){
-  for (let i=0; i < coordsX.length; i+=1) {
-    var a = (coordsX[(i+1) % coordsX.length] - coordsX[i]);
-    var b = (coordsY[(i+1) % coordsX.length] + coordsY[i] - (2 * coordsY[0]));
-    var c = ((Number(a) * Number(b))/2);
-    aire = (Number(aire) + Number(c)).toFixed(3);
+    for (let i=0; i < coordsX.length; i+=1) {
+      var a = (coordsX[(i+1) % coordsX.length] - coordsX[i]);
+      var b = (coordsY[(i+1) % coordsX.length] + coordsY[i] - (2 * coordsY[0]));
+      var c = ((Number(a) * Number(b))/2);
+      aire = (Number(aire) + Number(c)).toFixed(3);
+    }
   }
-}
   this.aire.innerHTML = Math.abs(aire);
 
 }
 
 getHauteur(activeShapePoints, hauteurVol){
-    var cartesian = new Cesium.Cartesian3(activeShapePoints[0].x, activeShapePoints[0].y, activeShapePoints[0].z);
-    let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-    let alti = cartographic.height.toFixed(3);
+  var cartesian = new Cesium.Cartesian3(activeShapePoints[0].x, activeShapePoints[0].y, activeShapePoints[0].z);
+  let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+  let alti = cartographic.height.toFixed(3);
 
-    var z = (Number(hauteurVol) + Number(alti));
-    return z;
+  var z = (Number(hauteurVol) + Number(alti));
+  return z;
 
 }
 
-createHole(union, choice) {
-  var dig_point = [];
+createHole(viewModel) {
+    var dig_point = [];
+  var hole_pts = [];
   var coordsX = [];
   var coordsY = [];
   var aire = 0;
@@ -658,6 +681,8 @@ createHole(union, choice) {
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
   this.handler.setInputAction(function(event) {
+    hole_pts = Array.from(dig_point);
+
     for (let i=0; i < coordsX.length; i+=1) {
       var a = (coordsX[(i+1) % coordsX.length] - coordsX[i]);
       var b = (coordsY[(i+1) % coordsX.length] + coordsY[i] - (2 * coordsY[0]));
@@ -665,62 +690,67 @@ createHole(union, choice) {
       aire = (Number(aire) + Number(c)).toFixed(3);
     }
 
+    // si l'aire est négative (ie si l'utilistauer a dessiné sa figure dans le sens trigo)
+    // on inverse le tableau de points pour que la découpe marche
     if(aire > 0) {
-      globe.holePlanes(dig_point, union, choice);
+      globe.holePlanes(viewModel, hole_pts);
     } else if(aire < 0) {
-      dig_point = dig_point.reverse();
-      globe.holePlanes(dig_point, union, choice);
+      hole_pts = hole_pts.reverse();
+      globe.holePlanes(viewModel, hole_pts);
     }
     points.removeAll();
+    dig_point = [];
   }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+
+  Cesium.knockout.getObservable(viewModel, 'affich').subscribe(function(value) {
+    tileset.clippingPlanes.enabled = value;
+});
+
+Cesium.knockout.getObservable(viewModel, 'trou').subscribe(function(value) {
+    globe.holePlanes(viewModel, hole_pts);
+});
 
 }
 
-holePlanes(dig_point, union, choice) {
+holePlanes(viewModel, hole_pts) {
 
-  var pts = dig_point;
-  var pointsLength = pts.length;
+  var pointsLength = hole_pts.length;
   var clippingPlanes = [];
 
   for (var i = 0; i < pointsLength; ++i) {
     var nextIndex = (i + 1) % pointsLength;
-    var midpoint = Cesium.Cartesian3.add(pts[i], pts[nextIndex], new Cesium.Cartesian3());
+    var midpoint = Cesium.Cartesian3.add(hole_pts[i], hole_pts[nextIndex], new Cesium.Cartesian3());
     midpoint = Cesium.Cartesian3.multiplyByScalar(midpoint, 0.5, midpoint);
     var up = Cesium.Cartesian3.normalize(midpoint, new Cesium.Cartesian3());
-    var right = Cesium.Cartesian3.subtract(pts[nextIndex], midpoint, new Cesium.Cartesian3());
+    var right = Cesium.Cartesian3.subtract(hole_pts[nextIndex], midpoint, new Cesium.Cartesian3());
     right = Cesium.Cartesian3.normalize(right, right);
     var normal = Cesium.Cartesian3.cross(right, up, new Cesium.Cartesian3());
     normal = Cesium.Cartesian3.normalize(normal, normal);
-    normal = Cesium.Cartesian3.multiplyByScalar(normal, -1, normal);
-    var originCenteredPlane = new Cesium.Plane(normal, 0.0);
-
-    if(choice === 'dessin'){
-      var distance = -Cesium.Plane.getPointDistance(originCenteredPlane, midpoint);
-      clippingPlanes.push(new Cesium.ClippingPlane(normal, distance));
-      console.log('dessin');
-    } else if(choice === 'suppr') {
-      var distance = 100;
-      clippingPlanes.push(new Cesium.ClippingPlane(normal, distance));
-      console.log('suppr');
+    if (!viewModel.trou){
+      normal = Cesium.Cartesian3.multiplyByScalar(normal, -1 ,normal);
     }
+    var plane = new Cesium.Plane.fromPointNormal(midpoint, normal);
+    var clippingPlane = new Cesium.ClippingPlane.fromPlane(plane);
+    clippingPlanes.push(clippingPlane);
 
   }
 
   // pour couper le globe
   this.viewer.scene.globe.depthTestAgainstTerrain = true;
   /*this.viewer.scene.globe.clippingPlanes = new Cesium.ClippingPlaneCollection({
-    planes : clippingPlanes,
-    unionClippingRegions : union,
-    edgeColor: Cesium.Color.WHITE,
-  });*/
+  planes : clippingPlanes,
+  unionClippingRegions : union,
+  edgeColor: Cesium.Color.WHITE,
+});*/
 
-  // pour couper le photomaillage
-  tileset.clippingPlanes = new Cesium.ClippingPlaneCollection({
-    planes : clippingPlanes,
-    unionClippingRegions : union, //si true: coupe tout ce qui est à l'extérieur de la zone cliquée
-    edgeColor: Cesium.Color.WHITE,
-    modelMatrix: Cesium.Matrix4.inverse(tileset._initialClippingPlanesOriginMatrix, new Cesium.Matrix4())
-  });
+// pour couper le photomaillage
+tileset.clippingPlanes = new Cesium.ClippingPlaneCollection({
+  planes : clippingPlanes,
+  unionClippingRegions: viewModel.trou, //si true: coupe tout ce qui est à l'extérieur de la zone cliquée
+  enabled: viewModel.affich,
+  edgeColor: Cesium.Color.WHITE,
+  modelMatrix: Cesium.Matrix4.inverse(tileset._initialClippingPlanesOriginMatrix, new Cesium.Matrix4())
+});
 
 }
 

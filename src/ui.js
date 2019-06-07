@@ -32,7 +32,7 @@ class Menu {
     this.distanceList = document.querySelector('#distanceList');
     this.aireList = document.querySelector('#aireList');
     this.planList = document.querySelector('#planList');
-    this.planVertiList = document.querySelector('#planVertiList');
+    //this.planVertiList = document.querySelector('#planVertiList');
     this.ligneList = document.querySelector('#ligneList');
     this.surfaceList = document.querySelector('#surfaceList');
     this.pointList = document.querySelector('#pointList');
@@ -90,10 +90,12 @@ class Menu {
     this.constructionContent = document.querySelector('#construction-content');
     this.coupeContent = document.querySelector('#coupe-content');
     this.timeContent = document.querySelector('#time-content');
+    this.cameraContent = document.querySelector('#camera-content');
     this.mesuresDiv = document.querySelector('#mesures');
     this.constructionDiv = document.querySelector('#construction');
     this.coupeDiv = document.querySelector('#coupe');
     this.timeDiv = document.querySelector('#time');
+    this.cameraDiv = document.querySelector('#camera');
     // mesures
     this.coordsCheckbox = document.querySelector('#point');
     this.ligneCheckbox = document.querySelector('#ligne');
@@ -103,19 +105,21 @@ class Menu {
     this.cligneCheckbox = document.querySelector('#cligne');
     this.csurfaceCheckbox = document.querySelector('#csurface');
     this.volumeCheckbox = document.querySelector('#volume');
+    this.supprCheckbox = document.querySelector("#suppr");
     // plan de coupe
     this.coupeCheckbox = document.querySelector('#plancoupe');
-    this.coupeVertiCheckbox = document.querySelector('#plancoupeverti');
+    //this.coupeVertiCheckbox = document.querySelector('#plancoupeverti');
     this.decoupeCheckbox = document.querySelector('#decoupe');
     // ombres
     this.shadowCheckbox = document.querySelector('#shadows');
-    // boutons
-    this.supprCheckbox = document.querySelector("#suppr");
-
-    // Créer le datepicker
+          // Créer le datepicker
     this.datepicker = $("#date")
     this.datepicker.datepicker();
     this.datepicker.datepicker("option", "dateFormat", "dd/mm/yy");
+    // caméra
+    this.upCheckbox = document.querySelector('#up');
+    this.leftCheckbox = document.querySelector('#ouest');
+    this.rightCheckbox = document.querySelector('#est');
 
     // Créer la liste des dataSource sous forme d'un object clé / valeur
     // Avec le nom de la source comme clé et la dataSource comme valeur
@@ -129,6 +133,7 @@ class Menu {
     this.menuClic("#boutonconstruction", this.constructionContent);
     this.menuClic("#boutoncoupe", this.coupeContent);
     this.menuClic("#boutontime", this.timeContent);
+    this.menuClic("#boutoncamera", this.cameraContent);
 
     //Variables pour les formulaires
     var point = [];
@@ -203,7 +208,7 @@ class Menu {
       globe.addClippingPlanes(orientation1, orientation2, X, Y, hauteur, longueur, largeur, couleur, planeEntities, clippingPlanes);
     });
 
-    document.querySelector("#envoyercoupeverti").addEventListener('click', (e) => {
+    /*document.querySelector("#envoyercoupeverti").addEventListener('click', (e) => {
       var orientation1 = 1.0;
       var orientation2 = 0.0;
       let showCouleur = document.querySelector("#showcouleurcoupeverti");
@@ -216,7 +221,7 @@ class Menu {
       showCouleur.style.backgroundColor = couleur;
 
       globe.addClippingPlanes(orientation1, orientation2, X, Y, hauteur, longueur, largeur, couleur, planeEntities, clippingPlanes);
-    });
+    });*/
 
     //Evenements pour la suppression / anunulation des dessins
     globe.annulFigure('#annulerpoint', billboard);
@@ -230,19 +235,18 @@ class Menu {
     globe.annulCoupe(planeEntities, clippingPlanes);
     globe.supprCoupe(planeEntities, clippingPlanes);
 
-    document.querySelector("#decoupeExt").addEventListener('click', (e) => {
-      var choice = 'dessin';
-      globe.createHole(true, choice);
-    });
+    // decoupe
+    this.viewModel = {
+      affich : true,
+      trou : false
+    };
 
-    document.querySelector("#decoupeInt").addEventListener('click', (e) => {
-      var choice = 'dessin';
-      globe.createHole(false, choice);
-    });
+    var toolbar = document.getElementById('toolbar');
+    Cesium.knockout.track(this.viewModel);
+    Cesium.knockout.applyBindings(this.viewModel, toolbar);
 
-    $('.supprimerdecoupe').click(function(e) {
-      var choice = 'suppr';
-      globe.createHole(false, choice);
+    document.querySelector("#envoyerdecoupe").addEventListener('click', (e) => {
+      globe.createHole(this.viewModel);
     });
 
   }
@@ -256,6 +260,7 @@ class Menu {
       this.constructionDiv.classList.toggle('menu-open');
       this.coupeDiv.classList.toggle('menu-open');
       this.timeDiv.classList.toggle('menu-open');
+      this.cameraDiv.classList.toggle('menu-open');
     });
   }
 
@@ -457,7 +462,7 @@ evenementsCouches(){
     }
   });
 
-  this.coupeVertiCheckbox.addEventListener('change', (e) => {
+  /*this.coupeVertiCheckbox.addEventListener('change', (e) => {
     if(e.target.checked){
       globe.coordCoupe("Xverti", "Yverti", "hauteurcoupeverti");
       this.planVertiList.classList.remove('hidden');
@@ -465,7 +470,7 @@ evenementsCouches(){
       this.planVertiList.classList.add('hidden');
       globe.supprSouris();
     }
-  });
+  });*/
 
   this.decoupeCheckbox.addEventListener('change', (e) => {
     if(e.target.checked){
@@ -478,6 +483,14 @@ evenementsCouches(){
 
   this.supprCheckbox.addEventListener('click', function() {
     globe.supprEntities();
+  });
+
+  this.upCheckbox.addEventListener('click', function() {
+    globe.flyUp();
+  });
+
+  this.leftCheckbox.addEventListener('click', function() {
+    globe.flyLeft();
   });
 
 

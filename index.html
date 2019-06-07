@@ -117,7 +117,7 @@
       <button id="supprimercoupe">Supprimer</button> <br/>
     </div>
 
-    <div class="backdrop hidden" id="planVertiList">
+    <!--<div class="backdrop hidden" id="planVertiList">
       <h2>Propriétés du plan de coupe</h2>
       <form>
         <p>Coordonnées du point central : <br/>
@@ -135,20 +135,20 @@
       <button id="envoyercoupeverti">Ajouter</button>
       <button id="annulercoupeverti">Annuler</button>
       <button id="supprimercoupeverti">Supprimer</button> <br/>
-    </div>
+    </div>-->
 
     <div class="backdrop hidden" id="decoupeList">
       <h2>Découpe dans le photomaillage</h2>
-      <h4>Garder uniquement le périmètre</h4>
-      <button id="decoupeExt">Ajouter</button>
-      <button class="supprimerdecoupe">Supprimer</button> <br/>
-      <h4>Enlever le périmètre du photomaillage</h4>
-      <button id="decoupeInt">Ajouter</button>
-      <button class="supprimerdecoupe">Supprimer</button>
-
-      <p>Clic gauche pour dessiner la figure</p>
+      <button id="envoyerdecoupe">Ajouter</button>
+      <p>Cliquer sur le photomaillage pour dessiner la forme à découper</p>
       <p>Clic droit pour effectuer la découpe</p>
 
+      <div id="toolbar">
+        <input id="decoupetrou" type="checkbox" data-bind="checked: trou, valueUpdate: 'input'"/>
+        <label for="decoupetrou">Inverser la découpe</label> <br/>
+        <input id="afficherdecoupe" type="checkbox" value="true" data-bind="checked: affich, valueUpdate: 'input'"/>
+        <label for="afficherdecoupe">Afficher</label>
+      </div>
     </div>
 
     <div class="backdrop hidden" id="fileList">
@@ -332,8 +332,6 @@
         <i class="arrow"></i>
       </button>
       <div class="panel-content">
-
-
         <button class="deroulant hidden" id="velumDiv">Velum
           <i class="arrow"></i>
         </button>
@@ -384,8 +382,7 @@
             <input id="historique" type="checkbox"/>
             <label for="historique">Historique</label>
           </div>
-
-      </div>
+        </div>
       </div>
     </div>
   </div>
@@ -414,7 +411,7 @@
   </div>
 
   <div class= "menuClic" id="construction">
-    <button class="button" id="boutonconstruction"><img src="src/img/icons8-maintenance-filled-50.png"></button>
+    <button class="button" id="boutonconstruction"><img src="src/img/icons8-edit.png"></button>
     <div class="aide" id="annotationD"> Outils de dessin </div>
     <div class="menuClic-content" id="construction-content">
       <div class="nowrap">
@@ -454,10 +451,10 @@
         <label for="plancoupe">Plan de coupe horizontal</label>
       </div>
 
-      <div class="nowrap">
+      <!--<div class="nowrap">
         <input id="plancoupeverti" type="checkbox"/>
         <label for="plancoupeverti">Plan de coupe vertical</label>
-      </div>
+      </div>-->
 
       <div class="nowrap">
         <input id="decoupe" type="checkbox"/>
@@ -476,6 +473,22 @@
         <label for="shadows">Afficher les ombres</label>
       </div>
       <p>Date: <input type="text" id="date"></p>
+    </div>
+  </div>
+
+  <div class="menuClic" id="camera">
+    <button class="button" id="boutoncamera"><img src="src/img/icons8-unsplash.png"></button>
+    <div class="aide" id="annotationcamera"> Points de vue </div>
+    <div class="menuClic-content" id="camera-content">
+      <div class="nowrap">
+        <button id="up">Vue du dessus</button>
+      </div>
+      <div class="nowrap">
+        <button id="est">Vue à l'est</button>
+      </div>
+      <div class="nowrap">
+        <button id="ouest">Vue à l'ouest</button>
+      </div>
     </div>
   </div>
 
