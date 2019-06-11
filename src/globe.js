@@ -34,10 +34,6 @@ class Globe {
     // variable qui stocke les évenements liés à la souris
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
 
-    // Recuperer la fonction par defaut lors d'un clic gauche
-    this.defaultLeftClick = this.viewer.screenSpaceEventHandler.getInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
-    //this.leftClick = this.viewer.cesiumWidget.screenSpaceEventHandler.setInputAction(Cesium.ScreenSpaceEventTypeLEFT_CLICK);
-
     // mesures de coords
     this.coordX = document.querySelector('#coordX');
     this.coordY = document.querySelector('#coordY');
@@ -86,24 +82,46 @@ setHome(tileset){
   });
 }
 
-flyUp() {
+getOrientation() {
+  this.handler.setInputAction(function(event) {
+    console.log(globe.viewer.camera.heading);
+    console.log(globe.viewer.camera.pitch);
+    console.log(globe.viewer.camera.roll);
+    var a = globe.viewer.camera.positionWC;
+    console.log(a);
+    //console.log(Cesium.Math.toDegrees(a));
+  }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+}
+
+flyTo(position, lacet, tangage, roulis) {
   this.viewer.camera.setView({
+    destination : position,
     orientation: {
-      heading : Cesium.Math.toRadians(0.0), // east, default value is 0.0 (north)
-      pitch : Cesium.Math.toRadians(-90),    // default value (looking down)
-      roll : 0.0                             // default value
+      heading : lacet,
+      pitch : tangage,
+      roll : roulis
     }
   });
 }
 
-flyLeft() {
-  this.viewer.camera.setView({
-    orientation: {
-      heading : Cesium.Math.toRadians(-180.0), // east, default value is 0.0 (north)
-      pitch : Cesium.Math.toRadians(0),    // default value (looking down)
-      roll : 0.0                             // default value
-    }
+addViewPoint(nom) {
+  this.handler.globe = this;
+  var viewPoint = document.createElement("BUTTON");
+  viewPoint.innerHTML = nom;
+  viewPoint.classList.add('nowrap');
+  document.getElementById("camera-content").appendChild(viewPoint);
+
+  viewPoint.addEventListener('click', (e) => {
+    globe.viewer.camera.setView({
+      destination : globe.viewer.camera.positionWC,
+      orientation: {
+        heading : globe.viewer.camera.heading,
+        pitch : globe.viewer.camera.pitch,
+        roll : globe.viewer.camera.roll
+      }
+    });
   });
+
 }
 
 // permet d'enregister le tileset au format 3DTiles
@@ -235,23 +253,12 @@ showCoords(show){
 // ajouter le plan de coupe horizontal
 addClippingPlanes(orientation1, orientation2, X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, planeEntities, clippingPlanes) {
 
-    //tileset.clippingPlanes = new Cesium.ClippingPlaneCollection({
     var clippingPlanes = new Cesium.ClippingPlaneCollection({
       planes : [
         new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, orientation1, orientation2), 0.0)
-      ],
-      //modelMatrix: Cesium.Matrix4.inverse(tileset.root.computedTransform, new Cesium.Matrix4())
-      //modelMatrix: Cesium.Matrix4.inverse(tileset._initialClippingPlanesOriginMatrix, new Cesium.Matrix4()),
+      ]
     });
 
-
-    /*if (!Cesium.Matrix4.equals(tileset.root.transform, Cesium.Matrix4.IDENTITY)) {
-      // The clipping plane is initially positioned at the tileset's root transform.
-      // Apply an additional matrix to center the clipping plane on the bounding sphere center.
-      var transformCenter = Cesium.Matrix4.getTranslation(tileset.root.transform, new Cesium.Cartesian3());
-      var height = Cesium.Cartesian3.distance(transformCenter, tileset.boundingSphere.center);
-      clippingPlanes.modelMatrix = Cesium.Matrix4.fromTranslation(new Cesium.Cartesian3(0.0, 0.0, height));
-    }*/
 
     for (var i = 0; i < clippingPlanes.length; i=+1) {
       var coords = proj4('EPSG:3948','EPSG:4326', [Number(X), Number(Y)]);
@@ -776,29 +783,31 @@ handleBatimentClick(enabled, tileset){
     selectedEntity: new Cesium.Entity() // Une entité qui contient les attributs du batiments selectionné
   };
 
+  let defaultClickHandler = this.viewer.screenSpaceEventHandler.getInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
   if (Cesium.PostProcessStageLibrary.isSilhouetteSupported(this.viewer.scene)) {
     // Créer la bordure verte
-    /*let silhouetteGreen = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
+    let silhouetteGreen = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
     silhouetteGreen.uniforms.color = Cesium.Color.LIME;
     silhouetteGreen.uniforms.length = 0.01;
     silhouetteGreen.selected = [];
     // Enregistrer les bordures dans cesium
-    this.viewer.scene.postProcessStages.add(Cesium.PostProcessStageLibrary.createSilhouetteStage([silhouetteGreen]));*/
+    this.viewer.scene.postProcessStages.add(Cesium.PostProcessStageLibrary.createSilhouetteStage([silhouetteGreen]));
 
-    this.handler.setInputAction(function(event) {
+    this.handler.setInputAction(function(movement) {
       // Supprimer toutes les bordures verte
       //silhouetteGreen.selected = [];
       // Récuperer la forme sur laquelle on a cliqué
-      let pickedFeature = scene.pick(event.position);
+      let pickedFeature = scene.pick(movement.position);
       // Si on clique sur un element qui n'appartient pas à tileset on ne met pas de bordure verte
       if (!Cesium.defined(pickedFeature) || !Cesium.defined(pickedFeature.content) || pickedFeature.content._tileset != tileset) {
         selected.feature = undefined;
-        this.defaultLeftClick(event);
+        defaultClickHandler(movement);
         return;
       }
       // Ajouter le bord vert sur la forme selectionnée
-      /*if (pickedFeature !== silhouetteGreen.selected[0]) {
-        silhouetteGreen.selected = [pickedFeature];*/
+      if (pickedFeature !== silhouetteGreen.selected[0]) {
+        silhouetteGreen.selected = [pickedFeature];
 
         selected.feature = pickedFeature;
         selected.selectedEntity.name = pickedFeature.getProperty('name');
@@ -813,7 +822,7 @@ handleBatimentClick(enabled, tileset){
 
         // Afficher le tableau en haut à droite
         globe.viewer.selectedEntity = selected.selectedEntity;
-      //}
+      }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
     // Quitter la fonction pour desactiver la selection de batiments

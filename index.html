@@ -117,26 +117,6 @@
       <button id="supprimercoupe">Supprimer</button> <br/>
     </div>
 
-    <!--<div class="backdrop hidden" id="planVertiList">
-      <h2>Propriétés du plan de coupe</h2>
-      <form>
-        <p>Coordonnées du point central : <br/>
-          X :<input id="Xverti" type="text" size="12"/> <br/>
-          Y :<input id="Yverti" type="text" size="12"/> <br/>
-        </p>
-        <input id="hauteurcoupeverti" class="hidden" type="text" size="6"/>
-        <p>Cliquez sur le photomaillage pour rentrer les coordonnées </p>
-        <p>Longueur (m):<input id="longueurcoupeverti" type="text" size="6" value="200"/> </p>
-        <p>Largeur (m):<input id="largeurcoupeverti" type="text" size="6" value="200"/> </p>
-        <p>Couleur : <input id="couleurcoupeverti" type="text" size="6" value="#FFFFFF"/>
-        <span class="showcouleur" id="showcouleurcoupeverti">id</span> </p>
-        <a href="https://www.webfx.com/web-design/color-picker/" target="_blank" onclick="window.open('https://www.webfx.com/web-design/color-picker/','name','width=600,height=400')">Choisissez votre couleur ici</a>
-      </form>
-      <button id="envoyercoupeverti">Ajouter</button>
-      <button id="annulercoupeverti">Annuler</button>
-      <button id="supprimercoupeverti">Supprimer</button> <br/>
-    </div>-->
-
     <div class="backdrop hidden" id="decoupeList">
       <h2>Découpe dans le photomaillage</h2>
       <button id="envoyerdecoupe">Ajouter</button>
@@ -149,6 +129,14 @@
         <input id="afficherdecoupe" type="checkbox" value="true" data-bind="checked: affich, valueUpdate: 'input'"/>
         <label for="afficherdecoupe">Afficher</label>
       </div>
+    </div>
+
+    <div class="backdrop hidden" id="cameraList">
+      <h2>Ajouter un point de vue</h2>
+      <form>
+        <p>Nom :<input id="nomcamera" type="text" size="20"/> </p>
+      </form>
+      <p><button id="ajoutercamera">Ajouter</button> </p>
     </div>
 
     <div class="backdrop hidden" id="fileList">
@@ -451,11 +439,6 @@
         <label for="plancoupe">Plan de coupe horizontal</label>
       </div>
 
-      <!--<div class="nowrap">
-        <input id="plancoupeverti" type="checkbox"/>
-        <label for="plancoupeverti">Plan de coupe vertical</label>
-      </div>-->
-
       <div class="nowrap">
         <input id="decoupe" type="checkbox"/>
         <label for="decoupe">Découpe dans le maillage</label>
@@ -480,14 +463,28 @@
     <button class="button" id="boutoncamera"><img src="src/img/icons8-unsplash.png"></button>
     <div class="aide" id="annotationcamera"> Points de vue </div>
     <div class="menuClic-content" id="camera-content">
+      <button class="button" id="addcamera"><img src="src/img/icons8-add-camera.png"></button>
+      <span style="font-size:small;"> Ajouter point de vue </span>
       <div class="nowrap">
-        <button id="up">Vue du dessus</button>
+        <button id="nord">Vue au nord</button>
       </div>
       <div class="nowrap">
         <button id="est">Vue à l'est</button>
       </div>
       <div class="nowrap">
         <button id="ouest">Vue à l'ouest</button>
+      </div>
+      <div class="nowrap">
+        <button id="sud">Vue au sud</button>
+      </div>
+      <div class="nowrap">
+        <button id="cathedrale">Cathédrale</button>
+      </div>
+      <div class="nowrap">
+        <button id="stade">Stade de la Meinau</button>
+      </div>
+      <div class="nowrap">
+        <button id="centre">Centre administratif</button>
       </div>
     </div>
   </div>

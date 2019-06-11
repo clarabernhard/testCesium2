@@ -342,36 +342,30 @@ i {
   position: absolute;
   top: 7px;
   left: 100px;
-  /* lien à insérer pour l'image: <a href="https://icons8.com/icon/1408/length">Length icon by Icons8</a> */
 }
 
 #construction {
   position: absolute;
   top: 7px;
   left: 140px;
-  /* lien à insérer pour l'image: <a href="https://icons8.com/icon/11219/maintenance-filled">Maintenance Filled icon by Icons8</a> */
 }
 
 #coupe {
   position: absolute;
   top: 7px;
   left: 180px;
-  /* lien à insérer pour l'image: <a href="https://icons8.com/icon/9247/partly-cloudy-day-filled">Partly Cloudy Day Filled icon by Icons8</a>
-  <a href="https://icons8.com/icon/11550/add-file">Add File icon by Icons8</a>*/
 }
 
 #time {
   position: absolute;
   top: 7px;
   left: 220px;
-  /* lien à insérer pour l'image: <a href="https://icons8.com/icon/713/scissors">Scissors icon by Icons8</a> */
 }
 
 #camera {
   position: absolute;
   top: 7px;
   left: 260px;
-  /* lien à insérer pour l'image: <a href="https://icons8.com/icon/713/scissors">Scissors icon by Icons8</a> */
 }
 
 /* les boutons bougent à l'ouverture du menu */
@@ -463,7 +457,6 @@ i {
 
  .hidden {
     display: none;
-    pointer-events: none;
 }
 
 .hamburger-icon {

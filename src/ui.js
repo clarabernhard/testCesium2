@@ -32,7 +32,6 @@ class Menu {
     this.distanceList = document.querySelector('#distanceList');
     this.aireList = document.querySelector('#aireList');
     this.planList = document.querySelector('#planList');
-    //this.planVertiList = document.querySelector('#planVertiList');
     this.ligneList = document.querySelector('#ligneList');
     this.surfaceList = document.querySelector('#surfaceList');
     this.pointList = document.querySelector('#pointList');
@@ -40,6 +39,7 @@ class Menu {
     this.fileList = document.querySelector('#fileList');
     this.configList = document.querySelector('#configList');
     this.decoupeList = document.querySelector('#decoupeList');
+    this.cameraList = document.querySelector('#cameraList');
 
     // annotation en bas à droite
     this.aideCheckbox = document.querySelector('.annotation');
@@ -108,7 +108,6 @@ class Menu {
     this.supprCheckbox = document.querySelector("#suppr");
     // plan de coupe
     this.coupeCheckbox = document.querySelector('#plancoupe');
-    //this.coupeVertiCheckbox = document.querySelector('#plancoupeverti');
     this.decoupeCheckbox = document.querySelector('#decoupe');
     // ombres
     this.shadowCheckbox = document.querySelector('#shadows');
@@ -117,9 +116,14 @@ class Menu {
     this.datepicker.datepicker();
     this.datepicker.datepicker("option", "dateFormat", "dd/mm/yy");
     // caméra
-    this.upCheckbox = document.querySelector('#up');
-    this.leftCheckbox = document.querySelector('#ouest');
-    this.rightCheckbox = document.querySelector('#est');
+    this.addCamera = document.querySelector('#addcamera');
+    this.nordCheckbox = document.querySelector('#nord');
+    this.ouestCheckbox = document.querySelector('#ouest');
+    this.estCheckbox = document.querySelector('#est');
+    this.sudCheckbox = document.querySelector('#sud');
+    this.cathedraleCheckbox = document.querySelector('#cathedrale');
+    this.centreCheckbox = document.querySelector('#centre');
+    this.stadeCheckbox = document.querySelector('#stade');
 
     // Créer la liste des dataSource sous forme d'un object clé / valeur
     // Avec le nom de la source comme clé et la dataSource comme valeur
@@ -208,21 +212,6 @@ class Menu {
       globe.addClippingPlanes(orientation1, orientation2, X, Y, hauteur, longueur, largeur, couleur, planeEntities, clippingPlanes);
     });
 
-    /*document.querySelector("#envoyercoupeverti").addEventListener('click', (e) => {
-      var orientation1 = 1.0;
-      var orientation2 = 0.0;
-      let showCouleur = document.querySelector("#showcouleurcoupeverti");
-      var X = $('#Xverti').val();
-      var Y = $('#Yverti').val();
-      var hauteur = $('#hauteurcoupeverti').val();
-      var longueur = $('#longueurcoupeverti').val();
-      var largeur = $('#largeurcoupeverti').val();
-      var couleur = $('#couleurcoupeverti').val();
-      showCouleur.style.backgroundColor = couleur;
-
-      globe.addClippingPlanes(orientation1, orientation2, X, Y, hauteur, longueur, largeur, couleur, planeEntities, clippingPlanes);
-    });*/
-
     //Evenements pour la suppression / anunulation des dessins
     globe.annulFigure('#annulerpoint', billboard);
     globe.supprFigure('#supprimerpoint', billboard);
@@ -248,6 +237,13 @@ class Menu {
     document.querySelector("#envoyerdecoupe").addEventListener('click', (e) => {
       globe.createHole(this.viewModel);
     });
+
+    document.querySelector("#ajoutercamera").addEventListener('click', (e) => {
+      var nom = $('#nomcamera').val();
+      globe.addViewPoint(nom);
+    });
+
+    //globe.getOrientation();
 
   }
 
@@ -462,16 +458,6 @@ evenementsCouches(){
     }
   });
 
-  /*this.coupeVertiCheckbox.addEventListener('change', (e) => {
-    if(e.target.checked){
-      globe.coordCoupe("Xverti", "Yverti", "hauteurcoupeverti");
-      this.planVertiList.classList.remove('hidden');
-    } else {
-      this.planVertiList.classList.add('hidden');
-      globe.supprSouris();
-    }
-  });*/
-
   this.decoupeCheckbox.addEventListener('change', (e) => {
     if(e.target.checked){
       this.decoupeList.classList.remove('hidden');
@@ -485,12 +471,40 @@ evenementsCouches(){
     globe.supprEntities();
   });
 
-  this.upCheckbox.addEventListener('click', function() {
-    globe.flyUp();
+  //caméra
+  this.addCamera.addEventListener('click', (e) => {
+    this.cameraList.classList.toggle('hidden');
   });
 
-  this.leftCheckbox.addEventListener('click', function() {
-    globe.flyLeft();
+  this.nordCheckbox.addEventListener('click', function() {
+    globe.flyTo(globe.viewer.camera.position, Cesium.Math.toRadians(0.0), Cesium.Math.toRadians(-90), 0);
+  });
+
+  this.ouestCheckbox.addEventListener('click', function() {
+    globe.flyTo(globe.viewer.camera.position, Cesium.Math.toRadians(90), Cesium.Math.toRadians(-90), 0);
+  });
+
+  this.estCheckbox.addEventListener('click', function() {
+    globe.flyTo(globe.viewer.camera.position, Cesium.Math.toRadians(-90), Cesium.Math.toRadians(-90), 0);
+  });
+
+  this.sudCheckbox.addEventListener('click', function() {
+    globe.flyTo(globe.viewer.camera.position, Cesium.Math.toRadians(180), Cesium.Math.toRadians(-90), 0);
+  });
+
+  this.cathedraleCheckbox.addEventListener('click', function() {
+    var position = new Cesium.Cartesian3(4189249.7037263233, 570120.9393585781, 4760103.226866859);
+    globe.flyTo(position, 0.154, -0.712, 0);
+  });
+
+  this.stadeCheckbox.addEventListener('click', function() {
+    var position = new Cesium.Cartesian3(4191131.537797537, 570676.907960483, 4758499.857702635);
+    globe.flyTo(position, 0.347, -0.759, 0);
+  });
+
+  this.centreCheckbox.addEventListener('click', function() {
+    var position = new Cesium.Cartesian3(4189625.3805890195, 570566.3438953182, 4759621.616047475);
+    globe.flyTo(position, 4.402, -0.653, 6.279);
   });
 
 
@@ -1125,12 +1139,22 @@ evenementsCouches(){
   });
 
   this.velumCouleurCheckbox.addEventListener('change', (e) => {
-    if(e.target.checked) {
-      this.couleurVelum(e.target.checked);
+    this.couleurVelum(e.target.checked);
+
+    let legendColors = {
+      'HT': '#1F9BDE',
+      'ET': '#B75AF1',
+      'NR': '#949DA5'
+    }
+
+    if(e.target.checked){
+      this.legendManager.addLegend('velumCouleur', legendColors, 'polygon');
       globe.handleBatimentClick(e.target.checked, this.dataSources['velum']);
-    } else {
+    } else{
+      this.legendManager.removeLegend('velumCouleur');
       globe.supprSouris();
     }
+
   });
 
 }
@@ -1201,28 +1225,17 @@ couleurVelum(show){
     return;
   }
 
-  let legendColors = {
-    'HT': '#1F9BDE',
-    'ET': '#B75AF1',
-    'NR': '#949DA5'
-  }
-
-  if(!this.legendManager.hasLegend('velumCouleur')){
-    this.legendManager.addLegend('velumCouleur', legendColors, 'polygon');
-  }
-
   let color = undefined;
   if(show){
     color = {
       conditions: [
-        ["${CLASSIF} === 'HT'", "color('#1F9BDE', 0.3)"],
-        ["${CLASSIF} === 'ET'", "color('#B75AF1', 0.3)"],
-        ["${CLASSIF} === 'NR'", "color('#949DA5', 0.3)"],
+        ["${CLASSIF} === 'HT'", "color('#1F9BDE', 0.7)"],
+        ["${CLASSIF} === 'ET'", "color('#B75AF1', 0.7)"],
+        ["${CLASSIF} === 'NR'", "color('#949DA5', 0.7)"],
         ["true", "color('#1F85DE')"]
       ]
     };
   } else{
-    this.legendManager.removeLegend('velumCouleur');
     color = {
       conditions: [
         ["true", "color('#FFFFFF'), 0.3"]
