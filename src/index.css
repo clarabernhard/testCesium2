@@ -368,6 +368,12 @@ i {
   left: 260px;
 }
 
+#link {
+  position: absolute;
+  top: 7px;
+  left: 300px;
+}
+
 /* les boutons bougent à l'ouverture du menu */
 #mesures.menu-open {
   left:540px;
@@ -388,6 +394,11 @@ i {
 
 #camera.menu-open {
   left:700px;
+  transition: left 0.5s, right 0.5s;
+}
+
+#link.menu-open {
+  left:740px;
   transition: left 0.5s, right 0.5s;
 }
 
@@ -431,6 +442,15 @@ i {
 }
 
 #camera:hover #annotationcamera {
+  display: block;
+  width: 100px;
+  position: relative;
+  top: -10px;
+  left: 10px;
+  z-index: 2;
+}
+
+#link:hover #annotationlink {
   display: block;
   width: 100px;
   position: relative;

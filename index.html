@@ -139,6 +139,14 @@
       <p><button id="ajoutercamera">Ajouter</button> </p>
     </div>
 
+    <div class="backdrop hidden" id="linkList">
+      <h2>Créez un lien de partage</h2>
+      <form>
+        <p><input id="nomlink" type="text" onClick="this.select();" size="20"/> </p>
+      </form>
+      <p><button id="addlink">Créer</button> </p>
+    </div>
+
     <div class="backdrop hidden" id="fileList">
       <h2>Ajouter une couche</h2>
       <!--<label for="test" class="btn">Ajouter</label>-->
@@ -239,10 +247,6 @@
         <i class="arrow"></i>
       </button>
       <div class="panel-content">
-        <div class="nowrap hidden" id="tvbDiv">
-          <input id="tvb" type="checkbox"/>
-          <label for="tvb">Trame verte et bleue</label>
-        </div>
 
         <div class="nowrap hidden" id="zhavereesDiv">
           <input id="zhaverees" type="checkbox"/>
@@ -262,6 +266,21 @@
         <div class="nowrap hidden" id="arbresRemDiv">
           <input id="arbresRem" type="checkbox"/>
           <label for="arbresRem">Arbres remarquables</label>
+        </div>
+
+        <button class="deroulant hidden" id="tvbDiv">Trame verte et bleue
+          <i class="arrow"></i>
+        </button>
+        <div class="hidden">
+        <div class="nowrap">
+          <input id="tvbCorridor" type="checkbox"/>
+          <label for="tvbCorridor">Corridors</label>
+        </div>
+        <div class="nowrap">
+          <input id="tvbReservoir" type="checkbox"/>
+          <label for="tvbReservoir">Réservoirs</label>
+        </div>
+
         </div>
 
         <button class="deroulant hidden" id="ppriDiv">PPRI
@@ -487,6 +506,11 @@
         <button id="centre">Centre administratif</button>
       </div>
     </div>
+  </div>
+
+  <div class="menuClic" id="link">
+    <button class="button" id="boutonlink"><img src="src/img/icons8-lien.png"></button>
+    <div class="aide" id="annotationlink"> Lien de partage </div>
   </div>
 
   <div id="loadingIndicator" class="cover hidden">

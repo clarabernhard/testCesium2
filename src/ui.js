@@ -40,6 +40,7 @@ class Menu {
     this.configList = document.querySelector('#configList');
     this.decoupeList = document.querySelector('#decoupeList');
     this.cameraList = document.querySelector('#cameraList');
+    this.linkList = document.querySelector('#linkList');
 
     // annotation en bas à droite
     this.aideCheckbox = document.querySelector('.annotation');
@@ -58,11 +59,12 @@ class Menu {
     this.alignementCheckbox = document.querySelector('#alignement');
     this.arbreCheckbox = document.querySelector('#arbre');
     // Ecologie
-    this.trameCheckbox = document.querySelector('#tvb');
     this.zhAvereesCheckbox = document.querySelector('#zhaverees');
     this.solPollueCheckbox = document.querySelector('#pollue');
     this.risqueTechnoCheckbox = document.querySelector('#risquetechno');
     this.arbreRemCheckbox = document.querySelector('#arbresRem');
+    this.tvbCorridorCheckbox = document.querySelector('#tvbCorridor');
+    this.tvbReservoirCheckbox = document.querySelector('#tvbReservoir');
     this.ppriNappeCheckbox = document.querySelector('#ppriNappe');
     this.ppriRemontCheckbox = document.querySelector('#ppriRemont');
     this.ppriSubCheckbox = document.querySelector('#ppriSub');
@@ -96,6 +98,7 @@ class Menu {
     this.coupeDiv = document.querySelector('#coupe');
     this.timeDiv = document.querySelector('#time');
     this.cameraDiv = document.querySelector('#camera');
+    this.linkDiv = document.querySelector('#link');
     // mesures
     this.coordsCheckbox = document.querySelector('#point');
     this.ligneCheckbox = document.querySelector('#ligne');
@@ -124,6 +127,8 @@ class Menu {
     this.cathedraleCheckbox = document.querySelector('#cathedrale');
     this.centreCheckbox = document.querySelector('#centre');
     this.stadeCheckbox = document.querySelector('#stade');
+    //lien
+    this.boutonLink = document.querySelector('#boutonlink');
 
     // Créer la liste des dataSource sous forme d'un object clé / valeur
     // Avec le nom de la source comme clé et la dataSource comme valeur
@@ -238,9 +243,23 @@ class Menu {
       globe.createHole(this.viewModel);
     });
 
-    document.querySelector("#ajoutercamera").addEventListener('click', (e) => {
+    document.querySelector("#ajoutercamera").addEventListener('click', function() {
       var nom = $('#nomcamera').val();
-      globe.addViewPoint(nom);
+      var viewPoint = globe.addViewPoint(nom);
+
+      let position = new Cesium.Cartesian3(globe.viewer.camera.positionWC.x, globe.viewer.camera.positionWC.y, globe.viewer.camera.positionWC.z);
+      let heading = globe.viewer.camera.heading;
+      let pitch = globe.viewer.camera.pitch;
+      let roll = globe.viewer.camera.roll;
+
+      viewPoint.addEventListener('click', function() {
+        globe.fly(position, heading, pitch, roll);
+      });
+
+    });
+
+    document.querySelector("#addlink").addEventListener('click', function() {
+      globe.createLink();
     });
 
     //globe.getOrientation();
@@ -257,6 +276,7 @@ class Menu {
       this.coupeDiv.classList.toggle('menu-open');
       this.timeDiv.classList.toggle('menu-open');
       this.cameraDiv.classList.toggle('menu-open');
+      this.linkDiv.classList.toggle('menu-open');
     });
   }
 
@@ -477,34 +497,38 @@ evenementsCouches(){
   });
 
   this.nordCheckbox.addEventListener('click', function() {
-    globe.flyTo(globe.viewer.camera.position, Cesium.Math.toRadians(0.0), Cesium.Math.toRadians(-90), 0);
+    globe.fly(globe.viewer.camera.position, Cesium.Math.toRadians(0.0), Cesium.Math.toRadians(-90), 0);
   });
 
   this.ouestCheckbox.addEventListener('click', function() {
-    globe.flyTo(globe.viewer.camera.position, Cesium.Math.toRadians(90), Cesium.Math.toRadians(-90), 0);
+    globe.fly(globe.viewer.camera.position, Cesium.Math.toRadians(90), Cesium.Math.toRadians(-90), 0);
   });
 
   this.estCheckbox.addEventListener('click', function() {
-    globe.flyTo(globe.viewer.camera.position, Cesium.Math.toRadians(-90), Cesium.Math.toRadians(-90), 0);
+    globe.fly(globe.viewer.camera.position, Cesium.Math.toRadians(-90), Cesium.Math.toRadians(-90), 0);
   });
 
   this.sudCheckbox.addEventListener('click', function() {
-    globe.flyTo(globe.viewer.camera.position, Cesium.Math.toRadians(180), Cesium.Math.toRadians(-90), 0);
+    globe.fly(globe.viewer.camera.position, Cesium.Math.toRadians(180), Cesium.Math.toRadians(-90), 0);
   });
 
   this.cathedraleCheckbox.addEventListener('click', function() {
     var position = new Cesium.Cartesian3(4189249.7037263233, 570120.9393585781, 4760103.226866859);
-    globe.flyTo(position, 0.154, -0.712, 0);
+    globe.fly(position, 0.154, -0.712, 0);
   });
 
   this.stadeCheckbox.addEventListener('click', function() {
     var position = new Cesium.Cartesian3(4191131.537797537, 570676.907960483, 4758499.857702635);
-    globe.flyTo(position, 0.347, -0.759, 0);
+    globe.fly(position, 0.347, -0.759, 0);
   });
 
   this.centreCheckbox.addEventListener('click', function() {
     var position = new Cesium.Cartesian3(4189625.3805890195, 570566.3438953182, 4759621.616047475);
-    globe.flyTo(position, 4.402, -0.653, 6.279);
+    globe.fly(position, 4.402, -0.653, 6.279);
+  });
+
+  this.boutonLink.addEventListener('click', (e) => {
+    this.linkList.classList.toggle('hidden');
   });
 
 
@@ -532,10 +556,10 @@ evenementsCouches(){
 
   this.margeCheckbox.addEventListener('change', (e) => {
     let colors = {
-      'Marge_voirie': '#FF5D00',
-      'Marge_cours_eau': '#8B601F',
-      'Marge_voie_ferree': '#760808',
-      'Marge_lisiere': '#E18FB5'
+      'Marge_voirie': '#FF9E00',
+      'Marge_cours_eau': '#0CB5D1',
+      'Marge_voie_ferree': '#D93008',
+      'Marge_lisiere': '#EED32E'
     }
 
     if(e.target.checked){
@@ -665,7 +689,7 @@ evenementsCouches(){
 
     this.show('jardin', 'data/geojson/jardin_surf.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
       classification: true,
-      classificationField: 'sous_type',
+      classificationField: 'name',
       colors: color,
       alpha: 1
     });
@@ -711,25 +735,6 @@ evenementsCouches(){
 
 
   // ECOLOGIE
-  this.trameCheckbox.addEventListener('change', (e) => {
-    let color = {
-      'TVB': '#24B9E0'
-    }
-
-    if(e.target.checked){
-      this.legendManager.addLegend('trame', color, 'polygon');
-    } else{
-      this.legendManager.removeLegend('trame');
-    }
-
-    this.show('trame_verte_bleue', 'data/geojson/tvb.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
-      classification: true,
-      classificationField: 'name',
-      colors: color,
-      alpha: 0.4
-    });
-  });
-
   this.zhAvereesCheckbox.addEventListener('change', (e) => {
     let color = {
       'Zone_humide_avérée': '#A551ED'
@@ -799,6 +804,44 @@ evenementsCouches(){
     }
 
     this.show('arbreRem', 'data/geojson/arbres_rem.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+      classification: true,
+      classificationField: 'name',
+      colors: color,
+      alpha: 0.4
+    });
+  });
+
+  this.tvbCorridorCheckbox.addEventListener('change', (e) => {
+    let color = {
+      'TVB_Corridors': '#24B9E0'
+    }
+
+    if(e.target.checked){
+      this.legendManager.addLegend('trame', color, 'polygon');
+    } else{
+      this.legendManager.removeLegend('trame');
+    }
+
+    this.show('trame_verte_bleue', 'data/geojson/tvb.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+      classification: true,
+      classificationField: 'name',
+      colors: color,
+      alpha: 0.4
+    });
+  });
+
+  this.tvbReservoirCheckbox.addEventListener('change', (e) => {
+    let color = {
+      'TVB_reservoir': '#1FDED8'
+    }
+
+    if(e.target.checked){
+      this.legendManager.addLegend('trameReservoir', color, 'polygon');
+    } else{
+      this.legendManager.removeLegend('trameReservoir');
+    }
+
+    this.show('trameReservoir', 'data/geojson/tvb_reservoir.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
       classification: true,
       classificationField: 'name',
       colors: color,

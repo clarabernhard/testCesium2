@@ -3,7 +3,7 @@
 // Créer un object globe qui pertmet de manipuler cesium plus simplement
 class Globe {
 
-  constructor(elementId, geocoder, link){
+  constructor(elementId, geocoder){
 
     // Créer le globe dans la div HTML qui a l'id cesiumContainer
     this.viewer = new Cesium.Viewer(elementId, {
@@ -69,17 +69,73 @@ this.viewer.imageryLayers.addImageryProvider(elevation);*/
 
 // définit le zoom par défaut
 setHome(tileset){
-  this.viewer.zoomTo(tileset, new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-35), 1750));
+  var params = this.getAllUrlParams(window.location.href);
+  let X = params.x;
+  let Y = params.y;
+  let Z = params.z;
+  let heading = params.heading;
+  let pitch = params.pitch;
+  let roll = params.roll;
+
+  if(X === undefined || Y === undefined || Z === undefined || heading === undefined || pitch === undefined || roll === undefined) {
+    let position = new Cesium.Cartesian3(4189340.8219407205, 570098.5779244825, 4760076.919231732)
+    this.fly(position, 0.37788918288670725, -0.6882336882753819, 0);
+  } else {
+    let position = new Cesium.Cartesian3(X,Y,Z);
+    this.fly(position, heading, pitch, roll);
+  }
 
   // Définir ce qu'il se passe lorsqu'on clique sur le bouton "maison"
   this.viewer.homeButton.viewModel.command.beforeExecute.addEventListener((e) => {
     e.cancel = true;
-
-    // Quand on clique on "vole" à l'endroit où est le photo maillage
+    // Quand on clique on "vole" à l'endroit où est le photomaillage
     this.viewer.flyTo(tileset, {
       offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-35), 1750)
     });
   });
+}
+
+// fonction pour lire les paramètres présents dans l'URL
+getAllUrlParams(url) {
+  var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
+  var obj = {};
+
+  if (queryString) {
+    queryString = queryString.split('#')[0];
+    var arr = queryString.split('&');
+
+    for (var i = 0; i < arr.length; i++) {
+      var a = arr[i].split('=');
+      var paramName = a[0];
+      var paramValue = typeof (a[1]) === 'undefined' ? true : a[1];
+
+      paramName = paramName.toLowerCase();
+      if (typeof paramValue === 'string') paramValue = paramValue.toLowerCase();
+
+      if (paramName.match(/\[(\d+)?\]$/)) {
+        var key = paramName.replace(/\[(\d+)?\]/, '');
+        if (!obj[key]) obj[key] = [];
+
+        if (paramName.match(/\[\d+\]$/)) {
+          var index = /\[(\d+)\]/.exec(paramName)[1];
+          obj[key][index] = paramValue;
+        } else {
+          obj[key].push(paramValue);
+        }
+      } else {
+        if (!obj[paramName]) {
+          obj[paramName] = paramValue;
+        } else if (obj[paramName] && typeof obj[paramName] === 'string'){
+          obj[paramName] = [obj[paramName]];
+          obj[paramName].push(paramValue);
+        } else {
+          obj[paramName].push(paramValue);
+        }
+      }
+    }
+  }
+
+  return obj;
 }
 
 getOrientation() {
@@ -87,13 +143,11 @@ getOrientation() {
     console.log(globe.viewer.camera.heading);
     console.log(globe.viewer.camera.pitch);
     console.log(globe.viewer.camera.roll);
-    var a = globe.viewer.camera.positionWC;
-    console.log(a);
-    //console.log(Cesium.Math.toDegrees(a));
+    console.log(globe.viewer.camera.positionWC);
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 }
 
-flyTo(position, lacet, tangage, roulis) {
+fly(position, lacet, tangage, roulis) {
   this.viewer.camera.setView({
     destination : position,
     orientation: {
@@ -105,23 +159,24 @@ flyTo(position, lacet, tangage, roulis) {
 }
 
 addViewPoint(nom) {
-  this.handler.globe = this;
   var viewPoint = document.createElement("BUTTON");
   viewPoint.innerHTML = nom;
   viewPoint.classList.add('nowrap');
   document.getElementById("camera-content").appendChild(viewPoint);
 
-  viewPoint.addEventListener('click', (e) => {
-    globe.viewer.camera.setView({
-      destination : globe.viewer.camera.positionWC,
-      orientation: {
-        heading : globe.viewer.camera.heading,
-        pitch : globe.viewer.camera.pitch,
-        roll : globe.viewer.camera.roll
-      }
-    });
-  });
+  return viewPoint;
 
+}
+
+createLink() {
+  let X = globe.viewer.camera.positionWC.x;
+  let Y = globe.viewer.camera.positionWC.y;
+  let Z = globe.viewer.camera.positionWC.z;
+  let heading = globe.viewer.camera.heading;
+  let pitch = globe.viewer.camera.pitch;
+  let roll = globe.viewer.camera.roll;
+
+  document.getElementById('nomlink').value = window.location.href+'?X='+X+'&Y='+Y+'&Z='+Z+'&heading='+heading+'&pitch='+pitch+'&roll='+roll;
 }
 
 // permet d'enregister le tileset au format 3DTiles
