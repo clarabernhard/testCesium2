@@ -11,6 +11,10 @@ class Menu {
     this.viewer = Globe.viewer;
     this.handler = Globe.handler;
 
+    // Créer la liste des dataSource sous forme d'un object clé / valeur
+    // Avec le nom de la source comme clé et la dataSource comme valeur
+    this.dataSources = globe.dataSources;
+
     // boutons de personnalisation
     this.addFile = document.querySelector("#boutonfile");
     this.config = document.querySelector("#config");
@@ -75,6 +79,7 @@ class Menu {
     //Reglementaire
     this.monumentCheckbox = document.querySelector('#monument');
     //Divers
+    this.danubeCheckbox = document.querySelector('#danube');
     this.velumCheckbox = document.querySelector('#velum');
     this.velumCouleurCheckbox = document.querySelector('#velumCouleur');
     this.administratifCheckbox = document.querySelector('#administratif');
@@ -85,6 +90,7 @@ class Menu {
     this.santeCheckbox = document.querySelector('#sante');
     this.sportifCheckbox = document.querySelector('#sportif');
     this.historiqueCheckbox = document.querySelector('#historique');
+    this.autreCheckbox = document.querySelector('#autre');
 
     //Boite à outils
     // boutons de la boite à outils
@@ -129,10 +135,6 @@ class Menu {
     this.stadeCheckbox = document.querySelector('#stade');
     //lien
     this.boutonLink = document.querySelector('#boutonlink');
-
-    // Créer la liste des dataSource sous forme d'un object clé / valeur
-    // Avec le nom de la source comme clé et la dataSource comme valeur
-    this.dataSources = [];
 
     // Evenements pour le menu de gauche
     this.openMenu();
@@ -305,15 +307,6 @@ class Menu {
   }*/
   element.classList.toggle('show');
 });
-}
-
-// Fonctions pour controler le loader
-showLoader(){
-  document.querySelector('#loadingIndicator').classList.remove('hidden');
-}
-
-hideLoader(){
-  document.querySelector('#loadingIndicator').classList.add('hidden');
 }
 
 // enregistre toutes les actions sur les boutons (menus de gauche + boite à outils)
@@ -545,7 +538,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('ER');
     }
 
-    this.show('ER', 'data/geojson/empl_reserve.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'ER', 'data/geojson/empl_reserve.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'type_prescription',
       colors: colors,
@@ -568,7 +561,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('margeRecul');
     }
 
-    this.show('margeRecul', 'data/geojson/marge_surf.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'margeRecul', 'data/geojson/marge_surf.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: colors,
@@ -588,7 +581,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('ensPaysager');
     }
 
-    this.show('ens_paysager', 'data/geojson/ens_paysager.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'ens_paysager', 'data/geojson/ens_paysager.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: color,
@@ -608,7 +601,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('batimentsInteressant'); // Suppression de la légende qui a l'ID 'batiments'
     }
 
-    this.show('bati_interessant', 'data/geojson/bati_interessant.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'bati_interessant', 'data/geojson/bati_interessant.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: colors,
@@ -628,7 +621,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('batimentsExceptionnel');
     }
 
-    this.show('bati_exceptionnel', 'data/geojson/bati_exceptionnel.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'bati_exceptionnel', 'data/geojson/bati_exceptionnel.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: colors,
@@ -649,7 +642,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('continuite');
     }
 
-    this.show('continuite_eco', 'data/geojson/cont_ecologique.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'continuite_eco', 'data/geojson/cont_ecologique.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: color,
@@ -668,7 +661,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('plante');
     }
 
-    this.show('espaces_plantes', 'data/geojson/esp_plante.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'espaces_plantes', 'data/geojson/esp_plante.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: color,
@@ -687,7 +680,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('jardin');
     }
 
-    this.show('jardin', 'data/geojson/jardin_surf.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'jardin', 'data/geojson/jardin_surf.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'name',
       colors: color,
@@ -706,7 +699,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('aligne');
     }
 
-    this.show('alignement', 'data/geojson/alignement_surf.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'alignement', 'data/geojson/alignement_surf.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: color,
@@ -720,17 +713,15 @@ evenementsCouches(){
     }
 
     if(e.target.checked){
-      this.legendManager.addLegend('arbre', color, 'point');
+      this.legendManager.addLegend('arbre', color, 'point', "<img src='src/img/tree.png'>");
     } else{
       this.legendManager.removeLegend('arbre');
     }
 
-    this.show('arbre', 'data/geojson/arbres.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
-      classification: true,
-      classificationField: 'name',
-      colors: color,
-      alpha: 0.4
+    this.showJson(e.target.checked, 'arbre', 'data/geojson/arbres.json', 'park2', '#007F24' , {
+
     });
+
   });
 
 
@@ -746,7 +737,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('zh_averees');
     }
 
-    this.show('zones_humides', 'data/geojson/zh_averees.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'zones_humides', 'data/geojson/zh_averees.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'name',
       colors: color,
@@ -765,7 +756,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('sol_pollue');
     }
 
-    this.show('solpollue', 'data/geojson/sol_pollue.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'solpollue', 'data/geojson/sol_pollue.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: color,
@@ -784,7 +775,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('risquetechno');
     }
 
-    this.show('risque_techno', 'data/geojson/risque_techno.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'risque_techno', 'data/geojson/risque_techno.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: color,
@@ -798,16 +789,13 @@ evenementsCouches(){
     }
 
     if(e.target.checked){
-      this.legendManager.addLegend('arbreRem', color, 'point');
+      this.legendManager.addLegend('arbreRem', color, 'point', "<img src='src/img/tree.png'>");
     } else{
       this.legendManager.removeLegend('arbreRem');
     }
 
-    this.show('arbreRem', 'data/geojson/arbres_rem.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
-      classification: true,
-      classificationField: 'name',
-      colors: color,
-      alpha: 0.4
+    this.showJson(e.target.checked, 'arbreRem', 'data/geojson/arbres_rem.json', 'park', '#0FA1AD' , {
+
     });
   });
 
@@ -822,7 +810,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('trame');
     }
 
-    this.show('trame_verte_bleue', 'data/geojson/tvb.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'trame_verte_bleue', 'data/geojson/tvb.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'name',
       colors: color,
@@ -841,7 +829,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('trameReservoir');
     }
 
-    this.show('trameReservoir', 'data/geojson/tvb_reservoir.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'trameReservoir', 'data/geojson/tvb_reservoir.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'name',
       colors: color,
@@ -861,7 +849,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('nappe');
     }
 
-    this.show('nappe', 'data/geojson/ppri_nappe.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'nappe', 'data/geojson/ppri_nappe.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'classe',
       colors: color,
@@ -881,7 +869,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('remont');
     }
 
-    this.show('remontee', 'data/geojson/ppri_innond_remontee.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'remontee', 'data/geojson/ppri_innond_remontee.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'nom',
       colors: colors,
@@ -907,7 +895,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('submersion');
     }
 
-    this.show('submersion', 'data/geojson/ppri_innond_debord.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'submersion', 'data/geojson/ppri_innond_debord.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'nom',
       colors: colors,
@@ -926,7 +914,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('reservoirA');
     }
 
-    this.show('tnu_reservoirA', 'data/geojson/tnu_reserv_arbore.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'tnu_reservoirA', 'data/geojson/tnu_reserv_arbore.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'name',
       colors: color,
@@ -945,7 +933,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('reservoirH');
     }
 
-    this.show('tnu_reservoirH', 'data/geojson/tnu_reservoir_herbace.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'tnu_reservoirH', 'data/geojson/tnu_reservoir_herbace.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'name',
       colors: color,
@@ -964,7 +952,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('corridorH');
     }
 
-    this.show('tnu_corridorH', 'data/geojson/tnu_corridor_herbace.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'tnu_corridorH', 'data/geojson/tnu_corridor_herbace.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'name',
       colors: color,
@@ -983,7 +971,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('corridorA');
     }
 
-    this.show('tnu_corridorA', 'data/geojson/tnu_corridor_arbore.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'tnu_corridorA', 'data/geojson/tnu_corridor_arbore.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'name',
       colors: color,
@@ -1004,7 +992,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('monuments_historiques');
     }
 
-    this.show('monuments_historiques', 'data/geojson/monument_histo.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'monuments_historiques', 'data/geojson/monument_histo.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'type_entite',
       colors: colors,
@@ -1024,7 +1012,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('administratif');
     }
 
-    this.show('administratif', 'data/geojson/batipublic_administratif.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'administratif', 'data/geojson/batipublic_administratif.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1044,7 +1032,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('religieux');
     }
 
-    this.show('religieux', 'data/geojson/batipublic_religieux.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'religieux', 'data/geojson/batipublic_religieux.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1064,7 +1052,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('culturel');
     }
 
-    this.show('culturel', 'data/geojson/batipublic_culturel.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'culturel', 'data/geojson/batipublic_culturel.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1084,7 +1072,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('social');
     }
 
-    this.show('social', 'data/geojson/batipublic_social.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'social', 'data/geojson/batipublic_social.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1104,7 +1092,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('historique');
     }
 
-    this.show('historique', 'data/geojson/batipublic_historique.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'historique', 'data/geojson/batipublic_historique.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1124,7 +1112,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('sante');
     }
 
-    this.show('sante', 'data/geojson/batipublic_sante.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'sante', 'data/geojson/batipublic_sante.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1144,7 +1132,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('sportif');
     }
 
-    this.show('sportif', 'data/geojson/batipublic_sportif.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'sportif', 'data/geojson/batipublic_sportif.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1164,7 +1152,30 @@ evenementsCouches(){
       this.legendManager.removeLegend('enseignement');
     }
 
-    this.show('enseignement', 'data/geojson/batipublic_enseignement.json', Globe.prototype.loadGeoJson.bind(this.globe), e.target.checked, {
+    this.showJson(e.target.checked, 'enseignement', 'data/geojson/batipublic_enseignement.json', '', '#FFFFFF' , {
+      classification: true,
+      classificationField: 'categorie',
+      colors: colors,
+      alpha: 0.6
+    });
+
+  });
+
+  this.autreCheckbox.addEventListener('change', (e) => {
+    let colors = {
+      'autre': '#DD3588',
+      'ordre_secours': '#B30E38',
+      'industr_techno': '#9BB24C',
+      'transport': '#9D7534'
+    }
+
+    if(e.target.checked){
+      this.legendManager.addLegend('autre', colors, 'polygon');
+    } else{
+      this.legendManager.removeLegend('autre');
+    }
+
+    this.showJson(e.target.checked, 'autre', 'data/geojson/batipublic_autre.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1177,7 +1188,7 @@ evenementsCouches(){
     if(e.target.checked == false){
       this.velumCouleurCheckbox.checked = false;
     }
-    this.show('velum', 'data/Velum3D/tileset.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
+    this.show3DTiles('velum', 'data/Velum3D/tileset.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
 
   });
 
@@ -1200,25 +1211,46 @@ evenementsCouches(){
 
   });
 
+  this.danubeCheckbox.addEventListener('change', (e) => {
+    this.show3DTiles('danube', 'data/Danube/tileset.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
+
+  });
+
 }
 
 // Ajouter une source de données a la liste en donnant son nom "name" et la datasource "value"
 addDataSource(name, value){
   this.dataSources[name] = value;
 }
+
+showJson(show, name, link, symbol, couleur, options = {}){
+  if(show){
+    if(this.dataSources[name] === undefined){
+      globe.loadGeoJson(link, name, symbol, couleur, options);
+    } else{
+      this.dataSources[name].show = true;
+    }
+  } else{
+    if(this.dataSources[name] !== undefined){
+      this.dataSources[name].show = false;
+    }
+  }
+}
+
 /*
 * Afficher ou masquer la source de données "name" en fonction de la valeur de "show"
 * Si elle n'a pas enore été affiché, la fonction va télécharger les données avec le lien "link" passé en parametre
 * Elle utilise la fonction "loader" passé en paramètre pour télécharger les données et les ajouter au globe
 * "Options" est un paramètre optionel (un objet) qui sera passé en deuxième paramètre de la fonction "loader"
+marche pour les 3DTiles et KML
 */
-show(name, link, loader, show, options = {}){
+show3DTiles(name, link, loader, show, options = {}){
   if(show){
     if(this.dataSources[name] === undefined){
-      this.showLoader();
+      globe.showLoader();
       loader(link, options).then((data) => {
         this.dataSources[name] = data;
-        this.hideLoader();
+        globe.hideLoader();
       });
     } else{
       this.dataSources[name].show = true;

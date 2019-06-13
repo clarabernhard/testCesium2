@@ -23,7 +23,7 @@ class Globe {
       this.raf09 = raf090;
     });
 
-    this.collection = new Cesium.DataSourceCollection();
+    this.dataSources = [];
 
     // insère les logos en bas
     this.viewer.bottomContainer.innerHTML = '<img src="src/img/logo/logo-strasbourg.png" alt="Logo strasbourg" />\
@@ -77,25 +77,25 @@ setHome(tileset){
   let pitch = params.pitch;
   let roll = params.roll;
 
+  // si l'URL ne contient pas de paramètres, on zoome sur la cathédrale
   if(X === undefined || Y === undefined || Z === undefined || heading === undefined || pitch === undefined || roll === undefined) {
-    let position = new Cesium.Cartesian3(4189340.8219407205, 570098.5779244825, 4760076.919231732)
-    this.fly(position, 0.37788918288670725, -0.6882336882753819, 0);
+    let position = new Cesium.Cartesian3(4189340.8219407, 570098.5779245, 4760076.919231)
+    this.fly(position, 0.3779, -0.6882, 0);
   } else {
+    // sinon on lit les paramètres présents dans l'URL
     let position = new Cesium.Cartesian3(X,Y,Z);
     this.fly(position, heading, pitch, roll);
   }
 
-  // Définir ce qu'il se passe lorsqu'on clique sur le bouton "maison"
+  // Définir ce qu'il se passe lorsqu'on clique sur le bouton "maison" (ici retour à la cathédrale)
   this.viewer.homeButton.viewModel.command.beforeExecute.addEventListener((e) => {
     e.cancel = true;
-    // Quand on clique on "vole" à l'endroit où est le photomaillage
-    this.viewer.flyTo(tileset, {
-      offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-35), 1750)
-    });
+    let position = new Cesium.Cartesian3(4189340.8219407, 570098.5779245, 4760076.919231)
+    this.fly(position, 0.3779, -0.6882, 0);
   });
 }
 
-// fonction pour lire les paramètres présents dans l'URL
+// fonction qui retourne les paramètres présents dans l'URL
 getAllUrlParams(url) {
   var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
   var obj = {};
@@ -134,7 +134,6 @@ getAllUrlParams(url) {
       }
     }
   }
-
   return obj;
 }
 
@@ -147,6 +146,8 @@ getOrientation() {
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 }
 
+// Fonction pour définir le point de vue de caméra en fonction de la position (Cartesian3)
+// et des 3 paramètres d'orientation de la caméra
 fly(position, lacet, tangage, roulis) {
   this.viewer.camera.setView({
     destination : position,
@@ -158,6 +159,7 @@ fly(position, lacet, tangage, roulis) {
   });
 }
 
+// Ajoute un bouton HTML qui enregistre un point de vue de caméra
 addViewPoint(nom) {
   var viewPoint = document.createElement("BUTTON");
   viewPoint.innerHTML = nom;
@@ -168,6 +170,7 @@ addViewPoint(nom) {
 
 }
 
+// Fonction pour créer le lien de partage
 createLink() {
   let X = globe.viewer.camera.positionWC.x;
   let Y = globe.viewer.camera.positionWC.y;
@@ -191,7 +194,7 @@ loadPhotomaillage(link, options = {}){
   return tileset;
 }
 
-// ajoute le tileset sous forme d'entités
+// ajoute le tileset sous forme d'entités + structure asynchrone
 addPhotomaillage(tileset) {
   var tilesetPrimitive = this.viewer.scene.primitives.add(tileset);
   return tilesetPrimitive.readyPromise;
@@ -218,17 +221,20 @@ loadKml(link, options = {clampToGround : true}){
   return promisse;
 }
 
-loadGeoJson(link, options = {}){
+loadGeoJson(link, name, symbol, couleur, options = {}){
   let promisse = Cesium.GeoJsonDataSource.load(link, {
     clampToGround: true,
-    markerSymbol: 'park',
-    markerColor: Cesium.Color.fromCssColorString('#007F24')
+    markerSymbol: symbol,
+    markerColor: Cesium.Color.fromCssColorString(couleur)
   });
   this.viewer.scene.globe.depthTestAgainstTerrain = true;
   this.viewer.scene.logarithmicDepthBuffer = false;
+  this.showLoader();
   promisse.then((dataSource) => {
 
     this.viewer.dataSources.add(dataSource);
+    this.dataSources[name] = dataSource;
+    this.hideLoader();
 
 
     if(options.classification && options.classificationField !== undefined){
@@ -262,6 +268,15 @@ loadGeoJson(link, options = {}){
   });
 
   return promisse;
+}
+
+// Fonctions pour controler le loader
+showLoader(){
+  document.querySelector('#loadingIndicator').classList.remove('hidden');
+}
+
+hideLoader(){
+  document.querySelector('#loadingIndicator').classList.add('hidden');
 }
 
 // Fonction pour afficher les ombres

@@ -8,14 +8,14 @@ class LegendManager {
         this.legendContainer = legendContainer;
     }
 
-    addLegend(id, values, choice){
+    addLegend(id, values, choice, symbol){
         let legend = document.createElement('div');
         legend.id = id;
         legend.classList.add('legend');
         legend.classList.add('backdrop');
 
         Object.keys(values).forEach((key) => {
-            legend.appendChild(this.makeLegendItem(key, values[key], choice));
+            legend.appendChild(this.makeLegendItem(key, values[key], choice, symbol));
         });
 
         this.legendContainer.appendChild(legend);
@@ -30,7 +30,7 @@ class LegendManager {
         return this.legendContainer.querySelectorAll('#' + id).length != 0;
     }
 
-    makeLegendItem(label, color, choice){
+    makeLegendItem(label, color, choice, symbol){
         let legendColor = document.createElement('span');
         if(choice === 'line'){
           legendColor.classList.add('legend-line');
@@ -39,7 +39,7 @@ class LegendManager {
           legendColor.classList.add('legend-color');
           legendColor.style = "background-color: " + color + ";";
         } else if(choice === 'point') {
-          legendColor.innerHTML = "<img src='https://img.icons8.com/color/48/000000/deciduous-tree.png'>";
+          legendColor.innerHTML = symbol;
         }
 
 
