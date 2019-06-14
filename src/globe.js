@@ -1,5 +1,5 @@
 "use strict";
-
+// web server: http://127.1.0.0:8000/
 // Créer un object globe qui pertmet de manipuler cesium plus simplement
 class Globe {
 
@@ -65,6 +65,10 @@ class Globe {
   }
 });
 this.viewer.imageryLayers.addImageryProvider(elevation);*/
+
+//var test = this.getFiles();
+var files = this.getServer('http://127.1.0.0:8000/json/');
+
 }
 
 // définit le zoom par défaut
@@ -858,7 +862,7 @@ handleBatimentClick(enabled, tileset){
   if (Cesium.PostProcessStageLibrary.isSilhouetteSupported(this.viewer.scene)) {
     // Créer la bordure verte
     let silhouetteGreen = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
-    silhouetteGreen.uniforms.color = Cesium.Color.LIME;
+    silhouetteGreen.uniforms.color = Cesium.Color.fromCssColorString('#E20000').withAlpha(0.7);
     silhouetteGreen.uniforms.length = 0.01;
     silhouetteGreen.selected = [];
     // Enregistrer les bordures dans cesium
@@ -866,7 +870,7 @@ handleBatimentClick(enabled, tileset){
 
     this.handler.setInputAction(function(movement) {
       // Supprimer toutes les bordures verte
-      //silhouetteGreen.selected = [];
+      silhouetteGreen.selected = [];
       // Récuperer la forme sur laquelle on a cliqué
       let pickedFeature = scene.pick(movement.position);
       // Si on clique sur un element qui n'appartient pas à tileset on ne met pas de bordure verte
@@ -901,6 +905,52 @@ handleBatimentClick(enabled, tileset){
       return;
     }
   }
+}
+
+getFiles() {
+
+  $.get('http://127.1.0.0:8000/json/', (data) =>
+    {
+        console.log(typeof data);
+        let listing = parseDirectoryListing(data);
+        console.log(listing);
+        console.log(typeof listing);
+        $('body').append(JSON.stringify(listing));
+    });
+
+    function parseDirectoryListing(text)
+    {
+        let docs = text
+                     .match(/href="([\w]+)/g) // pull out the hrefs
+                     .map((x) => x.replace('href="', '')); // clean up
+        console.log(docs);
+        console.log(typeof docs);
+
+        return docs;
+    }
+
+}
+
+getServer(filePath) {
+  var name;
+  var symbol;
+  var couleur = '#FFFFFF';
+  var result = null;
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.open("GET", filePath, false);
+  xmlhttp.send();
+  if (xmlhttp.status==200) {
+    result = xmlhttp.response;
+  }
+
+  console.log(result);
+  return result;
+
+  /*var test = $.getJSON(filePath);
+  console.log(test);
+  console.log(typeof test);
+  this.loadGeoJson(test, name, symbol, couleur);*/
+
 }
 
 

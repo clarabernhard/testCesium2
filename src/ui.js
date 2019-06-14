@@ -1196,8 +1196,8 @@ evenementsCouches(){
     this.couleurVelum(e.target.checked);
 
     let legendColors = {
-      'HT': '#1F9BDE',
-      'ET': '#B75AF1',
+      'HT': '#C29D00',
+      'ET': '#E77200',
       'NR': '#949DA5'
     }
 
@@ -1278,18 +1278,16 @@ onDateChanged(value){
 
 //Formulaire
 formulaireFichier(){
-  document.querySelector("#ajouter").addEventListener('click', (e) => {
-    var fichier = $('#fichier').prop('files')[0];
-    //var fichier = "file://S:/Commun/SIG3D/2019/PROJETS_2019/19027_PFE_INSA/FME/exports/bati_exceptionnel.json";
-    var reader = new FileReader();
+  var name;
+  var symbol;
+  var couleur = '#FFFFFF';
 
-    reader.addEventListener('load', function() {
-      alert('Contenu du fichier "' + fichier.name + '" :\n\n' + reader.result);
-    });
-    reader.readAsText(fichier);
-    var jsonObj = reader.result;
-    //Cesium.GeoJsonDataSource.load(fichier);
-    globe.loadGeoJson(jsonObj);
+  document.querySelector("#ajouter").addEventListener('click', (e) => {
+    //var fichier = $('#fichier').val();
+
+    var fichier = "http://127.1.0.0:8000/json/bati_exceptionnel.json";
+
+    globe.loadGeoJson(fichier, name, symbol, couleur);
   });
 }
 
@@ -1304,8 +1302,8 @@ couleurVelum(show){
   if(show){
     color = {
       conditions: [
-        ["${CLASSIF} === 'HT'", "color('#1F9BDE', 0.7)"],
-        ["${CLASSIF} === 'ET'", "color('#B75AF1', 0.7)"],
+        ["${CLASSIF} === 'HT'", "color('#C29D00', 0.7)"],
+        ["${CLASSIF} === 'ET'", "color('#E77200', 0.7)"],
         ["${CLASSIF} === 'NR'", "color('#949DA5', 0.7)"],
         ["true", "color('#1F85DE')"]
       ]
