@@ -10,6 +10,7 @@ class Menu {
 
     this.viewer = Globe.viewer;
     this.handler = Globe.handler;
+    globe.showJson = this.showJson;
 
     // Créer la liste des dataSource sous forme d'un object clé / valeur
     // Avec le nom de la source comme clé et la dataSource comme valeur
@@ -205,8 +206,6 @@ class Menu {
     });
 
     document.querySelector("#envoyercoupe").addEventListener('click', (e) => {
-      var orientation1 = 0.0;
-      var orientation2 = -1.0;
       let showCouleur = document.querySelector("#showcouleurcoupe");
       var X = $('#X').val();
       var Y = $('#Y').val();
@@ -216,7 +215,7 @@ class Menu {
       var couleur = $('#couleurcoupe').val();
       showCouleur.style.backgroundColor = couleur;
 
-      globe.addClippingPlanes(orientation1, orientation2, X, Y, hauteur, longueur, largeur, couleur, planeEntities, clippingPlanes);
+      globe.addClippingPlanes(X, Y, hauteur, longueur, largeur, couleur, planeEntities, clippingPlanes);
     });
 
     //Evenements pour la suppression / anunulation des dessins
@@ -263,6 +262,10 @@ class Menu {
     document.querySelector("#addlink").addEventListener('click', function() {
       globe.createLink();
     });
+
+    // ajout de couches
+    this.getFiles('http://127.1.0.0:8000/json/');
+    this.classifList = document.querySelector('#classifList');
 
     //globe.getOrientation();
 
@@ -314,7 +317,6 @@ evenementsCouches(){
 
   this.addFile.addEventListener('click', (e) => {
     this.fileList.classList.toggle('hidden');
-    this.formulaireFichier();
   });
 
   //configuration
@@ -463,7 +465,7 @@ evenementsCouches(){
 
   this.coupeCheckbox.addEventListener('change', (e) => {
     if(e.target.checked){
-      globe.coordCoupe("X", "Y", "hauteurcoupe");
+      globe.coordCoupe();
       this.planList.classList.remove('hidden');
     } else {
       this.planList.classList.add('hidden');
@@ -520,6 +522,7 @@ evenementsCouches(){
     globe.fly(position, 4.402, -0.653, 6.279);
   });
 
+  // partage de lien
   this.boutonLink.addEventListener('click', (e) => {
     this.linkList.classList.toggle('hidden');
   });
@@ -1197,7 +1200,7 @@ evenementsCouches(){
 
     let legendColors = {
       'HT': '#C29D00',
-      'ET': '#E77200',
+      'ET': '#B75AF1',
       'NR': '#949DA5'
     }
 
@@ -1276,21 +1279,6 @@ onDateChanged(value){
   this.globe.viewer.timeline.zoomTo(startTime, stopTime); // Définit la portion visible de la timeline
 }
 
-//Formulaire
-formulaireFichier(){
-  var name;
-  var symbol;
-  var couleur = '#FFFFFF';
-
-  document.querySelector("#ajouter").addEventListener('click', (e) => {
-    //var fichier = $('#fichier').val();
-
-    var fichier = "http://127.1.0.0:8000/json/bati_exceptionnel.json";
-
-    globe.loadGeoJson(fichier, name, symbol, couleur);
-  });
-}
-
 couleurVelum(show){
   if(this.dataSources.velum === undefined || this.dataSources.velum.show == false){
     alert("Vous devez afficher le velum pour utiliser cette fonction");
@@ -1320,6 +1308,66 @@ couleurVelum(show){
   this.dataSources.velum.style = new Cesium.Cesium3DTileStyle({
     color: color
   });
+}
+
+getFiles(filePath) {
+  var result = [];
+  var noms = [];
+  var json = [];
+  var symbol;
+  var couleur = 'FFFFFF';
+  var options;
+  var show = true;
+
+  var xmlhttp = new XMLHttpRequest();
+  this.xmlhttp = this;
+
+  xmlhttp.open("GET", filePath, false);
+  xmlhttp.onreadystatechange = function () {
+  if(xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+
+    let html = xmlhttp.responseText;
+    result = $(html).find("li > a");
+
+    for(let i=0;i<result.length;i++) {
+      noms.push(result[i].innerText);
+      json.push($.getJSON(filePath + result[i].innerText));
+
+      var couche = document.createElement("BUTTON");
+      couche.innerHTML = noms[i];
+      document.getElementById("fileList").appendChild(couche);
+      var espace = document.createElement("br");
+      document.getElementById("fileList").appendChild(espace);
+      couche.addEventListener('click', function() {
+        document.querySelector('#classifList').classList.toggle('hidden')
+      });
+
+      var ajout = document.createElement("BUTTON");
+      document.getElementById("classifList").appendChild(ajout);
+      var space = document.createElement("br");
+      document.getElementById("classifList").appendChild(space);
+      ajout.addEventListener('click', function() {
+        var valeurClassif = $('#valeurclassif').val();
+        var couleurClassif = $('#couleurclassif').val();
+        var champ = $('#classif').val();
+
+        var colors = {
+          valeurClassif: couleurClassif.toString()
+        }
+
+        globe.showJson(show, noms[i], json[i], symbol, couleur, options = {
+          classification: true,
+          classificationField: champ,
+          colors: colors,
+          alpha: 0.6
+        });
+      });
+    }
+  }
+};
+
+  xmlhttp.send();
+
 }
 
 

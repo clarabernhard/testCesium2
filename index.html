@@ -149,9 +149,15 @@
 
     <div class="backdrop hidden" id="fileList">
       <h2>Ajouter une couche</h2>
-      <!--<label for="test" class="btn">Ajouter</label>-->
-      <p><input id="fichier" type="url" value="http://127.1.0.0:8000/" accept=".json,.geojson,.kml"> </p>
-      <p><button id="ajouter">Ajouter</button> </p>
+    </div>
+
+    <div class="backdrop hidden" id="classifList">
+      <h2>Représentation de la couche</h2>
+      <form>
+        <p>Champ à classifier:<input id="classif" type="text" size="20" /> </p>
+        <p> Valeur <input id="valeurclassif" type="text" size="20" />
+            Couleur <input id="couleurclassif" type="text" size="20" value="#FFFFFF"/> </p>
+      </form>
     </div>
 
     <div class="backdrop hidden" id="configList">

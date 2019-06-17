@@ -13,10 +13,10 @@ class Globe {
     });
 
     // Supprime le terrain par défaut sur le globe
-        this.viewer.scene.imageryLayers.removeAll();
+    this.viewer.scene.imageryLayers.removeAll();
 
-        // Définit la couleur de fond du globe étant donné qu'on a supprimé le terrain (ici du noir)
-        this.viewer.scene.globe.baseColor = Cesium.Color.BLACK;
+    // Définit la couleur de fond du globe étant donné qu'on a supprimé le terrain (ici du noir)
+    this.viewer.scene.globe.baseColor = Cesium.Color.BLACK;
 
     this.raf09 = undefined;
     new Raf09('../Cesium/data/RAF09.mnt', (raf090) => {
@@ -30,6 +30,10 @@ class Globe {
     <img src="src/img/logo/europe-sengage.jpg" alt="Logo strasbourg" />\
     <img src="src/img/logo/logo-ue.jpg" alt="Logo strasbourg" />\
     <span style="color: #BEC8D1;font-size:small;"> Icons created by : <a style="color: #BEC8D1;font-size:small;" href="https://icons8.com" target="_blank" > https://icons8.com </span>';
+
+    /*var navigationHelpButton = new Cesium.NavigationHelpButton({
+    container : 'cesiumContainer'
+    });*/
 
     // variable qui stocke les évenements liés à la souris
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
@@ -56,7 +60,6 @@ class Globe {
     this.coupeY = document.querySelector('#Y');
     this.coupeZ = document.querySelector('#hauteurcoupe');
 
-
     /*var elevation = new Cesium.WebMapServiceImageryProvider({
     url : 'http://wxs.ign.fr/pvwmk1wgxoei8orp7rd1re78/geoportail/r/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap',
     layer : 'ELEVATION.ELEVATIONGRIDCOVERAGE',
@@ -65,9 +68,6 @@ class Globe {
   }
 });
 this.viewer.imageryLayers.addImageryProvider(elevation);*/
-
-//var test = this.getFiles();
-var files = this.getServer('http://127.1.0.0:8000/json/');
 
 }
 
@@ -278,7 +278,6 @@ loadGeoJson(link, name, symbol, couleur, options = {}){
 showLoader(){
   document.querySelector('#loadingIndicator').classList.remove('hidden');
 }
-
 hideLoader(){
   document.querySelector('#loadingIndicator').classList.add('hidden');
 }
@@ -325,7 +324,7 @@ showCoords(show){
 }
 
 // ajouter le plan de coupe horizontal
-addClippingPlanes(orientation1, orientation2, X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, planeEntities, clippingPlanes) {
+addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, planeEntities, clippingPlanes) {
 
     var clippingPlanes = new Cesium.ClippingPlaneCollection({
       planes : [
@@ -358,7 +357,7 @@ addClippingPlanes(orientation1, orientation2, X, Y, hauteurCoupe, longueurCoupe,
 }
 
 // Récupérer les coordonnées au clic et les afficher dans le formulaire du plan de coupe horizontal
-coordCoupe(element1, element2, element3){
+coordCoupe(){
 
   let scene = this.viewer.scene;
   this.handler.globe = this;
@@ -372,9 +371,9 @@ coordCoupe(element1, element2, element3){
       let height = cartographic.height.toFixed(3);
 
       var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
-      document.getElementById(element1).value = (coords[0].toFixed(4));
-      document.getElementById(element2).value = (coords[1].toFixed(4));
-      document.getElementById(element3).value = ((Number(height) - Number(globe.raf09.getGeoide(latitude, longitude))).toFixed(3));
+      document.getElementById("X").value = (coords[0].toFixed(4));
+      document.getElementById("Y").value = (coords[1].toFixed(4));
+      document.getElementById("hauteurcoupe").value = ((Number(height) - Number(globe.raf09.getGeoide(latitude, longitude))).toFixed(3));
     }
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
@@ -445,7 +444,7 @@ planeUpdate(plane, couleurCoupe) {
 }
 
 //outils dessin
-createPoint(worldPosition, largeur) {
+createPoint(worldPosition) {
   var point = this.viewer.entities.add({
     position : worldPosition,
     point : {
@@ -906,53 +905,6 @@ handleBatimentClick(enabled, tileset){
     }
   }
 }
-
-getFiles() {
-
-  $.get('http://127.1.0.0:8000/json/', (data) =>
-    {
-        console.log(typeof data);
-        let listing = parseDirectoryListing(data);
-        console.log(listing);
-        console.log(typeof listing);
-        $('body').append(JSON.stringify(listing));
-    });
-
-    function parseDirectoryListing(text)
-    {
-        let docs = text
-                     .match(/href="([\w]+)/g) // pull out the hrefs
-                     .map((x) => x.replace('href="', '')); // clean up
-        console.log(docs);
-        console.log(typeof docs);
-
-        return docs;
-    }
-
-}
-
-getServer(filePath) {
-  var name;
-  var symbol;
-  var couleur = '#FFFFFF';
-  var result = null;
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.open("GET", filePath, false);
-  xmlhttp.send();
-  if (xmlhttp.status==200) {
-    result = xmlhttp.response;
-  }
-
-  console.log(result);
-  return result;
-
-  /*var test = $.getJSON(filePath);
-  console.log(test);
-  console.log(typeof test);
-  this.loadGeoJson(test, name, symbol, couleur);*/
-
-}
-
 
 
 }
