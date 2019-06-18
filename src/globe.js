@@ -23,6 +23,8 @@ class Globe {
       this.raf09 = raf090;
     });
 
+    // Créer la liste des dataSource sous forme d'un object clé / valeur
+    // Avec le nom de la source comme clé et la dataSource comme valeur
     this.dataSources = [];
 
     // insère les logos en bas
@@ -207,7 +209,7 @@ addPhotomaillage(tileset) {
 // permet de charger des 3DTiles en gardant une structure asynchrone (voir fonction show dans la classe UI)
 load3DTiles(link, options = {}){
   // Chargement du photo maillage au format 3D tiles
-  let tileset = this.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+  let tileset = globe.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
     url : link, // URL vers le ficher JSON "racine"
     maximumScreenSpaceError : 1,
     maximumNumberOfLoadedTiles : 1000 // Nombre maximum de dalle chargées simultanément
@@ -280,6 +282,45 @@ showLoader(){
 }
 hideLoader(){
   document.querySelector('#loadingIndicator').classList.add('hidden');
+}
+
+/*
+* Afficher ou masquer la source de données "name" en fonction de la valeur de "show"
+* Si elle n'a pas enore été affiché, la fonction va télécharger les données avec le lien "link" passé en parametre
+* Elle utilise la fonction "loader" passé en paramètre pour télécharger les données et les ajouter au globe
+* "Options" est un paramètre optionel (un objet) qui sera passé en deuxième paramètre de la fonction "loader"
+marche pour les 3DTiles et KML
+*/
+showJson(show, name, link, symbol, couleur, options = {}){
+  if(show){
+    if(this.dataSources[name] === undefined){
+      globe.loadGeoJson(link, name, symbol, couleur, options);
+    } else{
+      this.dataSources[name].show = true;
+    }
+  } else{
+    if(this.dataSources[name] !== undefined){
+      this.dataSources[name].show = false;
+    }
+  }
+}
+
+show3DTiles(name, link, loader, show, options = {}){
+  if(show){
+    if(this.dataSources[name] === undefined){
+      globe.showLoader();
+      loader(link, options).then((data) => {
+        this.dataSources[name] = data;
+        globe.hideLoader();
+      });
+    } else{
+      this.dataSources[name].show = true;
+    }
+  } else{
+    if(this.dataSources[name] !== undefined){
+      this.dataSources[name].show = false;
+    }
+  }
 }
 
 // Fonction pour afficher les ombres

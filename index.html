@@ -153,11 +153,12 @@
 
     <div class="backdrop hidden" id="classifList">
       <h2>Représentation de la couche</h2>
-      <form>
+      <form id="classifForm">
         <p>Champ à classifier:<input id="classif" type="text" size="20" /> </p>
-        <p> Valeur <input id="valeurclassif" type="text" size="20" />
-            Couleur <input id="couleurclassif" type="text" size="20" value="#FFFFFF"/> </p>
       </form>
+      <button class="button" id="addclassif"><img src="src/img/icons8-plus.png"></button>
+      <span style="font-size:small;"> Ajouter classification </span>
+      <p><button id="ajouterclassif">Ajouter</button> </p>
     </div>
 
     <div class="backdrop hidden" id="configList">
@@ -191,6 +192,13 @@
 
       <button class="button" id="boutonfile"><img src="src/img/icons8-add-file-50.png"></button>
       <br/><br/><br/><br/>
+
+      <button class="panel-title">MES COUCHES
+        <i class="arrow"></i>
+      </button>
+      <div class="panel-content" id="mescouches">
+
+      </div>
 
       <button class="panel-title">PLU
         <i class="arrow"></i>

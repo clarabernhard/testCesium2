@@ -10,10 +10,7 @@ class Menu {
 
     this.viewer = Globe.viewer;
     this.handler = Globe.handler;
-    globe.showJson = this.showJson;
 
-    // Créer la liste des dataSource sous forme d'un object clé / valeur
-    // Avec le nom de la source comme clé et la dataSource comme valeur
     this.dataSources = globe.dataSources;
 
     // boutons de personnalisation
@@ -32,6 +29,7 @@ class Menu {
 
     // Créer un gestionnaire pour les légendes
     this.legendManager = new LegendManager(this.leftPane);
+    globe.legendManager = this.legendManager;
 
     // Formulaires
     this.distanceList = document.querySelector('#distanceList');
@@ -264,8 +262,9 @@ class Menu {
     });
 
     // ajout de couches
-    this.getFiles('http://127.1.0.0:8000/json/');
     this.classifList = document.querySelector('#classifList');
+    this.getJson('http://127.1.0.0:8000/json/');
+    this.get3DTiles('http://127.1.0.0:8000/3dtiles/');
 
     //globe.getOrientation();
 
@@ -541,7 +540,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('ER');
     }
 
-    this.showJson(e.target.checked, 'ER', 'data/geojson/empl_reserve.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'ER', 'data/geojson/empl_reserve.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'type_prescription',
       colors: colors,
@@ -564,7 +563,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('margeRecul');
     }
 
-    this.showJson(e.target.checked, 'margeRecul', 'data/geojson/marge_surf.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'margeRecul', 'data/geojson/marge_surf.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: colors,
@@ -584,7 +583,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('ensPaysager');
     }
 
-    this.showJson(e.target.checked, 'ens_paysager', 'data/geojson/ens_paysager.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'ens_paysager', 'data/geojson/ens_paysager.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: color,
@@ -604,7 +603,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('batimentsInteressant'); // Suppression de la légende qui a l'ID 'batiments'
     }
 
-    this.showJson(e.target.checked, 'bati_interessant', 'data/geojson/bati_interessant.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'bati_interessant', 'data/geojson/bati_interessant.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: colors,
@@ -624,7 +623,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('batimentsExceptionnel');
     }
 
-    this.showJson(e.target.checked, 'bati_exceptionnel', 'data/geojson/bati_exceptionnel.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'bati_exceptionnel', 'data/geojson/bati_exceptionnel.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: colors,
@@ -645,7 +644,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('continuite');
     }
 
-    this.showJson(e.target.checked, 'continuite_eco', 'data/geojson/cont_ecologique.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'continuite_eco', 'data/geojson/cont_ecologique.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: color,
@@ -664,7 +663,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('plante');
     }
 
-    this.showJson(e.target.checked, 'espaces_plantes', 'data/geojson/esp_plante.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'espaces_plantes', 'data/geojson/esp_plante.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: color,
@@ -683,7 +682,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('jardin');
     }
 
-    this.showJson(e.target.checked, 'jardin', 'data/geojson/jardin_surf.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'jardin', 'data/geojson/jardin_surf.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'name',
       colors: color,
@@ -702,7 +701,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('aligne');
     }
 
-    this.showJson(e.target.checked, 'alignement', 'data/geojson/alignement_surf.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'alignement', 'data/geojson/alignement_surf.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: color,
@@ -721,7 +720,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('arbre');
     }
 
-    this.showJson(e.target.checked, 'arbre', 'data/geojson/arbres.json', 'park2', '#007F24' , {
+    globe.showJson(e.target.checked, 'arbre', 'data/geojson/arbres.json', 'park2', '#007F24' , {
 
     });
 
@@ -740,7 +739,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('zh_averees');
     }
 
-    this.showJson(e.target.checked, 'zones_humides', 'data/geojson/zh_averees.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'zones_humides', 'data/geojson/zh_averees.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'name',
       colors: color,
@@ -759,7 +758,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('sol_pollue');
     }
 
-    this.showJson(e.target.checked, 'solpollue', 'data/geojson/sol_pollue.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'solpollue', 'data/geojson/sol_pollue.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: color,
@@ -778,7 +777,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('risquetechno');
     }
 
-    this.showJson(e.target.checked, 'risque_techno', 'data/geojson/risque_techno.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'risque_techno', 'data/geojson/risque_techno.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'sous_type',
       colors: color,
@@ -797,7 +796,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('arbreRem');
     }
 
-    this.showJson(e.target.checked, 'arbreRem', 'data/geojson/arbres_rem.json', 'park', '#0FA1AD' , {
+    globe.showJson(e.target.checked, 'arbreRem', 'data/geojson/arbres_rem.json', 'park', '#0FA1AD' , {
 
     });
   });
@@ -813,7 +812,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('trame');
     }
 
-    this.showJson(e.target.checked, 'trame_verte_bleue', 'data/geojson/tvb.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'trame_verte_bleue', 'data/geojson/tvb.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'name',
       colors: color,
@@ -832,7 +831,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('trameReservoir');
     }
 
-    this.showJson(e.target.checked, 'trameReservoir', 'data/geojson/tvb_reservoir.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'trameReservoir', 'data/geojson/tvb_reservoir.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'name',
       colors: color,
@@ -852,7 +851,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('nappe');
     }
 
-    this.showJson(e.target.checked, 'nappe', 'data/geojson/ppri_nappe.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'nappe', 'data/geojson/ppri_nappe.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'classe',
       colors: color,
@@ -872,7 +871,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('remont');
     }
 
-    this.showJson(e.target.checked, 'remontee', 'data/geojson/ppri_innond_remontee.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'remontee', 'data/geojson/ppri_innond_remontee.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'nom',
       colors: colors,
@@ -898,7 +897,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('submersion');
     }
 
-    this.showJson(e.target.checked, 'submersion', 'data/geojson/ppri_innond_debord.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'submersion', 'data/geojson/ppri_innond_debord.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'nom',
       colors: colors,
@@ -917,7 +916,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('reservoirA');
     }
 
-    this.showJson(e.target.checked, 'tnu_reservoirA', 'data/geojson/tnu_reserv_arbore.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'tnu_reservoirA', 'data/geojson/tnu_reserv_arbore.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'name',
       colors: color,
@@ -936,7 +935,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('reservoirH');
     }
 
-    this.showJson(e.target.checked, 'tnu_reservoirH', 'data/geojson/tnu_reservoir_herbace.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'tnu_reservoirH', 'data/geojson/tnu_reservoir_herbace.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'name',
       colors: color,
@@ -955,7 +954,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('corridorH');
     }
 
-    this.showJson(e.target.checked, 'tnu_corridorH', 'data/geojson/tnu_corridor_herbace.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'tnu_corridorH', 'data/geojson/tnu_corridor_herbace.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'name',
       colors: color,
@@ -974,7 +973,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('corridorA');
     }
 
-    this.showJson(e.target.checked, 'tnu_corridorA', 'data/geojson/tnu_corridor_arbore.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'tnu_corridorA', 'data/geojson/tnu_corridor_arbore.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'name',
       colors: color,
@@ -995,7 +994,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('monuments_historiques');
     }
 
-    this.showJson(e.target.checked, 'monuments_historiques', 'data/geojson/monument_histo.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'monuments_historiques', 'data/geojson/monument_histo.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'type_entite',
       colors: colors,
@@ -1015,7 +1014,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('administratif');
     }
 
-    this.showJson(e.target.checked, 'administratif', 'data/geojson/batipublic_administratif.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'administratif', 'data/geojson/batipublic_administratif.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1035,7 +1034,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('religieux');
     }
 
-    this.showJson(e.target.checked, 'religieux', 'data/geojson/batipublic_religieux.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'religieux', 'data/geojson/batipublic_religieux.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1055,7 +1054,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('culturel');
     }
 
-    this.showJson(e.target.checked, 'culturel', 'data/geojson/batipublic_culturel.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'culturel', 'data/geojson/batipublic_culturel.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1075,7 +1074,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('social');
     }
 
-    this.showJson(e.target.checked, 'social', 'data/geojson/batipublic_social.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'social', 'data/geojson/batipublic_social.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1095,7 +1094,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('historique');
     }
 
-    this.showJson(e.target.checked, 'historique', 'data/geojson/batipublic_historique.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'historique', 'data/geojson/batipublic_historique.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1115,7 +1114,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('sante');
     }
 
-    this.showJson(e.target.checked, 'sante', 'data/geojson/batipublic_sante.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'sante', 'data/geojson/batipublic_sante.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1135,7 +1134,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('sportif');
     }
 
-    this.showJson(e.target.checked, 'sportif', 'data/geojson/batipublic_sportif.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'sportif', 'data/geojson/batipublic_sportif.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1155,7 +1154,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('enseignement');
     }
 
-    this.showJson(e.target.checked, 'enseignement', 'data/geojson/batipublic_enseignement.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'enseignement', 'data/geojson/batipublic_enseignement.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1178,7 +1177,7 @@ evenementsCouches(){
       this.legendManager.removeLegend('autre');
     }
 
-    this.showJson(e.target.checked, 'autre', 'data/geojson/batipublic_autre.json', '', '#FFFFFF' , {
+    globe.showJson(e.target.checked, 'autre', 'data/geojson/batipublic_autre.json', '', '#FFFFFF' , {
       classification: true,
       classificationField: 'categorie',
       colors: colors,
@@ -1191,7 +1190,7 @@ evenementsCouches(){
     if(e.target.checked == false){
       this.velumCouleurCheckbox.checked = false;
     }
-    this.show3DTiles('velum', 'data/Velum3D/tileset.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
+    globe.show3DTiles('velum', 'data/Velum3D/tileset.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
 
   });
 
@@ -1215,7 +1214,7 @@ evenementsCouches(){
   });
 
   this.danubeCheckbox.addEventListener('change', (e) => {
-    this.show3DTiles('danube', 'data/Danube/tileset.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
+    globe.show3DTiles('danube', 'data/Danube/tileset.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
 
   });
 
@@ -1224,45 +1223,6 @@ evenementsCouches(){
 // Ajouter une source de données a la liste en donnant son nom "name" et la datasource "value"
 addDataSource(name, value){
   this.dataSources[name] = value;
-}
-
-showJson(show, name, link, symbol, couleur, options = {}){
-  if(show){
-    if(this.dataSources[name] === undefined){
-      globe.loadGeoJson(link, name, symbol, couleur, options);
-    } else{
-      this.dataSources[name].show = true;
-    }
-  } else{
-    if(this.dataSources[name] !== undefined){
-      this.dataSources[name].show = false;
-    }
-  }
-}
-
-/*
-* Afficher ou masquer la source de données "name" en fonction de la valeur de "show"
-* Si elle n'a pas enore été affiché, la fonction va télécharger les données avec le lien "link" passé en parametre
-* Elle utilise la fonction "loader" passé en paramètre pour télécharger les données et les ajouter au globe
-* "Options" est un paramètre optionel (un objet) qui sera passé en deuxième paramètre de la fonction "loader"
-marche pour les 3DTiles et KML
-*/
-show3DTiles(name, link, loader, show, options = {}){
-  if(show){
-    if(this.dataSources[name] === undefined){
-      globe.showLoader();
-      loader(link, options).then((data) => {
-        this.dataSources[name] = data;
-        globe.hideLoader();
-      });
-    } else{
-      this.dataSources[name].show = true;
-    }
-  } else{
-    if(this.dataSources[name] !== undefined){
-      this.dataSources[name].show = false;
-    }
-  }
 }
 
 // Mise a jour de la timeline lorsque l'utilisateur choisit une date dans le calendrier
@@ -1310,65 +1270,184 @@ couleurVelum(show){
   });
 }
 
-getFiles(filePath) {
+getJson(filePath) {
   var result = [];
   var noms = [];
   var json = [];
+
+  var id = [];
+  var N = 100;
+  for (var i = 1; i <= N; i++) {
+    id.push(i);
+  }
+
+  var valeurClassif = [];
+  var couleurClassif = [];
+
   var symbol;
   var couleur = 'FFFFFF';
   var options;
-  var show = true;
 
   var xmlhttp = new XMLHttpRequest();
   this.xmlhttp = this;
 
-  xmlhttp.open("GET", filePath, false);
+  xmlhttp.open("GET", filePath, true);
   xmlhttp.onreadystatechange = function () {
-  if(xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+    if(xmlhttp.readyState === 4 && xmlhttp.status === 200) {
 
-    let html = xmlhttp.responseText;
-    result = $(html).find("li > a");
+      let html = xmlhttp.responseText;
+      result = $(html).find("li > a");
 
-    for(let i=0;i<result.length;i++) {
-      noms.push(result[i].innerText);
-      json.push($.getJSON(filePath + result[i].innerText));
+      for(let i=0;i<result.length;i++) {
+        noms.push(result[i].innerText);
+        json.push($.getJSON(filePath + result[i].innerText));
 
-      var couche = document.createElement("BUTTON");
-      couche.innerHTML = noms[i];
-      document.getElementById("fileList").appendChild(couche);
-      var espace = document.createElement("br");
-      document.getElementById("fileList").appendChild(espace);
-      couche.addEventListener('click', function() {
-        document.querySelector('#classifList').classList.toggle('hidden')
-      });
+        // créé les boutons qui récupère les infos du serveur
+        var couche = document.createElement("BUTTON");
+        couche.innerHTML = noms[i];
+        document.getElementById("fileList").appendChild(couche);
+        var espace = document.createElement("br");
+        document.getElementById("fileList").appendChild(espace);
 
-      var ajout = document.createElement("BUTTON");
-      document.getElementById("classifList").appendChild(ajout);
-      var space = document.createElement("br");
-      document.getElementById("classifList").appendChild(space);
-      ajout.addEventListener('click', function() {
-        var valeurClassif = $('#valeurclassif').val();
-        var couleurClassif = $('#couleurclassif').val();
-        var champ = $('#classif').val();
+        // Pour chaque bouton, créé une checkbox dans l'onglet "mes couches"
+        couche.addEventListener('click', (e) => {
+          document.querySelector('#fileList').classList.add('hidden');
+          document.querySelector('#classifList').classList.remove('hidden');
 
-        var colors = {
-          valeurClassif: couleurClassif.toString()
-        }
+          document.querySelector('#ajouterclassif').addEventListener('click', function() {
+            let divValClassif = document.createElement("input");
+            divValClassif.type = "text";
+            divValClassif.size = 20;
+            divValClassif.classList.add('valeurclassif');
 
-        globe.showJson(show, noms[i], json[i], symbol, couleur, options = {
-          classification: true,
-          classificationField: champ,
-          colors: colors,
-          alpha: 0.6
+            let divCouleurClassif = document.createElement("input");
+            divCouleurClassif.type = "text";
+            divCouleurClassif.size = 20;
+            divCouleurClassif.classList.add('couleurclassif');
+
+            document.getElementById("classifForm").appendChild(divValClassif);
+            document.getElementById("classifForm").appendChild(divCouleurClassif);
+
+          });
+
+          document.querySelector('#ajouterclassif').addEventListener('click', function() {
+            let item = document.createElement('div');
+            item.classList.add('nowrap');
+            let checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.name = noms[i];
+            checkbox.id = id[i];
+            let label = document.createElement('label');
+            label.htmlFor = id[i];
+            label.appendChild(document.createTextNode(noms[i]));
+            item.appendChild(checkbox);
+            item.appendChild(label);
+            document.getElementById("mescouches").appendChild(item);
+
+            var champ = $('#classif').val();
+            valeurClassif.push($('.valeurclassif').val());
+            couleurClassif.push($('.couleurclassif').val());
+
+            var colors = {
+              for(let j=0; j<valeurClassif.length; j++)) {
+                valeurClassif[j]: couleurClassif[j]
+              }
+            }
+
+            console.log(champ, valeurClassif, couleurClassif);
+            console.log(colors);
+
+            checkbox.addEventListener('change', (e) => {
+              if(!this.legendManager.hasLegend(noms[i])){
+                if(e.target.checked){
+                  globe.legendManager.addLegend(noms[i], colors, 'polygon');
+                }
+              } else{
+                globe.legendManager.removeLegend(noms[i]);
+              }
+
+              globe.showJson(e.target.checked, noms[i], json[i], symbol, couleur, options = {
+                classification: true,
+                classificationField: champ,
+                colors: colors,
+                alpha: 0.6
+              });
+            });
+
+            document.querySelector('#classifList').classList.add('hidden');
+
+          });
+
         });
-      });
+      }
     }
-  }
-};
+  };
 
   xmlhttp.send();
-
 }
+
+get3DTiles(filePath) {
+  var result = [];
+  var noms = [];
+  var json = [];
+  var id = [];
+  var N = 100;
+  for (var i = 1; i <= N; i++) {
+    id.push(i);
+  }
+
+  var xmlhttp = new XMLHttpRequest();
+  this.xmlhttp = this;
+
+  xmlhttp.open("GET", filePath, true);
+  xmlhttp.onreadystatechange = function () {
+    if(xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+
+      let html = xmlhttp.responseText;
+      result = $(html).find("li > a");
+
+      for(let i=0;i<result.length;i++) {
+        noms.push(result[i].innerText);
+        json.push($.getJSON(filePath + result[i].innerText + 'tileset.json'));
+
+        // créé les boutons qui récupère les infos du serveur
+        var couche = document.createElement("BUTTON");
+        couche.innerHTML = noms[i];
+        document.getElementById("fileList").appendChild(couche);
+        var espace = document.createElement("br");
+        document.getElementById("fileList").appendChild(espace);
+
+        // Pour chaque bouton, créé une checkbox dans l'onglet "mes couches"
+        couche.addEventListener('click', (e) => {
+          document.querySelector('#fileList').classList.add('hidden');
+
+          let item = document.createElement('div');
+          item.classList.add('nowrap');
+          let checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.name = noms[i];
+          checkbox.id = id[i];
+          let label = document.createElement('label');
+          label.htmlFor = id[i];
+          label.appendChild(document.createTextNode(noms[i]));
+          item.appendChild(checkbox);
+          item.appendChild(label);
+          document.getElementById("mescouches").appendChild(item);
+
+          checkbox.addEventListener('change', (e) => {
+            globe.show3DTiles('test', json[i], Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
+
+          });
+
+        });
+      }
+    }
+  };
+
+  xmlhttp.send();
+}
+
+
 
 
 }
