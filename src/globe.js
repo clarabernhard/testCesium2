@@ -8,15 +8,25 @@ class Globe {
     // Créer le globe dans la div HTML qui a l'id cesiumContainer
     this.viewer = new Cesium.Viewer(elementId, {
       geocoder: geocoder,
-      //vrButton: true,
-      selectionIndicator: false
+      selectionIndicator: false,
+      skyBox : new Cesium.SkyBox({
+       sources : {
+         positiveX : 'src/img/Sky.jpg',
+         negativeX : 'src/img/Sky.jpg',
+         positiveY : 'src/img/Sky.jpg',
+         negativeY : 'src/img/Sky.jpg',
+         positiveZ : 'src/img/Sky.jpg',
+         negativeZ : 'src/img/Sky.jpg'
+       }
+     })
     });
 
     // Supprime le terrain par défaut sur le globe
     this.viewer.scene.imageryLayers.removeAll();
 
     // Définit la couleur de fond du globe étant donné qu'on a supprimé le terrain (ici du noir)
-    this.viewer.scene.globe.baseColor = Cesium.Color.BLACK;
+    this.viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#D6CCBF').withAlpha(0.4);
+
 
     this.raf09 = undefined;
     new Raf09('../Cesium/data/RAF09.mnt', (raf090) => {
@@ -208,7 +218,6 @@ addPhotomaillage(tileset) {
 
 // permet de charger des 3DTiles en gardant une structure asynchrone (voir fonction show dans la classe UI)
 load3DTiles(link, options = {}){
-  // Chargement du photo maillage au format 3D tiles
   let tileset = globe.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
     url : link, // URL vers le ficher JSON "racine"
     maximumScreenSpaceError : 1,
@@ -305,11 +314,11 @@ showJson(show, name, link, symbol, couleur, options = {}){
   }
 }
 
-show3DTiles(name, link, loader, show, options = {}){
+show3DTiles(show, name, link, options = {}){
   if(show){
     if(this.dataSources[name] === undefined){
       globe.showLoader();
-      loader(link, options).then((data) => {
+      globe.load3DTiles(link, options).then((data) => {
         this.dataSources[name] = data;
         globe.hideLoader();
       });

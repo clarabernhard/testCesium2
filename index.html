@@ -43,6 +43,7 @@
 
     <div class="backdrop hidden" id="pointList">
       <h2>Ajout de point</h2>
+      <button id="envoyerpoint">Ajouter</button>
       <button id="annulerpoint">Annuler</button>
       <button id="supprimerpoint">Supprimer</button>
       <p>Cliquez sur le photomaillage pour commencer à dessiner</p>
@@ -154,7 +155,7 @@
     <div class="backdrop hidden" id="classifList">
       <h2>Représentation de la couche</h2>
       <form id="classifForm">
-        <p>Champ à classifier:<input id="classif" type="text" size="20" /> </p>
+        <p>Champ à classifier:<input id="classif" type="text" size="10" /> </p>
       </form>
       <button class="button" id="addclassif"><img src="src/img/icons8-plus.png"></button>
       <span style="font-size:small;"> Ajouter classification </span>
@@ -444,6 +445,10 @@
     <button class="button" id="boutonconstruction"><img src="src/img/icons8-edit.png"></button>
     <div class="aide" id="annotationD"> Outils de dessin </div>
     <div class="menuClic-content" id="construction-content">
+
+      <a class="button" id="exportDessin"><img src="src/img/icons8-téléchargements.png"></a>
+      <span style="font-size:small;"> Exporter les dessins </span>
+
       <div class="nowrap">
         <input id="cpoint" type="checkbox"/>
         <label for="cpoint">Dessin point</label>

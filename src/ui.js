@@ -119,7 +119,7 @@ class Menu {
     this.decoupeCheckbox = document.querySelector('#decoupe');
     // ombres
     this.shadowCheckbox = document.querySelector('#shadows');
-          // Créer le datepicker
+    // Créer le datepicker
     this.datepicker = $("#date")
     this.datepicker.datepicker();
     this.datepicker.datepicker("option", "dateFormat", "dd/mm/yy");
@@ -159,6 +159,18 @@ class Menu {
     var box = [];
 
     //Evenements pour les boutons des formulaires
+
+    document.querySelector("#envoyerpoint").addEventListener('click', (e) => {
+      var choice = 'point';
+      var choice2 = 'construction';
+      var transparence;
+      var couleur;
+      var largeur;
+      var hauteurVol;
+
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
+    });
+
     document.querySelector("#envoyerligne").addEventListener('click', (e) => {
       var choice = 'line';
       var choice2 = 'construction';
@@ -228,6 +240,28 @@ class Menu {
     globe.annulCoupe(planeEntities, clippingPlanes);
     globe.supprCoupe(planeEntities, clippingPlanes);
 
+    //export
+    document.querySelector("#exportDessin").addEventListener('click', (e) => {
+      /*var element = document.querySelector('#exportDessin');
+      element.setAttribute('href', 'data:json,' + encodeURIComponent(line));
+      element.setAttribute('download', 'drawing.json');*/
+
+      console.log(line[0].polyline.positions._value); // .x .y .z
+      console.log(line[0].polyline.width._value);
+      console.log(line[0].polyline.material.color._value);
+
+      console.log(surface[0].polygon.hierarchy._value); // positions des sommets
+      console.log(surface[0].polygon.material.color._value); //.alpha .blue .green .red
+
+      console.log(volume[0].polygon.hierarchy._value);
+      console.log(volume[0].polygon.material.color._value);
+      console.log(volume[0].polygon.extrudedHeight._value);
+
+      console.log(billboard[0].position._value);
+      console.log(billboard[0].billboard.image._value);
+
+    });
+
     // decoupe
     this.viewModel = {
       affich : true,
@@ -267,6 +301,11 @@ class Menu {
     this.get3DTiles('http://127.1.0.0:8000/3dtiles/');
 
     //globe.getOrientation();
+
+    var jsonGlob = {};
+    var type = "Type";
+    var featureCollec = "FeatureCollection"
+    var feature;
 
   }
 
@@ -337,7 +376,7 @@ evenementsCouches(){
   });
 
   this.photoMaillageCheckbox.addEventListener('change', (e) => {
-    this.show('photoMaillage', 'data/Photomaillage/Cesium_1.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
+    globe.show3DTiles(e.target.checked, 'photoMaillage', 'data/Photomaillage/Cesium_1.json');
   });
 
   this.shadowCheckbox.addEventListener('change', function(e){
@@ -403,24 +442,8 @@ evenementsCouches(){
   });
 
   this.cpointCheckbox.addEventListener('change', (e) => {
-    var choice = 'point';
-    var choice2 = 'construction';
-    var transparence;
-    var couleur;
-    var largeur;
-    var hauteurVol;
-    var point = [];
-    var dline;
-    var dline2;
-    var surface;
-    var billboard = [];
-    var line;
-    var volume;
-    var dsurface;
-
     if(e.target.checked){
       this.pointList.classList.remove('hidden');
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
     } else{
       this.pointList.classList.add('hidden');
       globe.supprSouris();
@@ -1190,7 +1213,7 @@ evenementsCouches(){
     if(e.target.checked == false){
       this.velumCouleurCheckbox.checked = false;
     }
-    globe.show3DTiles('velum', 'data/Velum3D/tileset.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
+    globe.show3DTiles(e.target.checked, 'velum', 'data/Velum3D/tileset.json');
 
   });
 
@@ -1214,7 +1237,7 @@ evenementsCouches(){
   });
 
   this.danubeCheckbox.addEventListener('change', (e) => {
-    globe.show3DTiles('danube', 'data/Danube/tileset.json', Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
+    globe.show3DTiles(e.target.checked, 'danube', 'data/Danube/tileset.json');
 
   });
 
@@ -1288,6 +1311,8 @@ getJson(filePath) {
   var couleur = 'FFFFFF';
   var options;
 
+  var divClone = $("#classifList").clone(); // on garde en mémoire l'état d'origine pour le remettre une fois une couche ajoutée
+
   var xmlhttp = new XMLHttpRequest();
   this.xmlhttp = this;
 
@@ -1300,7 +1325,7 @@ getJson(filePath) {
 
       for(let i=0;i<result.length;i++) {
         noms.push(result[i].innerText);
-        json.push($.getJSON(filePath + result[i].innerText));
+        json.push(filePath + result[i].innerText);
 
         // créé les boutons qui récupère les infos du serveur
         var couche = document.createElement("BUTTON");
@@ -1314,19 +1339,30 @@ getJson(filePath) {
           document.querySelector('#fileList').classList.add('hidden');
           document.querySelector('#classifList').classList.remove('hidden');
 
-          document.querySelector('#ajouterclassif').addEventListener('click', function() {
+          document.querySelector('#addclassif').addEventListener('click', function() {
             let divValClassif = document.createElement("input");
             divValClassif.type = "text";
-            divValClassif.size = 20;
+            divValClassif.size = 10;
             divValClassif.classList.add('valeurclassif');
+            let valText = document.createElement('span');
+            valText.innerHTML = 'Valeur : ';
 
             let divCouleurClassif = document.createElement("input");
             divCouleurClassif.type = "text";
-            divCouleurClassif.size = 20;
+            divCouleurClassif.size = 10;
+            divCouleurClassif.value = '#FFFFFF';
             divCouleurClassif.classList.add('couleurclassif');
+            let coulText = document.createElement('span');
+            coulText.innerHTML = 'Couleur : ';
 
+            var espace2 = document.createElement("br");
+            var espace3 = document.createElement("br");
+            document.getElementById("classifForm").appendChild(valText);
             document.getElementById("classifForm").appendChild(divValClassif);
+            document.getElementById("classifForm").appendChild(espace2);
+            document.getElementById("classifForm").appendChild(coulText);
             document.getElementById("classifForm").appendChild(divCouleurClassif);
+            document.getElementById("classifForm").appendChild(espace3);
 
           });
 
@@ -1337,6 +1373,7 @@ getJson(filePath) {
             checkbox.type = "checkbox";
             checkbox.name = noms[i];
             checkbox.id = id[i];
+
             let label = document.createElement('label');
             label.htmlFor = id[i];
             label.appendChild(document.createTextNode(noms[i]));
@@ -1345,26 +1382,26 @@ getJson(filePath) {
             document.getElementById("mescouches").appendChild(item);
 
             var champ = $('#classif').val();
-            valeurClassif.push($('.valeurclassif').val());
-            couleurClassif.push($('.couleurclassif').val());
+            valeurClassif = $('.valeurclassif').map(function() {
+              return $(this).val();
+            }).get();
+            couleurClassif = $('.couleurclassif').map(function() {
+              return $(this).val();
+            }).get();
 
-            var colors = {
-              for(let j=0; j<valeurClassif.length; j++)) {
-                valeurClassif[j]: couleurClassif[j]
-              }
+            var colors = new Map();
+            for(let j=0; j<valeurClassif.length; j++) {
+              colors[valeurClassif[j]] = couleurClassif[j];
             }
-
-            console.log(champ, valeurClassif, couleurClassif);
-            console.log(colors);
+            document.querySelector('#classifList').classList.add('hidden');
+            $("#classifList").replaceWith(divClone);
 
             checkbox.addEventListener('change', (e) => {
-              if(!this.legendManager.hasLegend(noms[i])){
-                if(e.target.checked){
-                  globe.legendManager.addLegend(noms[i], colors, 'polygon');
-                }
+              /*if(e.target.checked){
+                globe.legendManager.addLegend(noms[i], colors, 'polygon');
               } else{
                 globe.legendManager.removeLegend(noms[i]);
-              }
+              }*/
 
               globe.showJson(e.target.checked, noms[i], json[i], symbol, couleur, options = {
                 classification: true,
@@ -1373,11 +1410,7 @@ getJson(filePath) {
                 alpha: 0.6
               });
             });
-
-            document.querySelector('#classifList').classList.add('hidden');
-
           });
-
         });
       }
     }
@@ -1408,13 +1441,13 @@ get3DTiles(filePath) {
 
       for(let i=0;i<result.length;i++) {
         noms.push(result[i].innerText);
-        json.push($.getJSON(filePath + result[i].innerText + 'tileset.json'));
+        json.push(filePath + result[i].innerText + 'tileset.json');
 
         // créé les boutons qui récupère les infos du serveur
         var couche = document.createElement("BUTTON");
         couche.innerHTML = noms[i];
         document.getElementById("fileList").appendChild(couche);
-        var espace = document.createElement("br");
+        let espace = document.createElement("br");
         document.getElementById("fileList").appendChild(espace);
 
         // Pour chaque bouton, créé une checkbox dans l'onglet "mes couches"
@@ -1435,8 +1468,7 @@ get3DTiles(filePath) {
           document.getElementById("mescouches").appendChild(item);
 
           checkbox.addEventListener('change', (e) => {
-            globe.show3DTiles('test', json[i], Globe.prototype.load3DTiles.bind(this.globe), e.target.checked);
-
+            globe.show3DTiles(e.target.checked, 'test', json[i]);
           });
 
         });
