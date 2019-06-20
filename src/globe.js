@@ -506,11 +506,11 @@ createPoint(worldPosition) {
   return point;
 }
 
-createBillboard(worldPosition) {
+createBillboard(worldPosition, image) {
   var symbol = this.viewer.entities.add({
     position : worldPosition,
     billboard : {
-      image : 'src/img/interface.png',
+      image : image,
       heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
       verticalOrigin: Cesium.VerticalOrigin.BOTTOM
     }
@@ -578,9 +578,9 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
           largeur = parseFloat(largeur);
           transparence = parseFloat(transparence);
           if(choice === 'point') {
-            floatingPoint = globe.createBillboard(earthPosition);
+            floatingPoint = globe.createBillboard(earthPosition, 'src/img/interface.png');
             activeShape = globe.createPoint(dynamicPositions);
-            activeShape = globe.createBillboard(dynamicPositions);
+            activeShape = globe.createBillboard(dynamicPositions, 'src/img/interface.png');
           } else if(choice === 'polygon') {
             activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence);
           } else if(choice === 'volume') {
@@ -600,7 +600,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
           activeShapePoints.push(earthPosition);
           if(choice === 'point'){
             point.push(globe.createPoint(earthPosition));
-            billboard.push(globe.createBillboard(earthPosition));
+            billboard.push(globe.createBillboard(earthPosition, 'src/img/interface.png'));
           } else {
             point.push(globe.createPoint(earthPosition));
           }
@@ -635,7 +635,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
       if(choice2 === 'construction'){
         if(choice === 'point') {
           point.push(globe.createPoint(activeShapePoints));
-          billboard.push(globe.createBillboard(activeShapePoints));
+          billboard.push(globe.createBillboard(activeShapePoints, 'src/img/interface.png'));
         } else if(choice === 'line') {
           line.push(globe.drawLine(activeShapePoints, largeur, couleur, transparence, true));
         } else if( choice === 'polygon') {

@@ -144,6 +144,11 @@ class Menu {
     this.menuClic("#boutoncoupe", this.coupeContent);
     this.menuClic("#boutontime", this.timeContent);
     this.menuClic("#boutoncamera", this.cameraContent);
+    /*this.windowClic("#boutonmesures", this.mesuresContent);
+    this.windowClic("#boutonconstruction", this.constructionContent);
+    this.windowClic("#boutoncoupe", this.coupeContent);
+    this.windowClic("#boutontime", this.timeContent);
+    this.windowClic("#boutoncamera", this.cameraContent);*/
 
     //Variables pour les formulaires
     var point = [];
@@ -339,15 +344,20 @@ class Menu {
     }
   }
 
-  menuClic(bouton, element) {
+  menuClic(bouton, element, img) {
     document.querySelector(bouton).addEventListener('click', (e) => {
-      /*if (!e.target.matches(bouton)) {
+      element.classList.toggle('show');
+    });
+  }
+
+windowClic(bouton, element) {
+  window.addEventListener('click', (e) => {
+    if (!event.target.matches(bouton)) {
       if (element.classList.contains('show')) {
-      element.classList.remove('show');
+        element.classList.remove('show');
+      }
     }
-  }*/
-  element.classList.toggle('show');
-});
+  });
 }
 
 // enregistre toutes les actions sur les boutons (menus de gauche + boite à outils)
