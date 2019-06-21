@@ -25,7 +25,7 @@ class Globe {
     this.viewer.scene.imageryLayers.removeAll();
 
     // Définit la couleur de fond du globe étant donné qu'on a supprimé le terrain (ici du noir)
-    this.viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#D6CCBF').withAlpha(0.4);
+    this.viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#AB9B8B').withAlpha(0.4);
 
 
     this.raf09 = undefined;
@@ -95,19 +95,39 @@ setHome(tileset){
 
   // si l'URL ne contient pas de paramètres, on zoome sur la cathédrale
   if(X === undefined || Y === undefined || Z === undefined || heading === undefined || pitch === undefined || roll === undefined) {
-    let position = new Cesium.Cartesian3(4189340.8219407, 570098.5779245, 4760076.919231)
-    this.fly(position, 0.3779, -0.6882, 0);
+    let position = new Cesium.Cartesian3(4189340.8219407, 570098.5779245, 4760076.919231);
+    this.viewer.camera.setView({
+      destination : position,
+      orientation: {
+        heading : 0.3779,
+        pitch : -0.6882,
+        roll : 0
+      }
+    });
   } else {
     // sinon on lit les paramètres présents dans l'URL
     let position = new Cesium.Cartesian3(X,Y,Z);
-    this.fly(position, heading, pitch, roll);
+    this.viewer.camera.setView({
+      destination : position,
+      orientation: {
+        heading : heading,
+        pitch : pitch,
+        roll : roll
+      }
+    });
   }
 
-  // Définir ce qu'il se passe lorsqu'on clique sur le bouton "maison" (ici retour à la cathédrale)
+  // Définir ce qu'il se passe lorsqu'on clique sur le bouton "maison" (ici retour à l'écran d'accueil
   this.viewer.homeButton.viewModel.command.beforeExecute.addEventListener((e) => {
     e.cancel = true;
-    let position = new Cesium.Cartesian3(4189340.8219407, 570098.5779245, 4760076.919231)
-    this.fly(position, 0.3779, -0.6882, 0);
+    if(X === undefined || Y === undefined || Z === undefined || heading === undefined || pitch === undefined || roll === undefined) {
+      let position = new Cesium.Cartesian3(4189340.8219407, 570098.5779245, 4760076.919231)
+      this.fly(position, 0.3779, -0.6882, 0);
+
+    } else {
+      let position = new Cesium.Cartesian3(X,Y,Z);
+      this.fly(position, heading, pitch, roll);
+    }
   });
 }
 
@@ -165,7 +185,7 @@ getOrientation() {
 // Fonction pour définir le point de vue de caméra en fonction de la position (Cartesian3)
 // et des 3 paramètres d'orientation de la caméra
 fly(position, lacet, tangage, roulis) {
-  this.viewer.camera.setView({
+  this.viewer.camera.flyTo({
     destination : position,
     orientation: {
       heading : lacet,
@@ -236,11 +256,12 @@ loadKml(link, options = {clampToGround : true}){
   return promisse;
 }
 
-loadGeoJson(link, name, symbol, couleur, options = {}){
+loadGeoJson(link, name, symbol, couleur, image, choice, options = {}){
+  var billboard = globe.viewer.scene.primitives.add(new Cesium.BillboardCollection());
   let promisse = Cesium.GeoJsonDataSource.load(link, {
     clampToGround: true,
-    markerSymbol: symbol,
-    markerColor: Cesium.Color.fromCssColorString(couleur)
+    markerSymbol: symbol, // pour l'affichage en symbole maki https://cesiumjs.org/Cesium/Build/Apps/Sandcastle/index.html?src=GeoJSON%20simplestyle.html&label=All
+    markerColor: couleur
   });
   this.viewer.scene.globe.depthTestAgainstTerrain = true;
   this.viewer.scene.logarithmicDepthBuffer = false;
@@ -250,7 +271,6 @@ loadGeoJson(link, name, symbol, couleur, options = {}){
     this.viewer.dataSources.add(dataSource);
     this.dataSources[name] = dataSource;
     this.hideLoader();
-
 
     if(options.classification && options.classificationField !== undefined){
       // Get the array of entities
@@ -280,6 +300,21 @@ loadGeoJson(link, name, symbol, couleur, options = {}){
         }
       }
     }
+    if(choice === 'point') {
+      for(let i=0;i<this.dataSources[name]._entityCollection._entities._array.length;i++) {
+        var X = (this.dataSources[name]._entityCollection._entities._array[i]._position._value.x);
+        var Y = (this.dataSources[name]._entityCollection._entities._array[i]._position._value.y);
+        var Z = (this.dataSources[name]._entityCollection._entities._array[i]._position._value.z);
+        var position = new Cesium.Cartesian3(X,Y,Z);
+        billboard.add({
+          position: position,
+          image : image,
+          heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
+          verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+          sizeInMeters: true
+        });
+      }
+    }
   });
 
   return promisse;
@@ -300,10 +335,10 @@ hideLoader(){
 * "Options" est un paramètre optionel (un objet) qui sera passé en deuxième paramètre de la fonction "loader"
 marche pour les 3DTiles et KML
 */
-showJson(show, name, link, symbol, couleur, options = {}){
+showJson(show, name, link, symbol, couleur, image, choice, options = {}){
   if(show){
     if(this.dataSources[name] === undefined){
-      globe.loadGeoJson(link, name, symbol, couleur, options);
+      globe.loadGeoJson(link, name, symbol, couleur, image, choice, options);
     } else{
       this.dataSources[name].show = true;
     }
@@ -510,7 +545,7 @@ createBillboard(worldPosition, image) {
   var symbol = this.viewer.entities.add({
     position : worldPosition,
     billboard : {
-      image : image,
+      image : 'src/img/interface.png',
       heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
       verticalOrigin: Cesium.VerticalOrigin.BOTTOM
     }
@@ -554,6 +589,8 @@ drawVolume(positionData, couleur, transparence, hauteurVol) {
   return shape;
 }
 
+// on met tous les tableaux d'entités en paramètres de la fonction car ils seront définis dans la classe ui
+// pour garder une trace des entités et permettre leur annulation/exportation
 updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface) {
   var activeShapePoints = [];
   var activeShape;
@@ -578,9 +615,9 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
           largeur = parseFloat(largeur);
           transparence = parseFloat(transparence);
           if(choice === 'point') {
-            floatingPoint = globe.createBillboard(earthPosition, 'src/img/interface.png');
+            floatingPoint = globe.createBillboard(earthPosition);
             activeShape = globe.createPoint(dynamicPositions);
-            activeShape = globe.createBillboard(dynamicPositions, 'src/img/interface.png');
+            activeShape = globe.createBillboard(dynamicPositions);
           } else if(choice === 'polygon') {
             activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence);
           } else if(choice === 'volume') {
@@ -600,7 +637,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
           activeShapePoints.push(earthPosition);
           if(choice === 'point'){
             point.push(globe.createPoint(earthPosition));
-            billboard.push(globe.createBillboard(earthPosition, 'src/img/interface.png'));
+            billboard.push(globe.createBillboard(earthPosition));
           } else {
             point.push(globe.createPoint(earthPosition));
           }
@@ -635,7 +672,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
       if(choice2 === 'construction'){
         if(choice === 'point') {
           point.push(globe.createPoint(activeShapePoints));
-          billboard.push(globe.createBillboard(activeShapePoints, 'src/img/interface.png'));
+          billboard.push(globe.createBillboard(activeShapePoints));
         } else if(choice === 'line') {
           line.push(globe.drawLine(activeShapePoints, largeur, couleur, transparence, true));
         } else if( choice === 'polygon') {
@@ -665,6 +702,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
       activeShapePoints = [];
     });
 
+    // on supprime les éléments des mesures lorsqu'on ferme l'onglet
     document.querySelector("#ligne").addEventListener('click', (e) => {
       activeShapePoints = [];
       for(var i = 0; i < dline.length; i++){
@@ -761,6 +799,7 @@ measureSurface(activeShapePoints) {
 
   if(coordsX.length > 2){
     for (let i=0; i < coordsX.length; i+=1) {
+      // le % est un modulo qui permet de faire une boucle des sommets (ie sommet n+1 = sommet 1)
       var a = (coordsX[(i+1) % coordsX.length] - coordsX[i]);
       var b = (coordsY[(i+1) % coordsX.length] + coordsY[i] - (2 * coordsY[0]));
       var c = ((Number(a) * Number(b))/2);
@@ -782,7 +821,7 @@ getHauteur(activeShapePoints, hauteurVol){
 }
 
 createHole(viewModel) {
-    var dig_point = [];
+  var dig_point = [];
   var hole_pts = [];
   var coordsX = [];
   var coordsY = [];
@@ -801,6 +840,7 @@ createHole(viewModel) {
     coordsX.push(coords[0]);
     coordsY.push(coords[1]);
 
+    // on ajoute visuellement des points pour la découpe qu'on supprime au clic droit
     points.add({
       position : earthPosition,
       color : Cesium.Color.WHITE
@@ -820,7 +860,7 @@ createHole(viewModel) {
       aire = (Number(aire) + Number(c)).toFixed(3);
     }
 
-    // si l'aire est négative (ie si l'utilistauer a dessiné sa figure dans le sens trigo)
+    // si l'aire est négative (ie si l'utilisateur a dessiné sa figure dans le sens trigo)
     // on inverse le tableau de points pour que la découpe marche
     if(aire > 0) {
       globe.holePlanes(viewModel, hole_pts);
