@@ -1404,6 +1404,7 @@ getJson(filePath) {
             document.getElementById("mescouches").appendChild(item);
 
             var champ = $('#classif').val();
+            var transparence = $('#classiftransparence').val();
             valeurClassif = $('.valeurclassif').map(function() {
               return $(this).val();
             }).get();
@@ -1425,11 +1426,11 @@ getJson(filePath) {
                 globe.legendManager.removeLegend(noms[i]);
               }*/
 
-              globe.showJson(e.target.checked, noms[i], json[i], symbol, couleur, options = {
+              globe.showJson(e.target.checked, noms[i], json[i], '', '#FFFFFF', '', '', options = {
                 classification: true,
                 classificationField: champ,
                 colors: colors,
-                alpha: 0.6
+                alpha: transparence
               });
             });
           });

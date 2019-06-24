@@ -9,6 +9,8 @@ class Globe {
     this.viewer = new Cesium.Viewer(elementId, {
       geocoder: geocoder,
       selectionIndicator: false,
+      requestRenderMode : true,
+      maximumRenderTimeChange : Infinity,
       skyBox : new Cesium.SkyBox({
        sources : {
          positiveX : 'src/img/Sky.jpg',
@@ -341,10 +343,12 @@ showJson(show, name, link, symbol, couleur, image, choice, options = {}){
       globe.loadGeoJson(link, name, symbol, couleur, image, choice, options);
     } else{
       this.dataSources[name].show = true;
+      this.viewer.scene.requestRender();
     }
   } else{
     if(this.dataSources[name] !== undefined){
       this.dataSources[name].show = false;
+      this.viewer.scene.requestRender();
     }
   }
 }
@@ -359,17 +363,28 @@ show3DTiles(show, name, link, options = {}){
       });
     } else{
       this.dataSources[name].show = true;
+      this.viewer.scene.requestRender();
     }
   } else{
     if(this.dataSources[name] !== undefined){
       this.dataSources[name].show = false;
+      this.viewer.scene.requestRender();
     }
   }
 }
 
 // Fonction pour afficher les ombres
 shadow(enabled){
+  this.handler.globe = this;
+
   this.viewer.shadows = enabled;
+  if(enabled) {
+    document.addEventListener("mousemove", function() {
+      globe.viewer.scene.requestRender();
+    });
+  } else {
+    this.supprSouris();
+  }
 }
 
 // récupérer lat/lon/hauteur à chaque clic gauche
@@ -413,7 +428,7 @@ addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe,
 
     var clippingPlanes = new Cesium.ClippingPlaneCollection({
       planes : [
-        new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, orientation1, orientation2), 0.0)
+        new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 0, -1), 0.0)
       ]
     });
 
@@ -520,6 +535,7 @@ planeUpdate(plane, couleurCoupe) {
       targetY += deltaY;
     }
     globe.altitude.innerHTML = targetY;
+    globe.viewer.scene.requestRender();
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
   return function () {
@@ -646,7 +662,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
       if(choice === 'polygon'&& choice2 === 'mesure') {
         globe.measureSurface(activeShapePoints);
       }
-
+      globe.viewer.scene.requestRender();
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
     this.handler.setInputAction(function(event) {
@@ -661,6 +677,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
       if(choice === 'line' && choice2 === 'mesure') {
         globe.measureDistance(activeShapePoints);
       }
+      globe.viewer.scene.requestRender();
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
     this.handler.setInputAction(function(event) {
@@ -696,6 +713,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
         // garder les activeShapePoints définis permet l'affichage des mesures
         activeShapePoints = [];
       }
+      globe.viewer.scene.requestRender();
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
     $('.nouv').click(function(e) {
@@ -705,16 +723,18 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
     // on supprime les éléments des mesures lorsqu'on ferme l'onglet
     document.querySelector("#ligne").addEventListener('click', (e) => {
       activeShapePoints = [];
-      for(var i = 0; i < dline.length; i++){
+      for(var i = 0; i < point.length; i++){
         this.viewer.entities.remove(dline[i]);
         this.viewer.entities.remove(dline2[i]);
       }
+      this.viewer.scene.requestRender();
     });
     document.querySelector("#surface").addEventListener('click', (e) => {
       activeShapePoints = [];
-      for(var i = 0; i < dsurface.length; i++){
+      for(var i = 0; i < point.length; i++){
         this.viewer.entities.remove(dsurface[i]);
       }
+      this.viewer.scene.requestRender();
     });
   }
 
@@ -722,6 +742,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
     document.querySelector(element).addEventListener('click', (e) => {
       var lastLine = figure.pop();
       this.viewer.entities.remove(lastLine);
+      this.viewer.scene.requestRender();
     });
   }
 
@@ -730,7 +751,9 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
       for(var i = 0; i < figure.length+1; i++){
         this.viewer.entities.remove(figure[i]);
       }
+      this.viewer.scene.requestRender();
     });
+
   }
 
 measureDistance(activeShapePoints)  {
@@ -847,7 +870,7 @@ createHole(viewModel) {
     });
 
     dig_point.push(new Cesium.Cartesian3.fromDegrees(longitudeString, latitudeString));
-
+    globe.viewer.scene.requestRender();
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
   this.handler.setInputAction(function(event) {
@@ -870,6 +893,7 @@ createHole(viewModel) {
     }
     points.removeAll();
     dig_point = [];
+    globe.viewer.scene.requestRender();
   }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
   Cesium.knockout.getObservable(viewModel, 'affich').subscribe(function(value) {
