@@ -181,11 +181,9 @@ class Menu {
       var choice = 'line';
       var choice2 = 'construction';
       var hauteurVol;
-      let showCouleur = document.querySelector("#showcouleurligne");
       var largeur = $('#largeur').val();
       var couleur = $('#couleur').val();
       var transparence = $('#transparence').val();
-      showCouleur.style.backgroundColor = couleur;
 
       globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
 
@@ -196,11 +194,9 @@ class Menu {
       var choice2 = 'construction';
       var hauteurVol;
       var largeur = 3;
-      let showCouleur = document.querySelector("#showcouleursurf");
 
       var couleur = $('#couleursurf').val();
       var transparence = $('#transparencesurf').val();
-      showCouleur.style.backgroundColor = couleur;
 
       globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
 
@@ -210,26 +206,22 @@ class Menu {
       var choice = 'volume';
       var choice2 = 'construction';
       var largeur = 3;
-      let showCouleur = document.querySelector("#showcouleurvol");
 
       var hauteurVol = $('#hauteurvol').val();
       var couleur = $('#couleurvol').val();
       var transparence = $('#transparencevol').val();
-      showCouleur.style.backgroundColor = couleur;
 
       globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
 
     });
 
     document.querySelector("#envoyercoupe").addEventListener('click', (e) => {
-      let showCouleur = document.querySelector("#showcouleurcoupe");
       var X = $('#X').val();
       var Y = $('#Y').val();
       var hauteur = $('#hauteurcoupe').val();
       var longueur = $('#longueurcoupe').val();
       var largeur = $('#largeurcoupe').val();
       var couleur = $('#couleurcoupe').val();
-      showCouleur.style.backgroundColor = couleur;
 
       globe.addClippingPlanes(X, Y, hauteur, longueur, largeur, couleur, planeEntities, clippingPlanes);
     });
@@ -303,8 +295,8 @@ class Menu {
 
     // ajout de couches
     this.classifList = document.querySelector('#classifList');
-    this.getJson('http://127.1.0.0:8000/json/');
-    this.get3DTiles('http://127.1.0.0:8000/3dtiles/');
+    this.getJson();
+    this.get3DTiles();
 
     //globe.getOrientation();
 
@@ -354,21 +346,21 @@ class Menu {
 
   }
 
-windowClic(bouton, element) {
-  /*window.addEventListener('click', (e) => {
+  windowClic(bouton, element) {
+    /*window.addEventListener('click', (e) => {
     if (!event.target.matches(bouton)) {
-      if (element.classList.contains('show')) {
-        element.classList.remove('show');
-      }
-    }
-  });*/
-  window.addEventListener('click', function(event){
-    var $trigger = $(bouton);
-    if($trigger !== event.target && !$trigger.has(event.target).length){
-      $(element).hide();
+    if (element.classList.contains('show')) {
+    element.classList.remove('show');
+  }
+}
+});*/
+window.addEventListener('click', function(event){
+  var $trigger = $(bouton);
+  if($trigger !== event.target && !$trigger.has(event.target).length){
+    $(element).hide();
 
-    }
-  });
+  }
+});
 
 }
 
@@ -377,6 +369,9 @@ evenementsCouches(){
 
   this.addFile.addEventListener('click', (e) => {
     this.fileList.classList.toggle('hidden');
+    if(localStorage.getItem("identifiant") != undefined) {
+      document.getElementById("idEMS").value = localStorage.getItem("identifiant");
+    }
   });
 
   //configuration
@@ -1333,116 +1328,124 @@ getJson(filePath) {
   var couleur = 'FFFFFF';
   var options;
 
-  var divClone = $("#classifList").clone(); // on garde en mémoire l'état d'origine pour le remettre une fois une couche ajoutée
+  document.querySelector('#affichercouche').addEventListener('click', function() {
+    document.querySelector('#affichercouche').classList.add('hidden');
+    localStorage.setItem('identifiant', $('#idEMS').val());
+    var identifiant = localStorage.getItem('identifiant');
 
-  var xmlhttp = new XMLHttpRequest();
-  this.xmlhttp = this;
 
-  xmlhttp.open("GET", filePath, true);
-  xmlhttp.onreadystatechange = function () {
-    if(xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+    var filePath = 'http://127.1.0.0:8000/' + identifiant + '/json/';
 
-      let html = xmlhttp.responseText;
-      result = $(html).find("li > a");
+    var divClone = $("#classifList").clone(); // on garde en mémoire l'état d'origine pour le remettre une fois une couche ajoutée
 
-      for(let i=0;i<result.length;i++) {
-        noms.push(result[i].innerText);
-        json.push(filePath + result[i].innerText);
+    var xmlhttp = new XMLHttpRequest();
+    this.xmlhttp = this;
 
-        // créé les boutons qui récupère les infos du serveur
-        var couche = document.createElement("BUTTON");
-        couche.innerHTML = noms[i];
-        document.getElementById("fileList").appendChild(couche);
-        var espace = document.createElement("br");
-        document.getElementById("fileList").appendChild(espace);
+    xmlhttp.open("GET", filePath, true);
+    xmlhttp.onreadystatechange = function () {
+      if(xmlhttp.readyState === 4 && xmlhttp.status === 200) {
 
-        // Pour chaque bouton, créé une checkbox dans l'onglet "mes couches"
-        couche.addEventListener('click', (e) => {
-          document.querySelector('#fileList').classList.add('hidden');
-          document.querySelector('#classifList').classList.remove('hidden');
+        let html = xmlhttp.responseText;
+        result = $(html).find("li > a");
 
-          document.querySelector('#addclassif').addEventListener('click', function() {
-            let divValClassif = document.createElement("input");
-            divValClassif.type = "text";
-            divValClassif.size = 10;
-            divValClassif.classList.add('valeurclassif');
-            let valText = document.createElement('span');
-            valText.innerHTML = 'Valeur : ';
+        for(let i=0;i<result.length;i++) {
+          noms.push(result[i].innerText);
+          json.push(filePath + result[i].innerText);
 
-            let divCouleurClassif = document.createElement("input");
-            divCouleurClassif.type = "text";
-            divCouleurClassif.size = 10;
-            divCouleurClassif.value = '#FFFFFF';
-            divCouleurClassif.classList.add('couleurclassif');
-            let coulText = document.createElement('span');
-            coulText.innerHTML = 'Couleur : ';
+          // créé les boutons qui récupère les infos du serveur
+          var couche = document.createElement("BUTTON");
+          couche.innerHTML = noms[i];
+          document.getElementById("fileList").appendChild(couche);
+          var espace = document.createElement("br");
+          document.getElementById("fileList").appendChild(espace);
 
-            var espace2 = document.createElement("br");
-            var espace3 = document.createElement("br");
-            document.getElementById("classifForm").appendChild(valText);
-            document.getElementById("classifForm").appendChild(divValClassif);
-            document.getElementById("classifForm").appendChild(espace2);
-            document.getElementById("classifForm").appendChild(coulText);
-            document.getElementById("classifForm").appendChild(divCouleurClassif);
-            document.getElementById("classifForm").appendChild(espace3);
+          // Pour chaque bouton, créé une checkbox dans l'onglet "mes couches"
+          couche.addEventListener('click', (e) => {
+            document.querySelector('#fileList').classList.add('hidden');
+            document.querySelector('#classifList').classList.remove('hidden');
 
-          });
+            document.querySelector('#addclassif').addEventListener('click', function() {
+              let divValClassif = document.createElement("input");
+              divValClassif.type = "text";
+              divValClassif.size = 10;
+              divValClassif.classList.add('valeurclassif');
+              let valText = document.createElement('span');
+              valText.innerHTML = 'Valeur : ';
 
-          document.querySelector('#ajouterclassif').addEventListener('click', function() {
-            let item = document.createElement('div');
-            item.classList.add('nowrap');
-            let checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.name = noms[i];
-            checkbox.id = id[i];
+              let divCouleurClassif = document.createElement("input");
+              divCouleurClassif.type = "color";
+              divCouleurClassif.value = '#FFFFFF';
+              divCouleurClassif.classList.add('couleurclassif');
+              let coulText = document.createElement('span');
+              coulText.innerHTML = 'Couleur : ';
 
-            let label = document.createElement('label');
-            label.htmlFor = id[i];
-            label.appendChild(document.createTextNode(noms[i]));
-            item.appendChild(checkbox);
-            item.appendChild(label);
-            document.getElementById("mescouches").appendChild(item);
+              var espace2 = document.createElement("br");
+              var espace3 = document.createElement("br");
+              document.getElementById("classifForm").appendChild(valText);
+              document.getElementById("classifForm").appendChild(divValClassif);
+              document.getElementById("classifForm").appendChild(espace2);
+              document.getElementById("classifForm").appendChild(coulText);
+              document.getElementById("classifForm").appendChild(divCouleurClassif);
+              document.getElementById("classifForm").appendChild(espace3);
 
-            var champ = $('#classif').val();
-            var transparence = $('#classiftransparence').val();
-            valeurClassif = $('.valeurclassif').map(function() {
-              return $(this).val();
-            }).get();
-            couleurClassif = $('.couleurclassif').map(function() {
-              return $(this).val();
-            }).get();
+            });
 
-            var colors = new Map();
-            for(let j=0; j<valeurClassif.length; j++) {
-              colors[valeurClassif[j]] = couleurClassif[j];
-            }
-            document.querySelector('#classifList').classList.add('hidden');
-            $("#classifList").replaceWith(divClone);
+            document.querySelector('#ajouterclassif').addEventListener('click', function() {
+              let item = document.createElement('div');
+              item.classList.add('nowrap');
+              let checkbox = document.createElement("input");
+              checkbox.type = "checkbox";
+              checkbox.name = noms[i];
+              checkbox.id = id[i];
 
-            checkbox.addEventListener('change', (e) => {
-              /*if(e.target.checked){
+              let label = document.createElement('label');
+              label.htmlFor = id[i];
+              label.appendChild(document.createTextNode(noms[i]));
+              item.appendChild(checkbox);
+              item.appendChild(label);
+              document.getElementById("mescouches").appendChild(item);
+
+              var champ = $('#classif').val();
+              var transparence = $('#classiftransparence').val();
+              valeurClassif = $('.valeurclassif').map(function() {
+                return $(this).val();
+              }).get();
+              couleurClassif = $('.couleurclassif').map(function() {
+                return $(this).val();
+              }).get();
+
+              var colors = new Map();
+              for(let j=0; j<valeurClassif.length; j++) {
+                colors[valeurClassif[j]] = couleurClassif[j];
+              }
+              document.querySelector('#classifList').classList.add('hidden');
+              $("#classifList").replaceWith(divClone);
+
+              checkbox.addEventListener('change', (e) => {
+                /*if(e.target.checked){
                 globe.legendManager.addLegend(noms[i], colors, 'polygon');
               } else{
-                globe.legendManager.removeLegend(noms[i]);
-              }*/
+              globe.legendManager.removeLegend(noms[i]);
+            }*/
 
-              globe.showJson(e.target.checked, noms[i], json[i], '', '#FFFFFF', '', '', options = {
-                classification: true,
-                classificationField: champ,
-                colors: colors,
-                alpha: transparence
-              });
+            globe.showJson(e.target.checked, noms[i], json[i], undefined, Cesium.Color.fromCssColorString('#05A197'), '', '', options = {
+              classification: true,
+              classificationField: champ,
+              colors: colors,
+              alpha: transparence
             });
           });
         });
-      }
+      });
     }
-  };
+  }
+};
 
-  xmlhttp.send();
+xmlhttp.send();
+});
 }
 
-get3DTiles(filePath) {
+get3DTiles() {
   var result = [];
   var noms = [];
   var json = [];
@@ -1452,54 +1455,62 @@ get3DTiles(filePath) {
     id.push(i);
   }
 
-  var xmlhttp = new XMLHttpRequest();
-  this.xmlhttp = this;
+  document.querySelector('#affichercouche').addEventListener('click', function() {
+    document.querySelector('#affichercouche').classList.add('hidden');
+    var identifiant = localStorage.getItem('identifiant');
 
-  xmlhttp.open("GET", filePath, true);
-  xmlhttp.onreadystatechange = function () {
-    if(xmlhttp.readyState === 4 && xmlhttp.status === 200) {
 
-      let html = xmlhttp.responseText;
-      result = $(html).find("li > a");
+    var filePath = 'http://127.1.0.0:8000/' + identifiant + '/3dtiles/';
 
-      for(let i=0;i<result.length;i++) {
-        noms.push(result[i].innerText);
-        json.push(filePath + result[i].innerText + 'tileset.json');
+    var xmlhttp = new XMLHttpRequest();
+    this.xmlhttp = this;
 
-        // créé les boutons qui récupère les infos du serveur
-        var couche = document.createElement("BUTTON");
-        couche.innerHTML = noms[i];
-        document.getElementById("fileList").appendChild(couche);
-        let espace = document.createElement("br");
-        document.getElementById("fileList").appendChild(espace);
+    xmlhttp.open("GET", filePath, true);
+    xmlhttp.onreadystatechange = function () {
+      if(xmlhttp.readyState === 4 && xmlhttp.status === 200) {
 
-        // Pour chaque bouton, créé une checkbox dans l'onglet "mes couches"
-        couche.addEventListener('click', (e) => {
-          document.querySelector('#fileList').classList.add('hidden');
+        let html = xmlhttp.responseText;
+        result = $(html).find("li > a");
 
-          let item = document.createElement('div');
-          item.classList.add('nowrap');
-          let checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.name = noms[i];
-          checkbox.id = id[i];
-          let label = document.createElement('label');
-          label.htmlFor = id[i];
-          label.appendChild(document.createTextNode(noms[i]));
-          item.appendChild(checkbox);
-          item.appendChild(label);
-          document.getElementById("mescouches").appendChild(item);
+        for(let i=0;i<result.length;i++) {
+          noms.push(result[i].innerText);
+          json.push(filePath + result[i].innerText + 'tileset.json');
 
-          checkbox.addEventListener('change', (e) => {
-            globe.show3DTiles(e.target.checked, 'test', json[i]);
+          // créé les boutons qui récupère les infos du serveur
+          var couche = document.createElement("BUTTON");
+          couche.innerHTML = noms[i];
+          document.getElementById("fileList").appendChild(couche);
+          let espace = document.createElement("br");
+          document.getElementById("fileList").appendChild(espace);
+
+          // Pour chaque bouton, créé une checkbox dans l'onglet "mes couches"
+          couche.addEventListener('click', (e) => {
+            document.querySelector('#fileList').classList.add('hidden');
+
+            let item = document.createElement('div');
+            item.classList.add('nowrap');
+            let checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.name = noms[i];
+            checkbox.id = id[i];
+            let label = document.createElement('label');
+            label.htmlFor = id[i];
+            label.appendChild(document.createTextNode(noms[i]));
+            item.appendChild(checkbox);
+            item.appendChild(label);
+            document.getElementById("mescouches").appendChild(item);
+
+            checkbox.addEventListener('change', (e) => {
+              globe.show3DTiles(e.target.checked, 'test', json[i]);
+            });
+
           });
-
-        });
+        }
       }
-    }
-  };
+    };
 
-  xmlhttp.send();
+    xmlhttp.send();
+  });
 }
 
 
