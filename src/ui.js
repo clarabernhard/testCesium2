@@ -366,7 +366,7 @@ window.addEventListener('click', function(event){
 
 // enregistre toutes les actions sur les boutons (menus de gauche + boite à outils)
 evenementsCouches(){
-
+  
   this.addFile.addEventListener('click', (e) => {
     this.fileList.classList.toggle('hidden');
     if(localStorage.getItem("identifiant") != undefined) {

@@ -24,10 +24,10 @@ class Globe {
     });
 
     // Supprime le terrain par défaut sur le globe
-    this.viewer.scene.imageryLayers.removeAll();
+    //this.viewer.scene.imageryLayers.removeAll();
 
     // Définit la couleur de fond du globe étant donné qu'on a supprimé le terrain (ici du noir)
-    this.viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#AB9B8B').withAlpha(0.4);
+    //this.viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#AB9B8B').withAlpha(0.4);
 
 
     this.raf09 = undefined;
@@ -82,6 +82,10 @@ class Globe {
   }
 });
 this.viewer.imageryLayers.addImageryProvider(elevation);*/
+
+this.viewer.navigationHelpButton.viewModel.command.beforeExecute.addEventListener('click', (e) => {
+  this.configList.classList.toggle('hidden');
+});
 
 }
 

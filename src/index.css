@@ -180,6 +180,7 @@ html, body {
    position: absolute;
    left: 340px;
    top: 75px;
+   cursor: pointer;
  }
 
  #config {
@@ -189,6 +190,7 @@ html, body {
    background-color: #ECECEC;
    color: black;
    width: 25%;
+   cursor: pointer;
  }
   #reset {
     display: block;
@@ -198,14 +200,7 @@ html, body {
     background-color: #ECECEC;
     color: black;
     width: 25%;
-
-  }
-
-  #credit {
-    display: inline-block;
-    position: relative;
-    bottom: 10px;
-    left: 30px;
+    cursor: pointer;
   }
 
 /* Style des légendes */
@@ -271,16 +266,6 @@ html, body {
   width: 50px;
 }
 
-.showcouleur {
-  display: inline-block;
-  line-height: 20px;
-  width: 20px;
-  color: rgba(0,0,0,0);
-  /*background-color: #FF0000;*/
-
-}
-
-
 /* Style du loader = icône qui affiche le chargement de la page */
  .cover {
     display: block;
@@ -319,20 +304,25 @@ i {
 /* Boite à outils */
 /* style des boutons de la boîte à outils*/
 .button {
-  background-color: #2B2F33;
-  border-radius: 3px;
-  padding-left: 5px;
-  padding-right: 5px;
-  padding-top: 2px;
-  padding-bottom: 2px;
+  background: #303336;
+  border: 1px solid #444;
+  color: #edffff;
+  fill: #edffff;
+  padding: 3px 5px;
+  margin: 2px 2px;
   cursor: pointer;
-  width: auto;
-  height: auto;
+  border-radius: 14%;
+  z-index: 0;
+
 }
 
 /* changement de couleur au survol des boutons */
 .button:hover {
-  background-color: rgba(42, 143, 231, 0.5);
+  color: #fff;
+  fill: #fff;
+  background: #48b;
+  border-color: #aef;
+  /*box-shadow: 0 0 8px #fff;*/
 }
 
 .menuClic-content {
@@ -347,38 +337,38 @@ i {
 /* position des boutons */
 #mesures {
   position: absolute;
-  top: 7px;
+  top: 5px;
   left: 100px;
 }
 
 #construction {
   position: absolute;
-  top: 7px;
-  left: 140px;
+  top: 5px;
+  left: 145px;
 }
 
 #coupe {
   position: absolute;
-  top: 7px;
-  left: 180px;
+  top: 5px;
+  left: 190px;
 }
 
 #time {
   position: absolute;
-  top: 7px;
-  left: 220px;
+  top: 5px;
+  left: 235px;
 }
 
 #camera {
   position: absolute;
-  top: 7px;
-  left: 260px;
+  top: 5px;
+  left: 280px;
 }
 
 #link {
   position: absolute;
-  top: 7px;
-  left: 300px;
+  top: 5px;
+  left: 325px;
 }
 
 /* les boutons bougent à l'ouverture du menu */
@@ -467,7 +457,7 @@ i {
 }*/
 
 .menuClic {
-  display: inline-block;
+  display: block;
   background-color: #2B2F33;
   border-radius: 3px;
 }
@@ -488,6 +478,10 @@ i {
 
 .hamburger-icon {
     position: relative;
+    background: #303336;
+    border: 1px solid #444;
+    color: #edffff;
+    fill: #edffff;
     padding: 5px 5px 5px calc(5px + 1.25em);
     cursor: pointer;
 }
@@ -501,6 +495,13 @@ i {
     height: 0.125em;
     border-top: 0.375em double #FFF;
     border-bottom: 0.125em solid #FFF;
+}
+
+.hamburger-icon:hover {
+  color: #fff;
+  fill: #fff;
+  background: #48b;
+  border-color: #aef;
 }
 
 .show {
