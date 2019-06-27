@@ -22,12 +22,13 @@ class Globe {
        }
      })
     });
+    this.viewer.extend(Cesium.viewerCesiumNavigationMixin, {});
 
     // Supprime le terrain par défaut sur le globe
-    //this.viewer.scene.imageryLayers.removeAll();
+    this.viewer.scene.imageryLayers.removeAll();
 
     // Définit la couleur de fond du globe étant donné qu'on a supprimé le terrain (ici du noir)
-    //this.viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#AB9B8B').withAlpha(0.4);
+    this.viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#AB9B8B').withAlpha(0.4);
 
 
     this.raf09 = undefined;
@@ -83,9 +84,9 @@ class Globe {
 });
 this.viewer.imageryLayers.addImageryProvider(elevation);*/
 
-this.viewer.navigationHelpButton.viewModel.command.beforeExecute.addEventListener('click', (e) => {
+/*this.viewer.navigationHelpButton.viewModel.command.beforeExecute.addEventListener('click', (e) => {
   this.configList.classList.toggle('hidden');
-});
+});*/
 
 }
 
@@ -262,8 +263,7 @@ loadKml(link, options = {clampToGround : true}){
   return promisse;
 }
 
-loadGeoJson(link, name, symbol, couleur, image, choice, options = {}){
-  var billboard = globe.viewer.scene.primitives.add(new Cesium.BillboardCollection());
+loadGeoJson(link, name, symbol, couleur, image, choice, billboard, options = {}){
   let promisse = Cesium.GeoJsonDataSource.load(link, {
     clampToGround: true,
     markerSymbol: symbol, // pour l'affichage en symbole maki https://cesiumjs.org/Cesium/Build/Apps/Sandcastle/index.html?src=GeoJSON%20simplestyle.html&label=All
@@ -306,21 +306,17 @@ loadGeoJson(link, name, symbol, couleur, image, choice, options = {}){
         }
       }
     }
+
     if(choice === 'point') {
       for(let i=0;i<this.dataSources[name]._entityCollection._entities._array.length;i++) {
         var X = (this.dataSources[name]._entityCollection._entities._array[i]._position._value.x);
         var Y = (this.dataSources[name]._entityCollection._entities._array[i]._position._value.y);
         var Z = (this.dataSources[name]._entityCollection._entities._array[i]._position._value.z);
         var position = new Cesium.Cartesian3(X,Y,Z);
-        billboard.add({
-          position: position,
-          image : image,
-          heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
-          verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-          sizeInMeters: true
-        });
+        billboard.push(this.createBillboard(position, image, true));
       }
     }
+
   });
 
   return promisse;
@@ -341,17 +337,27 @@ hideLoader(){
 * "Options" est un paramètre optionel (un objet) qui sera passé en deuxième paramètre de la fonction "loader"
 marche pour les 3DTiles et KML
 */
-showJson(show, name, link, symbol, couleur, image, choice, options = {}){
+showJson(show, name, link, symbol, couleur, image, choice, billboard, options = {}){
   if(show){
     if(this.dataSources[name] === undefined){
-      globe.loadGeoJson(link, name, symbol, couleur, image, choice, options);
+      globe.loadGeoJson(link, name, symbol, couleur, image, choice, billboard, options);
     } else{
       this.dataSources[name].show = true;
+      if(choice === 'point') {
+        for(var i = 0; i < billboard.length; i++){
+          billboard[i].show = true;
+        }
+      }
       this.viewer.scene.requestRender();
     }
   } else{
     if(this.dataSources[name] !== undefined){
       this.dataSources[name].show = false;
+      if(choice === 'point') {
+        for(var i = 0; i < billboard.length; i++){
+          billboard[i].show = false;
+        }
+      }
       this.viewer.scene.requestRender();
     }
   }
@@ -561,13 +567,14 @@ createPoint(worldPosition) {
   return point;
 }
 
-createBillboard(worldPosition, image) {
+createBillboard(worldPosition, image, size) {
   var symbol = this.viewer.entities.add({
     position : worldPosition,
     billboard : {
-      image : 'src/img/interface.png',
+      image : image,
       heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
-      verticalOrigin: Cesium.VerticalOrigin.BOTTOM
+      verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+      sizeInMeters: size
     }
   });
   return symbol;
@@ -635,9 +642,9 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
           largeur = parseFloat(largeur);
           transparence = parseFloat(transparence);
           if(choice === 'point') {
-            floatingPoint = globe.createBillboard(earthPosition);
+            floatingPoint = globe.createBillboard(earthPosition, 'src/img/interface.png', false);
             activeShape = globe.createPoint(dynamicPositions);
-            activeShape = globe.createBillboard(dynamicPositions);
+            activeShape = globe.createBillboard(dynamicPositions, 'src/img/interface.png', false);
           } else if(choice === 'polygon') {
             activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence);
           } else if(choice === 'volume') {
@@ -657,7 +664,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
           activeShapePoints.push(earthPosition);
           if(choice === 'point'){
             point.push(globe.createPoint(earthPosition));
-            billboard.push(globe.createBillboard(earthPosition));
+            billboard.push(globe.createBillboard(earthPosition, 'src/img/interface.png', false));
           } else {
             point.push(globe.createPoint(earthPosition));
           }
@@ -693,7 +700,7 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
       if(choice2 === 'construction'){
         if(choice === 'point') {
           point.push(globe.createPoint(activeShapePoints));
-          billboard.push(globe.createBillboard(activeShapePoints));
+          billboard.push(globe.createBillboard(activeShapePoints, 'src/img/interface.png', false));
         } else if(choice === 'line') {
           line.push(globe.drawLine(activeShapePoints, largeur, couleur, transparence, true));
         } else if( choice === 'polygon') {
