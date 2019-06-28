@@ -58,6 +58,7 @@ html, body {
     bottom: 120px;
     overflow-y: auto;
     overflow-x: none;
+    /*pointer-events: none;*/
 }
 
 #left-pane.menu-open {

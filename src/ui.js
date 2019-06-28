@@ -242,29 +242,60 @@ class Menu {
 
     //export
     document.querySelector("#exportDessin").addEventListener('click', (e) => {
-
-
       var jsonGlob = {};
       jsonGlob = {"type" : "FeatureCollection", "features" : []};
-      jsonGlob["features"] = {};
-      jsonGlob["features"] = {"type" : "Feature", "geometry" : {}};
-      jsonGlob["features"].geometry = {"type" : "MultiPolygon","coordinates" : [[[]]]};
-      console.log(jsonGlob);
 
-      /*var element = document.querySelector('#exportDessin');
-      element.setAttribute('href', 'data:json,' + encodeURIComponent(jsonGlob));
-      element.setAttribute('download', 'drawing.json');*/
+      var j = 0;
+      var l = 0;
+      var features = [];
+      var coordLine = [];
+      var coordSurf = [];
+      for (var i = 0; i < line.length; i++) {
+        while (j < line[i].polyline.positions._value.length) {
+          var type = {"type" : "Feature", "properties" : {}, "geometry" : {}};
+          type["geometry"] = {"type" : "LineString", "coordinates" : []};
 
-      /*var link = document.getElementById('exportDessin');
-      link.href = this.makeTextFile(jsonGlob.toString());
-      link.style.display = 'block';*/
+          var cartesian = new Cesium.Cartesian3(line[i].polyline.positions._value[j].x, line[i].polyline.positions._value[j].y, line[i].polyline.positions._value[j].z);
+          let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+          let longitude = Cesium.Math.toDegrees(cartographic.longitude);
+          let latitude = Cesium.Math.toDegrees(cartographic.latitude);
+          var coordXY = [Number(longitude), Number(latitude)];
+          coordLine.push(coordXY);
+          j++;
+        }
+        type["geometry"].coordinates = coordLine;
+        features.push(type);
+      }
 
+      /*for (var i = 0; i < surface.length; i++) {
+        while (l < surface[i].polygon.hierarchy._value.length) {
+          var typeSurf = {"type" : "Feature", "properties" : {}, "geometry" : {}};
+          typeSurf["geometry"] = {"type" : "MultiPolygon",  "coordinates" : []};
 
-      /*console.log(line[0].polyline.positions._value); // .x .y .z
+          var cartesian2 = new Cesium.Cartesian3(surface[i].polygon.hierarchy._value[l].x, surface[i].polygon.hierarchy._value[l].y, surface[i].polygon.hierarchy._value[l].z);
+          let cartographic2 = Cesium.Cartographic.fromCartesian(cartesian2);
+          let longitude2 = Cesium.Math.toDegrees(cartographic2.longitude);
+          let latitude2 = Cesium.Math.toDegrees(cartographic2.latitude);
+          var coordXY2 = [Number(longitude2), Number(latitude2)];
+          coordSurf.push(coordXY2);
+          l++;
+        }
+        typeSurf["geometry"].coordinates = coordSurf;
+        features.push(typeSurf);
+      }*/
+
+      jsonGlob["features"] = features;
+      var test = JSON.stringify(jsonGlob);
+
+      var element = document.querySelector('#exportDessin');
+      element.setAttribute('href', 'data:json,' + encodeURIComponent(test));
+      element.setAttribute('download', 'drawing.json');
+
+      /*console.log(line[0].polyline.positions._value[0].x); // .x .y .z
       console.log(line[0].polyline.width._value);
-      console.log(line[0].polyline.material.color._value);
+      console.log(line[0].polyline.material.color._value);*/
 
-      console.log(surface[0].polygon.hierarchy._value); // positions des sommets
+      /*console.log(surface[0].polygon.hierarchy._value[0]); // positions des sommets
       console.log(surface[0].polygon.material.color._value); //.alpha .blue .green .red
 
       console.log(volume[0].polygon.hierarchy._value);
@@ -285,6 +316,7 @@ class Menu {
     var toolbar = document.getElementById('toolbar');
     Cesium.knockout.track(this.viewModel);
     Cesium.knockout.applyBindings(this.viewModel, toolbar);
+    globe.viewer.scene.requestRender();
 
     document.querySelector("#envoyerdecoupe").addEventListener('click', (e) => {
       globe.createHole(this.viewModel);
@@ -293,6 +325,9 @@ class Menu {
     document.querySelector("#ajoutercamera").addEventListener('click', function() {
       var nom = $('#nomcamera').val();
       var viewPoint = globe.addViewPoint(nom);
+
+      document.querySelector('#cameraList').classList.add('hidden');
+      document.getElementById("nomcamera").value = '';
 
       let position = new Cesium.Cartesian3(globe.viewer.camera.positionWC.x, globe.viewer.camera.positionWC.y, globe.viewer.camera.positionWC.z);
       let heading = globe.viewer.camera.heading;
@@ -303,8 +338,6 @@ class Menu {
         globe.fly(position, heading, pitch, roll);
       });
 
-      this.cameraList.classList.add('hidden');
-      document.getElementById("nomcamera").value = '';
     });
 
     document.querySelector("#addlink").addEventListener('click', function() {
@@ -1259,6 +1292,40 @@ evenementsCouches(){
 
   });
 
+  document.querySelector('#velo').addEventListener('change', (e) => {
+    let colors = {
+      '1': '#DEA11F'
+    }
+
+    globe.showJson(e.target.checked, 'velo', 'data/geojson/trajet_velo.json', '', '#FFFFFF', '', '', undefined, {
+      classification: true,
+      classificationField: 'id',
+      colors: colors,
+      alpha: 0.6
+    });
+
+  });
+
+  document.querySelector('#velosurf').addEventListener('change', (e) => {
+    let colors = {
+      'velo': '#DEA11F'
+    }
+
+    if(e.target.checked){
+      this.legendManager.addLegend('velosurf', colors, 'polygon');
+    } else{
+      this.legendManager.removeLegend('velosurf');
+    }
+
+    globe.showJson(e.target.checked, 'velosurf', 'data/geojson/velo_surf.json', '', '#FFFFFF', '', '', undefined, {
+      classification: true,
+      classificationField: 'id',
+      colors: colors,
+      alpha: 0.6
+    });
+
+  });
+
 }
 
 // Ajouter une source de données a la liste en donnant son nom "name" et la datasource "value"
@@ -1513,23 +1580,6 @@ get3DTiles() {
     xmlhttp.send();
   });
 }
-
-makeTextFile(text) {
-  var textFile = null;
-  var data = new Blob([text], {type: 'text/plain'});
-
-  // If we are replacing a previously generated file we need to
-  // manually revoke the object URL to avoid memory leaks.
-  if (textFile !== null) {
-    window.URL.revokeObjectURL(textFile);
-  }
-
-  textFile = window.URL.createObjectURL(data);
-
-  return textFile;
-};
-
-
 
 
 }

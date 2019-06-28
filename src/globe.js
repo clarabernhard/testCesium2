@@ -412,6 +412,7 @@ setCoordsCallback(callback){
       let heightString = cartographic.height.toFixed(3);
       callback(longitudeString, latitudeString, heightString);
     }
+    this.viewer.scene.requestRender();
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
 
@@ -464,6 +465,7 @@ addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe,
       });
       planeEntities.push(planeEntity);
     }
+    this.viewer.scene.requestRender();
 }
 
 // Récupérer les coordonnées au clic et les afficher dans le formulaire du plan de coupe horizontal
@@ -494,6 +496,7 @@ annulCoupe(entity, clippingPlanes){
     this.viewer.entities.remove(entity[annul]);
     entity.pop();
     clippingPlanes = [];
+    this.viewer.scene.requestRender();
   });
 }
 
@@ -505,6 +508,7 @@ supprCoupe(entity, clippingPlanes){
     }
     entity = [];
     clippingPlanes = [];
+    this.viewer.scene.requestRender();
   });
 }
 

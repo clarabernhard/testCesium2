@@ -27,6 +27,8 @@ this.monumentDiv = document.querySelector('#monumentDiv');
 this.danubeDiv = document.querySelector('#danubeDiv');
 this.velumDiv = document.querySelector('#velumDiv');
 this.batipublicDiv = document.querySelector('#batipublicDiv');
+this.veloDiv = document.querySelector('#veloDiv');
+this.velosurfDiv = document.querySelector('#velosurfDiv');
 
 function hideElements() {
   // cacher les éléments ligne par ligne
@@ -59,6 +61,8 @@ function hideElements() {
   this.danubeDiv.classList.add('hidden');
   this.velumDiv.classList.add('hidden');
   this.batipublicDiv.classList.add('hidden');
+  this.veloDiv.classList.add('hidden');
+  this.velosurfDiv.classList.add('hidden');
 
 }
 
@@ -92,6 +96,8 @@ function showElements() {
   this.danubeDiv.classList.remove('hidden');
   this.velumDiv.classList.remove('hidden');
   this.batipublicDiv.classList.remove('hidden');
+  this.veloDiv.classList.remove('hidden');
+  this.velosurfDiv.classList.remove('hidden');
 
 }
 
@@ -122,6 +128,8 @@ function initPLU() {
     this.danubeDiv.classList.add('hidden');
     this.velumDiv.classList.add('hidden');
     this.batipublicDiv.classList.add('hidden');
+    this.veloDiv.classList.add('hidden');
+    this.velosurfDiv.classList.add('hidden');
 
   }
 
@@ -153,5 +161,7 @@ function initEco() {
   this.danubeDiv.classList.add('hidden');
   this.velumDiv.classList.add('hidden');
   this.batipublicDiv.classList.remove('hidden');
+  this.veloDiv.classList.remove('hidden');
+  this.velosurfDiv.classList.remove('hidden');
 
 }
