@@ -12,15 +12,15 @@ class Globe {
       requestRenderMode : true,
       maximumRenderTimeChange : Infinity,
       skyBox : new Cesium.SkyBox({
-       sources : {
-         positiveX : 'src/img/Sky.jpg',
-         negativeX : 'src/img/Sky.jpg',
-         positiveY : 'src/img/Sky.jpg',
-         negativeY : 'src/img/Sky.jpg',
-         positiveZ : 'src/img/Sky.jpg',
-         negativeZ : 'src/img/Sky.jpg'
-       }
-     })
+        sources : {
+          positiveX : 'src/img/Sky.jpg',
+          negativeX : 'src/img/Sky.jpg',
+          positiveY : 'src/img/Sky.jpg',
+          negativeY : 'src/img/Sky.jpg',
+          positiveZ : 'src/img/Sky.jpg',
+          negativeZ : 'src/img/Sky.jpg'
+        }
+      })
     });
     this.viewer.extend(Cesium.viewerCesiumNavigationMixin, {});
 
@@ -48,44 +48,44 @@ class Globe {
 
     /*var navigationHelpButton = new Cesium.NavigationHelpButton({
     container : 'cesiumContainer'
-    });*/
+  });*/
 
-    // variable qui stocke les évenements liés à la souris
-    this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
+  // variable qui stocke les évenements liés à la souris
+  this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
 
-    // mesures de coords
-    this.coordX = document.querySelector('#coordX');
-    this.coordY = document.querySelector('#coordY');
-    this.coordZ = document.querySelector('#coordZ');
-    this.coordsList = document.querySelector('#coordsList');
+  // mesures de coords
+  this.coordX = document.querySelector('#coordX');
+  this.coordY = document.querySelector('#coordY');
+  this.coordZ = document.querySelector('#coordZ');
+  this.coordsList = document.querySelector('#coordsList');
 
-    // mesures de distance
-    this.distance = document.querySelector('#distance');
-    this.distanceCumulee = document.querySelector('#distancecumulee');
-    this.hauteur = document.querySelector('#hauteur');
-    this.distanceInclinee = document.querySelector('#distanceinclinee');
-    this.distanceInclineeC = document.querySelector('#distanceinclineecum');
+  // mesures de distance
+  this.distance = document.querySelector('#distance');
+  this.distanceCumulee = document.querySelector('#distancecumulee');
+  this.hauteur = document.querySelector('#hauteur');
+  this.distanceInclinee = document.querySelector('#distanceinclinee');
+  this.distanceInclineeC = document.querySelector('#distanceinclineecum');
 
-    // mesures de surface
-    this.aire = document.querySelector('#aire');
+  // mesures de surface
+  this.aire = document.querySelector('#aire');
 
-    // plan de coupe
-    this.altitude = document.querySelector('#alticoupe');
-    this.coupeX = document.querySelector('#X');
-    this.coupeY = document.querySelector('#Y');
-    this.coupeZ = document.querySelector('#hauteurcoupe');
+  // plan de coupe
+  this.altitude = document.querySelector('#alticoupe');
+  this.coupeX = document.querySelector('#X');
+  this.coupeY = document.querySelector('#Y');
+  this.coupeZ = document.querySelector('#hauteurcoupe');
 
-    /*var elevation = new Cesium.WebMapServiceImageryProvider({
-    url : 'http://wxs.ign.fr/pvwmk1wgxoei8orp7rd1re78/geoportail/r/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap',
-    layer : 'ELEVATION.ELEVATIONGRIDCOVERAGE',
-    parameters : {
-    crossOrigin: '0'
-  }
+  /*var elevation = new Cesium.WebMapServiceImageryProvider({
+  url : 'http://wxs.ign.fr/pvwmk1wgxoei8orp7rd1re78/geoportail/r/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap',
+  layer : 'ELEVATION.ELEVATIONGRIDCOVERAGE',
+  parameters : {
+  crossOrigin: '0'
+}
 });
 this.viewer.imageryLayers.addImageryProvider(elevation);*/
 
 /*this.viewer.navigationHelpButton.viewModel.command.beforeExecute.addEventListener('click', (e) => {
-  this.configList.classList.toggle('hidden');
+this.configList.classList.toggle('hidden');
 });*/
 
 }
@@ -421,9 +421,9 @@ showCoords(show){
   this.setCoordsCallback((longitude, latitude, hauteur) => { // Fonction éxécutée à chaque clic
 
     var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
-    this.coordX.innerHTML = coords[0].toFixed(4);
-    this.coordY.innerHTML = coords[1].toFixed(4);
-    this.coordZ.innerHTML = (Number(hauteur) - Number(this.raf09.getGeoide(latitude, longitude))).toFixed(3);
+    this.coordX.innerHTML = coords[0].toFixed(2);
+    this.coordY.innerHTML = coords[1].toFixed(2);
+    this.coordZ.innerHTML = (Number(hauteur) - Number(this.raf09.getGeoide(latitude, longitude))).toFixed(2);
 
   });
   if(show){
@@ -437,35 +437,35 @@ showCoords(show){
 // ajouter le plan de coupe horizontal
 addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, planeEntities, clippingPlanes) {
 
-    var clippingPlanes = new Cesium.ClippingPlaneCollection({
-      planes : [
-        new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 0, -1), 0.0)
-      ]
+  var clippingPlanes = new Cesium.ClippingPlaneCollection({
+    planes : [
+      new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 0, -1), 0.0)
+    ]
+  });
+
+
+  for (var i = 0; i < clippingPlanes.length; i=+1) {
+    var coords = proj4('EPSG:3948','EPSG:4326', [Number(X), Number(Y)]);
+    var a = Number(this.raf09.getGeoide(coords[1], coords[0]));
+
+    var y = coords[1];
+    var x = coords[0];
+    var z = (Number(hauteurCoupe) + a);
+
+    var plane = clippingPlanes.get(i);
+    var planeEntity = this.viewer.entities.add({
+      position : Cesium.Cartesian3.fromDegrees(x, y, z),
+      plane : {
+        dimensions : new Cesium.Cartesian2(longueurCoupe, largeurCoupe),
+        material : Cesium.Color.fromCssColorString(couleurCoupe).withAlpha(0.4),
+        plane : new Cesium.CallbackProperty(this.planeUpdate(plane, couleurCoupe), false),
+        outline : true,
+        outlineColor : Cesium.Color.WHITE
+      }
     });
-
-
-    for (var i = 0; i < clippingPlanes.length; i=+1) {
-      var coords = proj4('EPSG:3948','EPSG:4326', [Number(X), Number(Y)]);
-      var a = Number(this.raf09.getGeoide(coords[1], coords[0]));
-
-      var y = coords[1];
-      var x = coords[0];
-      var z = (Number(hauteurCoupe) + a);
-
-      var plane = clippingPlanes.get(i);
-      var planeEntity = this.viewer.entities.add({
-        position : Cesium.Cartesian3.fromDegrees(x, y, z),
-        plane : {
-          dimensions : new Cesium.Cartesian2(longueurCoupe, largeurCoupe),
-          material : Cesium.Color.fromCssColorString(couleurCoupe).withAlpha(0.4),
-          plane : new Cesium.CallbackProperty(this.planeUpdate(plane, couleurCoupe), false),
-          outline : true,
-          outlineColor : Cesium.Color.WHITE
-        }
-      });
-      planeEntities.push(planeEntity);
-    }
-    this.viewer.scene.requestRender();
+    planeEntities.push(planeEntity);
+  }
+  this.viewer.scene.requestRender();
 }
 
 // Récupérer les coordonnées au clic et les afficher dans le formulaire du plan de coupe horizontal
@@ -483,9 +483,9 @@ coordCoupe(){
       let height = cartographic.height.toFixed(3);
 
       var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
-      document.getElementById("X").value = (coords[0].toFixed(4));
-      document.getElementById("Y").value = (coords[1].toFixed(4));
-      document.getElementById("hauteurcoupe").value = ((Number(height) - Number(globe.raf09.getGeoide(latitude, longitude))).toFixed(3));
+      document.getElementById("X").value = (coords[0].toFixed(2));
+      document.getElementById("Y").value = (coords[1].toFixed(2));
+      document.getElementById("hauteurcoupe").value = ((Number(height) - Number(globe.raf09.getGeoide(latitude, longitude))).toFixed(2));
     }
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
@@ -506,7 +506,6 @@ supprCoupe(entity, clippingPlanes){
     for(var i = 0; i < entity.length; i++){
       this.viewer.entities.remove(entity[i]);
     }
-    entity = [];
     clippingPlanes = [];
     this.viewer.scene.requestRender();
   });
@@ -596,6 +595,32 @@ drawLine(positionData, largeur, couleur, transparence, clamp) {
   return shape;
 }
 
+drawArrowLine(positionData, largeur, couleur, transparence, clamp) {
+  var shape = this.viewer.entities.add({
+    polyline : {
+      positions : positionData,
+      material : new Cesium.PolylineArrowMaterialProperty(Cesium.Color.fromCssColorString(couleur).withAlpha(transparence)),
+      clampToGround : clamp,
+      width : largeur
+    }
+  });
+  return shape;
+}
+
+drawDashLine(positionData, largeur, couleur, transparence, clamp) {
+  var shape = this.viewer.entities.add({
+    polyline : {
+      positions : positionData,
+      material : new Cesium.PolylineDashMaterialProperty({
+        color : Cesium.Color.fromCssColorString(couleur).withAlpha(transparence)
+      }),
+      clampToGround : clamp,
+      width : largeur
+    }
+  });
+  return shape;
+}
+
 drawPolygon(positionData, couleur, transparence) {
   var shape = this.viewer.entities.add({
     polygon: {
@@ -631,145 +656,180 @@ updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, 
   var scene = this.viewer.scene;
   this.handler.globe = this;
 
-    this.handler.setInputAction(function(event) {
-      var earthPosition = scene.pickPosition(event.position);
-      if(Cesium.defined(earthPosition)) {
-        if(activeShapePoints.length === 0) {
-          // on ajoute 2 fois un point au début pour permettre l'affichage de la ligne/surface
-          // le dernier point correspond au point flottant du mouvement de la souris
-          floatingPoint = globe.createPoint(earthPosition);
-          activeShapePoints.push(earthPosition);
-          activeShapePoints.push(earthPosition);
-          var dynamicPositions = new Cesium.CallbackProperty(function () {
-            return activeShapePoints;
-          }, false);
-          largeur = parseFloat(largeur);
-          transparence = parseFloat(transparence);
-          if(choice === 'point') {
-            floatingPoint = globe.createBillboard(earthPosition, 'src/img/interface.png', false);
-            activeShape = globe.createPoint(dynamicPositions);
-            activeShape = globe.createBillboard(dynamicPositions, 'src/img/interface.png', false);
-          } else if(choice === 'polygon') {
-            activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence);
-          } else if(choice === 'volume') {
-            z = globe.getHauteur(activeShapePoints, hauteurVol);
-            activeShape = globe.drawVolume(dynamicPositions, couleur, transparence, z);
-          } else if(choice === 'line') {
-            if(choice2 === 'mesure') {
-              activeShape = globe.drawLine(dynamicPositions, largeur, couleur, transparence, false);
-              largeur = parseFloat(largeur);
-              activeShape = globe.drawLine(dynamicPositions, largeur, '#000000', '0.5', true);
-            } else if(choice2 === 'construction') {
-              couleur = couleur.toString();
-              activeShape = globe.drawLine(dynamicPositions, largeur, couleur, transparence, true);
+  this.handler.setInputAction(function(event) {
+    var earthPosition = scene.pickPosition(event.position);
+    if(Cesium.defined(earthPosition)) {
+      if(activeShapePoints.length === 0) {
+        // on ajoute 2 fois un point au début pour permettre l'affichage de la ligne/surface
+        // le dernier point correspond au point flottant du mouvement de la souris
+        floatingPoint = globe.createPoint(earthPosition);
+        activeShapePoints.push(earthPosition);
+        activeShapePoints.push(earthPosition);
+        var dynamicPositions = new Cesium.CallbackProperty(function () {
+          return activeShapePoints;
+        }, false);
+        largeur = parseFloat(largeur);
+        transparence = parseFloat(transparence);
+        if(choice === 'point') {
+          floatingPoint = globe.createBillboard(earthPosition, 'src/img/interface.png', false);
+          activeShape = globe.createPoint(dynamicPositions);
+          activeShape = globe.createBillboard(dynamicPositions, 'src/img/interface.png', false);
+        } else if(choice === 'polygon') {
+          activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence);
+        } else if(choice === 'volume') {
+          z = globe.getHauteur(activeShapePoints, hauteurVol);
+          activeShape = globe.drawVolume(dynamicPositions, couleur, transparence, z);
+        } else if(choice === 'line') {
+          if(choice2 === 'mesure') {
+            activeShape = globe.drawLine(dynamicPositions, largeur, couleur, transparence, false);
+            largeur = parseFloat(largeur);
+            activeShape = globe.drawLine(dynamicPositions, largeur, '#000000', '0.5', true);
+          } else if(choice2 === 'construction') {
+            couleur = couleur.toString();
+            // clamp to ground ou pas
+            if($('#clampligne').val() === 'colle') {
+              // style normal
+              if($('#styleligne').val() === 'simple') {
+                activeShape = globe.drawLine(dynamicPositions, largeur, couleur, transparence, true);
+              } else if($('#styleligne').val() === 'pointille') { // style pointillé
+                activeShape = globe.drawDashLine(dynamicPositions, largeur, couleur, transparence, true);
+              } else if($('#styleligne').val() === 'fleche') { // avec une flèche à la fin
+                activeShape = globe.drawArrowLine(dynamicPositions, largeur, couleur, transparence, true);
+              }
+            } else if($('#clampligne').val() === 'noncolle'){ // mêmes instructions avec la ligne non collée au sol
+              if($('#styleligne').val() === 'simple') {
+                activeShape = globe.drawLine(dynamicPositions, largeur, couleur, transparence, false);
+              } else if($('#styleligne').val() === 'pointille') {
+                activeShape = globe.drawDashLine(dynamicPositions, largeur, couleur, transparence, false);
+              } else if($('#styleligne').val() === 'fleche') {
+                activeShape = globe.drawArrowLine(dynamicPositions, largeur, couleur, transparence, false);
+              }
             }
           }
+        }
+      } else {
+        activeShapePoints.push(earthPosition);
+        if(choice === 'point'){
+          point.push(globe.createPoint(earthPosition));
+          billboard.push(globe.createBillboard(earthPosition, 'src/img/interface.png', false));
         } else {
-          activeShapePoints.push(earthPosition);
-          if(choice === 'point'){
-            point.push(globe.createPoint(earthPosition));
-            billboard.push(globe.createBillboard(earthPosition, 'src/img/interface.png', false));
-          } else {
-            point.push(globe.createPoint(earthPosition));
+          point.push(globe.createPoint(earthPosition));
+        }
+      }
+    }
+    if(choice === 'polygon'&& choice2 === 'mesure') {
+      globe.measureSurface(activeShapePoints);
+    }
+    globe.viewer.scene.requestRender();
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+  this.handler.setInputAction(function(event) {
+    if(Cesium.defined(floatingPoint)) {
+      var newPosition = scene.pickPosition(event.endPosition);
+      if (Cesium.defined(newPosition)) {
+        floatingPoint.position.setValue(newPosition);
+        activeShapePoints.pop();
+        activeShapePoints.push(newPosition);
+      }
+    }
+    if(choice === 'line' && choice2 === 'mesure') {
+      globe.measureDistance(activeShapePoints);
+    }
+    globe.viewer.scene.requestRender();
+  }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+  this.handler.setInputAction(function(event) {
+    largeur = parseFloat(largeur);
+    transparence = parseFloat(transparence);
+    // on supprime le dernier point flottant
+    activeShapePoints.pop();
+
+    if(choice2 === 'construction'){
+      if(choice === 'point') {
+        point.push(globe.createPoint(activeShapePoints));
+        billboard.push(globe.createBillboard(activeShapePoints, 'src/img/interface.png', false));
+      } else if(choice === 'line') {
+        if($('#clampligne').val() === 'colle') {
+          if($('#styleligne').val() === 'simple') {
+            line.push(globe.drawLine(activeShapePoints, largeur, couleur, transparence, true));
+          } else if($('#styleligne').val() === 'pointille') {
+            line.push(globe.drawDashLine(activeShapePoints, largeur, couleur, transparence, true));
+          } else if($('#styleligne').val() === 'fleche') {
+            line.push(globe.drawArrowLine(activeShapePoints, largeur, couleur, transparence, true));
+          }
+        } else if($('#clampligne').val() === 'noncolle') {
+          if($('#styleligne').val() === 'simple') {
+            line.push(globe.drawLine(activeShapePoints, largeur, couleur, transparence, false));
+          } else if($('#styleligne').val() === 'pointille') {
+            line.push(globe.drawDashLine(activeShapePoints, largeur, couleur, transparence, false));
+          } else if($('#styleligne').val() === 'fleche') {
+            line.push(globe.drawArrowLine(activeShapePoints, largeur, couleur, transparence, false));
           }
         }
-      }
-      if(choice === 'polygon'&& choice2 === 'mesure') {
-        globe.measureSurface(activeShapePoints);
-      }
-      globe.viewer.scene.requestRender();
-    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
-    this.handler.setInputAction(function(event) {
-      if(Cesium.defined(floatingPoint)) {
-        var newPosition = scene.pickPosition(event.endPosition);
-        if (Cesium.defined(newPosition)) {
-          floatingPoint.position.setValue(newPosition);
-          activeShapePoints.pop();
-          activeShapePoints.push(newPosition);
-        }
+      } else if( choice === 'polygon') {
+        surface.push(globe.drawPolygon(activeShapePoints, couleur, transparence));
+      } else if( choice === 'volume') {
+        volume.push(globe.drawVolume(activeShapePoints, couleur, transparence, z));
       }
-      if(choice === 'line' && choice2 === 'mesure') {
-        globe.measureDistance(activeShapePoints);
+    } else if(choice2 === 'mesure'){
+      if(choice === 'line') {
+        dline.push(globe.drawLine(activeShapePoints, largeur, couleur, transparence, false));
+        dline2.push(globe.drawLine(activeShapePoints, largeur, '#000000', '0.5', true));
+      } else if( choice === 'polygon') {
+        dsurface.push(globe.drawPolygon(activeShapePoints, couleur, transparence));
       }
-      globe.viewer.scene.requestRender();
-    }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-
-    this.handler.setInputAction(function(event) {
-      largeur = parseFloat(largeur);
-      transparence = parseFloat(transparence);
-      // on supprime le dernier point flottant
-      activeShapePoints.pop();
-
-      if(choice2 === 'construction'){
-        if(choice === 'point') {
-          point.push(globe.createPoint(activeShapePoints));
-          billboard.push(globe.createBillboard(activeShapePoints, 'src/img/interface.png', false));
-        } else if(choice === 'line') {
-          line.push(globe.drawLine(activeShapePoints, largeur, couleur, transparence, true));
-        } else if( choice === 'polygon') {
-          surface.push(globe.drawPolygon(activeShapePoints, couleur, transparence));
-        } else if( choice === 'volume') {
-          volume.push(globe.drawVolume(activeShapePoints, couleur, transparence, z));
-        }
-      } else if(choice2 === 'mesure'){
-        if(choice === 'line') {
-          dline.push(globe.drawLine(activeShapePoints, largeur, couleur, transparence, false));
-          dline2.push(globe.drawLine(activeShapePoints, largeur, '#000000', '0.5', true));
-        } else if( choice === 'polygon') {
-          dsurface.push(globe.drawPolygon(activeShapePoints, couleur, transparence));
-        }
-      }
-      globe.viewer.entities.remove(floatingPoint);
-      globe.viewer.entities.remove(activeShape);
-      floatingPoint = undefined;
-      activeShape = undefined;
-      if(choice2 === 'construction'){
-        // garder les activeShapePoints définis permet l'affichage des mesures
-        activeShapePoints = [];
-      }
-      globe.viewer.scene.requestRender();
-    }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
-
-    $('.nouv').click(function(e) {
+    }
+    globe.viewer.entities.remove(floatingPoint);
+    globe.viewer.entities.remove(activeShape);
+    floatingPoint = undefined;
+    activeShape = undefined;
+    if(choice2 === 'construction'){
+      // garder les activeShapePoints définis permet l'affichage des mesures
       activeShapePoints = [];
-    });
+    }
+    globe.viewer.scene.requestRender();
+  }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
-    // on supprime les éléments des mesures lorsqu'on ferme l'onglet
-    document.querySelector("#ligne").addEventListener('click', (e) => {
-      activeShapePoints = [];
-      for(var i = 0; i < point.length; i++){
-        this.viewer.entities.remove(dline[i]);
-        this.viewer.entities.remove(dline2[i]);
-      }
-      this.viewer.scene.requestRender();
-    });
-    document.querySelector("#surface").addEventListener('click', (e) => {
-      activeShapePoints = [];
-      for(var i = 0; i < point.length; i++){
-        this.viewer.entities.remove(dsurface[i]);
-      }
-      this.viewer.scene.requestRender();
-    });
-  }
+  $('.nouv').click(function(e) {
+    activeShapePoints = [];
+  });
 
-  annulFigure(element, figure) {
-    document.querySelector(element).addEventListener('click', (e) => {
-      var lastLine = figure.pop();
-      this.viewer.entities.remove(lastLine);
-      this.viewer.scene.requestRender();
-    });
-  }
+  // on supprime les éléments des mesures lorsqu'on ferme l'onglet
+  document.querySelector("#ligne").addEventListener('click', (e) => {
+    activeShapePoints = [];
+    for(var i = 0; i < point.length; i++){
+      this.viewer.entities.remove(dline[i]);
+      this.viewer.entities.remove(dline2[i]);
+    }
+    this.viewer.scene.requestRender();
+  });
+  document.querySelector("#surface").addEventListener('click', (e) => {
+    activeShapePoints = [];
+    for(var i = 0; i < point.length; i++){
+      this.viewer.entities.remove(dsurface[i]);
+    }
+    this.viewer.scene.requestRender();
+  });
+}
 
-  supprFigure(element, figure) {
-    document.querySelector(element).addEventListener('click', (e) => {
-      for(var i = 0; i < figure.length+1; i++){
-        this.viewer.entities.remove(figure[i]);
-      }
-      this.viewer.scene.requestRender();
-    });
+annulFigure(element, figure) {
+  document.querySelector(element).addEventListener('click', (e) => {
+    var lastLine = figure.pop();
+    this.viewer.entities.remove(lastLine);
+    this.viewer.scene.requestRender();
+  });
+}
 
-  }
+supprFigure(element, figure) {
+  document.querySelector(element).addEventListener('click', (e) => {
+    for(var i = 0; i < figure.length+1; i++){
+      this.viewer.entities.remove(figure[i]);
+    }
+    this.viewer.scene.requestRender();
+  });
+
+}
 
 measureDistance(activeShapePoints)  {
   var coordsX = [];
@@ -913,11 +973,11 @@ createHole(viewModel) {
 
   Cesium.knockout.getObservable(viewModel, 'affich').subscribe(function(value) {
     tileset.clippingPlanes.enabled = value;
-});
+  });
 
-Cesium.knockout.getObservable(viewModel, 'trou').subscribe(function(value) {
+  Cesium.knockout.getObservable(viewModel, 'trou').subscribe(function(value) {
     globe.holePlanes(viewModel, hole_pts);
-});
+  });
 
 }
 

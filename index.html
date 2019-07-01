@@ -54,9 +54,19 @@
       <form>
         <h2>Propriétés de la ligne</h2>
         <p>Largeur ligne (pixels):<input id="largeur" type="text" size="3" value="3"/> </p>
+        <p>Style de ligne:
+        <select id="styleligne">
+          <option value="simple">Simple</option>
+          <option value="pointille">Pointillés</option>
+          <option value="fleche">Fleche</option>
+        </select></p>
         <p><span> Couleur : </span> <input type="color" id="couleur" value="#FF0000"></p>
-        <p>Transparence :</p>
-        <span>0</span><input type="range" id="transparence"  min="0" max="1" value="0.7" step="0.1"><span>1</span> <br/>
+        <p>Transparence : <span>0</span><input type="range" id="transparence"  min="0" max="1" value="1" step="0.1"><span>1</span> </p>
+        <p>Plaquée au photomaillage :
+        <select id="clampligne">
+          <option value="colle">Oui</option>
+          <option value="noncolle">Non</option>
+        </select></p>
       </form>
       <button id="envoyerligne">Ajouter</button>
       <button id="annulerligne">Annuler</button>
@@ -79,7 +89,7 @@
 
     <div class="backdrop hidden" id="volumeList">
       <form>
-        <h2>Propriétés du volume</h2>
+        <h2>Propriétés de la boîte </h2>
         <p>Hauteur (m):<input id="hauteurvol" type="text" size="6" value="20"/> </p>
         <p><span> Couleur : </span> <input type="color" id="couleurvol" value="#FFFFFF"></p>
         <span>0</span><input type="range" id="transparencevol"  min="0" max="1" value="1" step="0.1"><span>1</span> <br/>
@@ -94,8 +104,8 @@
       <h2>Propriétés du plan de coupe</h2>
       <form>
         <p>Coordonnées du point central : <br/>
-          X :<input id="X" type="text" size="12"/> <br/>
-          Y :<input id="Y" type="text" size="12"/> <br/>
+          X :<input id="X" type="text" size="10"/> <br/>
+          Y :<input id="Y" type="text" size="10"/> <br/>
         </p>
         <p>Altitude (m):<input id="hauteurcoupe" type="text" size="6"/> </p>
         <p>Cliquez sur le photomaillage pour rentrer les coordonnées </p>
@@ -472,7 +482,7 @@
 
       <div class="nowrap">
         <input id="volume" type="checkbox"/>
-        <label for="volume">Dessin volume</label>
+        <label for="volume">Dessin boîte</label>
       </div>
 
       <div class="nowrap">

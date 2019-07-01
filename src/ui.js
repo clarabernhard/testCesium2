@@ -245,12 +245,12 @@ class Menu {
       var jsonGlob = {};
       jsonGlob = {"type" : "FeatureCollection", "features" : []};
 
-      var j = 0;
-      var l = 0;
+      var i=0;
       var features = [];
-      var coordLine = [];
-      var coordSurf = [];
-      for (var i = 0; i < line.length; i++) {
+
+      while (i < line.length) {
+        var j = 0;
+        var coordLine = [];
         while (j < line[i].polyline.positions._value.length) {
           var type = {"type" : "Feature", "properties" : {}, "geometry" : {}};
           type["geometry"] = {"type" : "LineString", "coordinates" : []};
@@ -263,26 +263,47 @@ class Menu {
           coordLine.push(coordXY);
           j++;
         }
+        var nom = line[i].id;
+        console.log(nom);
+        type["properties"].name = nom;
         type["geometry"].coordinates = coordLine;
         features.push(type);
+        i++;
       }
 
-      /*for (var i = 0; i < surface.length; i++) {
-        while (l < surface[i].polygon.hierarchy._value.length) {
+      for (var i = 0; i < surface.length; i++) {
+        var coordSurf = [];
+        var arraySurf = [];
+        var k = 0;
+        while (k < surface[i].polygon.hierarchy._value.length) {
           var typeSurf = {"type" : "Feature", "properties" : {}, "geometry" : {}};
-          typeSurf["geometry"] = {"type" : "MultiPolygon",  "coordinates" : []};
+          typeSurf["geometry"] = {"type" : "Polygon",  "coordinates" : [[]]};
 
-          var cartesian2 = new Cesium.Cartesian3(surface[i].polygon.hierarchy._value[l].x, surface[i].polygon.hierarchy._value[l].y, surface[i].polygon.hierarchy._value[l].z);
-          let cartographic2 = Cesium.Cartographic.fromCartesian(cartesian2);
-          let longitude2 = Cesium.Math.toDegrees(cartographic2.longitude);
-          let latitude2 = Cesium.Math.toDegrees(cartographic2.latitude);
-          var coordXY2 = [Number(longitude2), Number(latitude2)];
-          coordSurf.push(coordXY2);
-          l++;
+          var cartesian = new Cesium.Cartesian3(surface[i].polygon.hierarchy._value[k].x, surface[i].polygon.hierarchy._value[k].y, surface[i].polygon.hierarchy._value[k].z);
+          let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+          let longitude = Cesium.Math.toDegrees(cartographic.longitude);
+          let latitude = Cesium.Math.toDegrees(cartographic.latitude);
+          var coordXY = [Number(longitude), Number(latitude)];
+          coordSurf.push(coordXY);
+          console.log(coordSurf);
+          k++;
         }
-        typeSurf["geometry"].coordinates = coordSurf;
+
+        // on rajoute la première coordonnée à la fin de la liste pour permettre l'affichage
+        var cartesian = new Cesium.Cartesian3(surface[i].polygon.hierarchy._value[0].x, surface[i].polygon.hierarchy._value[0].y, surface[i].polygon.hierarchy._value[0].z);
+        let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+        let longitude = Cesium.Math.toDegrees(cartographic.longitude);
+        let latitude = Cesium.Math.toDegrees(cartographic.latitude);
+        var coordXY = [Number(longitude), Number(latitude)];
+        coordSurf.push(coordXY);
+        console.log(coordSurf);
+
+        // il faut une accolade de plus pour que Cesium arrive à lire le JSON
+        arraySurf.push(coordSurf);
+        console.log(arraySurf);
+        typeSurf["geometry"].coordinates = arraySurf;
         features.push(typeSurf);
-      }*/
+      }
 
       jsonGlob["features"] = features;
       var test = JSON.stringify(jsonGlob);
