@@ -50,6 +50,7 @@ class Menu {
 
     // Affichage des couches
     this.photoMaillageCheckbox = document.querySelector('#photoMaillage');
+    this.photoMaillage2017Checkbox = document.querySelector('#photoMaillage2017');
     // PLU
     this.ERCheckbox = document.querySelector('#ER');
     this.margeCheckbox = document.querySelector('#marge');
@@ -449,6 +450,10 @@ evenementsCouches(){
 
   this.photoMaillageCheckbox.addEventListener('change', (e) => {
     globe.show3DTiles(e.target.checked, 'photoMaillage', 'data/Photomaillage/Cesium_1.json');
+  });
+
+  this.photoMaillage2017Checkbox.addEventListener('change', (e) => {
+    globe.show3DTiles(e.target.checked, 'photoMaillage2017', '../Cesium/data/photoMaillage/EXPORT_Cesium_130.json');
   });
 
   this.shadowCheckbox.addEventListener('change', function(e){
@@ -1511,17 +1516,11 @@ getJson(filePath) {
               $("#classifList").replaceWith(divClone);
 
               checkbox.addEventListener('change', (e) => {
-                /*if(e.target.checked){
-                globe.legendManager.addLegend(noms[i], colors, 'polygon');
-              } else{
-              globe.legendManager.removeLegend(noms[i]);
-            }*/
-
-            globe.showJson(e.target.checked, noms[i], json[i], undefined, Cesium.Color.fromCssColorString('#05A197'), '', '', options = {
-              classification: true,
-              classificationField: champ,
-              colors: colors,
-              alpha: transparence
+                globe.showJson(e.target.checked, noms[i], json[i], undefined, Cesium.Color.fromCssColorString('#05A197'), '', '', undefined, {
+                  classification: true,
+                  classificationField: champ,
+                  colors: colors,
+                  alpha: transparence
             });
           });
         });
