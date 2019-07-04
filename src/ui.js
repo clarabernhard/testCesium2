@@ -95,7 +95,9 @@ class Menu {
     * Evenements pour l'ajout des dessins et entités
     *
     */
-    //Tableaux pour les dessins d'entités : on fait un seul tableau dans le constructeur pour garder une trace des entités à tout moment
+
+    //Tableaux pour les dessins/mesures d'entités : on fait un seul tableau dans le constructeur pour garder une trace des entités à tout moment
+
     // dessin
     var point = [];
     var billboard = [];
@@ -110,12 +112,60 @@ class Menu {
     var planeEntities = [];
     var clippingPlanes = [];
 
+    /*
+    * MESURES
+    */
+    document.querySelector('#ligne').addEventListener('change', (e) => {
+      var choice = 'line';
+      var choice2 = 'mesure';
+      var hauteurVol;
+
+      if(e.target.checked){
+        globe.updateShape(choice, choice2, 3, '#FF0000', 1, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
+        this.distanceList.classList.remove('hidden');
+        this.aideCheckbox.classList.remove('hidden');
+      } else{
+        this.distanceList.classList.add('hidden');
+        this.aideCheckbox.classList.add('hidden');
+        for(var i = 0; i < point.length; i++){
+          globe.viewer.entities.remove(dline[i]);
+          globe.viewer.entities.remove(dline2[i]);
+        }
+        globe.viewer.scene.requestRender();
+        globe.supprSouris();
+      }
+    });
+
+    document.querySelector('#surface').addEventListener('change', (e) => {
+      var choice = 'polygon';
+      var choice2 = 'mesure';
+      var hauteurVol;
+
+      if(e.target.checked){
+        globe.updateShape(choice, choice2, 3, '#1ABFD0', 0.4, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
+        this.aireList.classList.remove('hidden');
+        this.aideCheckbox.classList.remove('hidden');
+      } else{
+        this.aireList.classList.add('hidden');
+        this.aideCheckbox.classList.add('hidden');
+        for(var i = 0; i < point.length; i++){
+          globe.viewer.entities.remove(dsurface[i]);
+        }
+        globe.viewer.scene.requestRender();
+        globe.supprSouris();
+      }
+    });
+
+    /*
+    * DESSINS
+    */
+
     // On déclare les évenements des ajouts d'entités dans le constructeur pour qu'ils soient enregistrés qu'une fois
     // Si on les déclare au moment de l'ouverture du formulaire, à la 3ème ouverture l'évenement sera ajouté 3 fois
     // et on va ajouter 3 entités en même temps
     document.querySelector("#envoyerpoint").addEventListener('click', (e) => {
       var choice = 'point';
-      var choice2 = 'construction';
+      var choice2 = 'dessin';
       var transparence;
       var couleur;
       var largeur;
@@ -125,7 +175,7 @@ class Menu {
 
     document.querySelector("#envoyerligne").addEventListener('click', (e) => {
       var choice = 'line';
-      var choice2 = 'construction';
+      var choice2 = 'dessin';
       var hauteurVol;
       var largeur = $('#largeur').val();
       var couleur = $('#couleur').val();
@@ -135,7 +185,7 @@ class Menu {
 
     document.querySelector("#envoyersurf").addEventListener('click', (e) => {
       var choice = 'polygon';
-      var choice2 = 'construction';
+      var choice2 = 'dessin';
       var hauteurVol;
       var largeur = 3;
       var couleur = $('#couleursurf').val();
@@ -145,7 +195,7 @@ class Menu {
 
     document.querySelector("#envoyervol").addEventListener('click', (e) => {
       var choice = 'volume';
-      var choice2 = 'construction';
+      var choice2 = 'dessin';
       var largeur = 3;
       var hauteurVol = $('#hauteurvol').val();
       var couleur = $('#couleurvol').val();
@@ -175,88 +225,169 @@ class Menu {
     globe.annulCoupe(planeEntities, clippingPlanes);
     globe.supprCoupe(planeEntities, clippingPlanes);
 
+    // supprime toutes les entités
+    document.querySelector('#suppr').addEventListener('click', function() {
+      globe.viewer.entities.removeAll();
+      billboard = [];
+      line = [];
+      surface = [];
+      volume = [];
+    });
+
     /*
     *
     *  Export des dessins
     *
     */
     document.querySelector("#exportDessin").addEventListener('click', (e) => {
-      var jsonGlob = {};
+      let jsonGlob = {};
       jsonGlob = {"type" : "FeatureCollection", "features" : []};
 
-      var i=0;
-      var features = [];
+      let i=0;
+      let features = [];
 
       while (i < line.length) {
-        var j = 0;
-        var coordLine = [];
+        let j = 0;
+        let coordLine = [];
         while (j < line[i].polyline.positions._value.length) {
           var type = {"type" : "Feature", "properties" : {}, "geometry" : {}};
           type["geometry"] = {"type" : "LineString", "coordinates" : []};
 
-          var cartesian = new Cesium.Cartesian3(line[i].polyline.positions._value[j].x, line[i].polyline.positions._value[j].y, line[i].polyline.positions._value[j].z);
+          let cartesian = new Cesium.Cartesian3(line[i].polyline.positions._value[j].x, line[i].polyline.positions._value[j].y, line[i].polyline.positions._value[j].z);
           let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
           let longitude = Cesium.Math.toDegrees(cartographic.longitude);
           let latitude = Cesium.Math.toDegrees(cartographic.latitude);
-          var coordXY = [Number(longitude), Number(latitude)];
+          let coordXY = [Number(longitude), Number(latitude)];
           coordLine.push(coordXY);
           j++;
         }
-        var nom = line[i].id;
-        console.log(nom);
+        let nom = line[i].id;
         type["properties"].name = nom;
+        console.log(line[i]);
+
+        let rouge = line[i].polyline.material.color._value.red;
+        let vert =  line[i].polyline.material.color._value.green;
+        let bleu =  line[i].polyline.material.color._value.blue;
+        let transpa = line[i].polyline.material.color._value.alpha;
+        type["properties"].color = {};
+        type["properties"]["color"].red = rouge;
+        type["properties"]["color"].green = vert;
+        type["properties"]["color"].blue = bleu;
+        type["properties"]["color"].alpha = transpa;
+
+        let largeur =  line[i].polyline.width._value;
+        type["properties"].width = largeur;
+
         type["geometry"].coordinates = coordLine;
         features.push(type);
         i++;
       }
 
-      for (var i = 0; i < surface.length; i++) {
-        var coordSurf = [];
-        var arraySurf = [];
-        var k = 0;
+      for (let i = 0; i < surface.length; i++) {
+        let coordSurf = [];
+        let arraySurf = [];
+        let k = 0;
         while (k < surface[i].polygon.hierarchy._value.length) {
           var typeSurf = {"type" : "Feature", "properties" : {}, "geometry" : {}};
           typeSurf["geometry"] = {"type" : "Polygon",  "coordinates" : [[]]};
 
-          var cartesian = new Cesium.Cartesian3(surface[i].polygon.hierarchy._value[k].x, surface[i].polygon.hierarchy._value[k].y, surface[i].polygon.hierarchy._value[k].z);
+          let cartesian = new Cesium.Cartesian3(surface[i].polygon.hierarchy._value[k].x, surface[i].polygon.hierarchy._value[k].y, surface[i].polygon.hierarchy._value[k].z);
           let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
           let longitude = Cesium.Math.toDegrees(cartographic.longitude);
           let latitude = Cesium.Math.toDegrees(cartographic.latitude);
-          var coordXY = [Number(longitude), Number(latitude)];
+          let coordXY = [Number(longitude), Number(latitude)];
           coordSurf.push(coordXY);
-          console.log(coordSurf);
           k++;
         }
 
         // on rajoute la première coordonnée à la fin de la liste pour permettre l'affichage
-        var cartesian = new Cesium.Cartesian3(surface[i].polygon.hierarchy._value[0].x, surface[i].polygon.hierarchy._value[0].y, surface[i].polygon.hierarchy._value[0].z);
+        let cartesian = new Cesium.Cartesian3(surface[i].polygon.hierarchy._value[0].x, surface[i].polygon.hierarchy._value[0].y, surface[i].polygon.hierarchy._value[0].z);
         let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
         let longitude = Cesium.Math.toDegrees(cartographic.longitude);
         let latitude = Cesium.Math.toDegrees(cartographic.latitude);
-        var coordXY = [Number(longitude), Number(latitude)];
+        let coordXY = [Number(longitude), Number(latitude)];
         coordSurf.push(coordXY);
-        console.log(coordSurf);
 
-        // il faut une accolade de plus pour que Cesium arrive à lire le JSON
+        let nom = surface[i].id;
+        typeSurf["properties"].name = nom;
+
+        let rouge = surface[i].polygon.material.color._value.red;
+        let vert =  surface[i].polygon.material.color._value.green;
+        let bleu =  surface[i].polygon.material.color._value.blue;
+        let transpa =  surface[i].polygon.material.color._value.alpha;
+        typeSurf["properties"].color = {};
+        typeSurf["properties"]["color"].red = rouge;
+        typeSurf["properties"]["color"].green = vert;
+        typeSurf["properties"]["color"].blue = bleu;
+        typeSurf["properties"]["color"].alpha = transpa;
+
+        console.log(surface);
+
+        // il faut une accolade de plus pour les coordonnées des polygon pour que Cesium arrive à lire le JSON
         arraySurf.push(coordSurf);
-        console.log(arraySurf);
         typeSurf["geometry"].coordinates = arraySurf;
         features.push(typeSurf);
       }
 
-      jsonGlob["features"] = features;
-      var test = JSON.stringify(jsonGlob);
+      for (let i = 0; i < volume.length; i++) {
+        let coordVol = [];
+        let arrayVol = [];
+        let k = 0;
+        while (k < volume[i].polygon.hierarchy._value.length) {
+          var typeVol = {"type" : "Feature", "properties" : {}, "geometry" : {}};
+          typeVol["geometry"] = {"type" : "Polygon",  "coordinates" : [[]]};
 
-      var element = document.querySelector('#exportDessin');
-      element.setAttribute('href', 'data:json,' + encodeURIComponent(test));
+          let cartesian = new Cesium.Cartesian3(volume[i].polygon.hierarchy._value[k].x, volume[i].polygon.hierarchy._value[k].y, volume[i].polygon.hierarchy._value[k].z);
+          let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+          let longitude = Cesium.Math.toDegrees(cartographic.longitude);
+          let latitude = Cesium.Math.toDegrees(cartographic.latitude);
+          let coordXY = [Number(longitude), Number(latitude)];
+          coordVol.push(coordXY);
+          k++;
+        }
+
+        // on rajoute la première coordonnée à la fin de la liste pour permettre l'affichage
+        let cartesian = new Cesium.Cartesian3(volume[i].polygon.hierarchy._value[0].x, volume[i].polygon.hierarchy._value[0].y, volume[i].polygon.hierarchy._value[0].z);
+        let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+        let longitude = Cesium.Math.toDegrees(cartographic.longitude);
+        let latitude = Cesium.Math.toDegrees(cartographic.latitude);
+        let coordXY = [Number(longitude), Number(latitude)];
+        coordVol.push(coordXY);
+
+        let nom = volume[i].id;
+        typeVol["properties"].name = nom;
+
+        let rouge = volume[i].polygon.material.color._value.red;
+        let vert =  volume[i].polygon.material.color._value.green;
+        let bleu =  volume[i].polygon.material.color._value.blue;
+        let transpa =  volume[i].polygon.material.color._value.alpha;
+        typeVol["properties"].color = {};
+        typeVol["properties"]["color"].red = rouge;
+        typeVol["properties"]["color"].green = vert;
+        typeVol["properties"]["color"].blue = bleu;
+        typeVol["properties"]["color"].alpha = transpa;
+
+        typeVol["properties"].extrudedHeight = volume[i].polygon.extrudedHeight._value;
+
+        // il faut une accolade de plus pour les coordonnées des polygon pour que Cesium arrive à lire le JSON
+        arrayVol.push(coordVol);
+        typeVol["geometry"].coordinates = arrayVol;
+        features.push(typeVol);
+      }
+
+      jsonGlob["features"] = features;
+      var download = JSON.stringify(jsonGlob);
+
+      let element = document.querySelector('#exportDessin');
+      element.setAttribute('href', 'data:json,' + encodeURIComponent(download));
       element.setAttribute('download', 'drawing.json');
 
       /*console.log(line[0].polyline.positions._value[0].x); // .x .y .z
       console.log(line[0].polyline.width._value);
-      console.log(line[0].polyline.material.color._value);*/
+      console.log(line[0].polyline.material.color._value); */ // .red .green .blue .alpha
 
       /*console.log(surface[0].polygon.hierarchy._value[0]); // positions des sommets
-      console.log(surface[0].polygon.material.color._value); //.alpha .blue .green .red
+      console.log(surface[0].polygon.material.color._value);
 
       console.log(volume[0].polygon.hierarchy._value);
       console.log(volume[0].polygon.material.color._value);
@@ -264,6 +395,9 @@ class Menu {
 
       console.log(billboard[0].position._value);
       console.log(billboard[0].billboard.image._value);*/
+
+
+
 
     });
 
@@ -317,6 +451,7 @@ class Menu {
     */
     this.getJson();
     this.get3DTiles();
+    this.getDrawing();
 
   }
 
@@ -401,54 +536,6 @@ class Menu {
       globe.showCoords(e.target.checked);
     });
 
-    document.querySelector('#ligne').addEventListener('change', (e) => {
-      var choice = 'line';
-      var choice2 = 'mesure';
-      var hauteurVol;
-      var point = [];
-      var dline = [];
-      var dline2 = [];
-      var surface;
-      var billboard;
-      var line;
-      var volume;
-      var dsurface;
-
-      if(e.target.checked){
-        globe.updateShape(choice, choice2, 3, '#FF0000', 1, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
-        this.distanceList.classList.remove('hidden');
-        this.aideCheckbox.classList.remove('hidden');
-      } else{
-        this.distanceList.classList.add('hidden');
-        this.aideCheckbox.classList.add('hidden');
-        globe.supprSouris();
-      }
-    });
-
-    document.querySelector('#surface').addEventListener('change', (e) => {
-      var choice = 'polygon';
-      var choice2 = 'mesure';
-      var hauteurVol;
-      var point = [];
-      var dline;
-      var dline2;
-      var surface;
-      var billboard;
-      var line;
-      var volume;
-      var dsurface = [];
-
-      if(e.target.checked){
-        globe.updateShape(choice, choice2, 3, '#1ABFD0', 0.4, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
-        this.aireList.classList.remove('hidden');
-        this.aideCheckbox.classList.remove('hidden');
-      } else{
-        this.aireList.classList.add('hidden');
-        this.aideCheckbox.classList.add('hidden');
-        globe.supprSouris();
-      }
-    });
-
     // Dessins
     document.querySelector('#cpoint').addEventListener('change', (e) => {
       if(e.target.checked){
@@ -510,15 +597,6 @@ class Menu {
         this.decoupeList.classList.add('hidden');
         globe.supprSouris();
       }
-    });
-
-    // supprime toutes les entités
-    document.querySelector('#suppr').addEventListener('click', function() {
-      globe.viewer.entities.removeAll();
-      billboard = [];
-      line = [];
-      surface = [];
-      volume = [];
     });
 
     // ombres
@@ -1273,7 +1351,12 @@ class Menu {
 
   }
 
-  // Ajouter une source de données a la liste en donnant son nom "name" et la datasource "value"
+  /*
+  *
+  * Fin de la fonction evenementsCouches
+  */
+
+  // Ajoute une source de données à la liste en donnant son nom "name" et la datasource "value"
   addDataSource(name, value){
     this.dataSources[name] = value;
   }
@@ -1292,6 +1375,9 @@ class Menu {
     this.globe.viewer.timeline.zoomTo(startTime, stopTime); // Définit la portion visible de la timeline
   }
 
+  /*
+  * Classification du 3Dtiles velum en fonction de la valeur de l'attribut 'classif'
+  */
   couleurVelum(show){
     if(this.dataSources.velum === undefined || this.dataSources.velum.show == false){
       alert("Vous devez afficher le velum pour utiliser cette fonction");
@@ -1323,7 +1409,7 @@ class Menu {
     });
   }
 
-  /*
+  /* Ajout de couches interactif
   * Principe: on a un serveur web qui permet d'avoir les fichiers au format http (Cesium n'accepte pas les fichiers stockés en
   * local pour des raisons de crossOrigin), on veut récupérer une liste de tous les fichiers présents dans un dossier spécifique.
   * On envoie la requête sur le serveur qui nous donne la liste au format texte, on récupère tous les noms de fichiers et
@@ -1523,6 +1609,99 @@ class Menu {
                 globe.show3DTiles(e.target.checked, 'test', json[i]);
               });
 
+            });
+          }
+        }
+      };
+
+      xmlhttp.send();
+    });
+  }
+
+  getDrawing() {
+    var result = []; // tableau pour stocker les éléments du dossier
+    var noms = []; // stocke les noms des couches
+    var json = []; // stocke les liens vers les json associés au nom
+
+    var id = []; // tableau unitaire 1, 2, 3 jusqu'à 100
+    // permet de donner un identifiant aux couches
+    // on ne peut pas avoir plus de 100 fichiers présents dans le dossier du serveur
+    var N = 100;
+    for (var i = 1; i <= N; i++) {
+      id.push(i);
+    }
+
+    var valeurClassif = []; // champ de texte utlisé pour la classification
+    var couleurClassif = []; // couleur associée
+
+    // variables neutres qui servent lors de l'appel de la fonction showJson
+    var symbol;
+    var couleur = 'FFFFFF';
+    var options;
+
+    document.querySelector('#affichercouche').addEventListener('click', function() {
+      document.querySelector('#affichercouche').classList.add('hidden'); // on ne peut afficher qu'un seul contenu de dossier par session
+      localStorage.setItem('identifiant', $('#idEMS').val()); // on enregistre l'identifiant dans la mémoire du navigateur (cookie)
+      var identifiant = localStorage.getItem('identifiant'); // et on le récupère
+
+      var filePath = 'http://127.1.0.0:8000/' + identifiant + '/drawing/'; // donne le chemin d'accès au dossier
+
+      var divClone = $("#classifList").clone(); // on garde en mémoire l'état d'origine pour le remettre une fois une couche ajoutée
+
+      var xmlhttp = new XMLHttpRequest();
+      this.xmlhttp = this;
+      xmlhttp.open("GET", filePath, true);
+      xmlhttp.onreadystatechange = function () {
+        if(xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+
+          let html = xmlhttp.responseText; // renvoie un texte au format html où la liste des fichers est dans une li
+          result = $(html).find("li > a"); // on récupère tous les li
+
+
+          for(let i=0;i<result.length;i++) {
+            noms.push(result[i].innerText);
+            json.push(filePath + result[i].innerText);
+
+            // créé les boutons qui récupère les infos du serveur
+            var couche = document.createElement("BUTTON");
+            couche.innerHTML = noms[i];
+            document.getElementById("fileList").appendChild(couche);
+            let espace = document.createElement("br");
+            document.getElementById("fileList").appendChild(espace);
+
+            // Pour chaque bouton, créé une checkbox dans l'onglet "mes couches"
+            couche.addEventListener('click', (e) => {
+              document.querySelector('#fileList').classList.add('hidden');
+
+              let item = document.createElement('div');
+              item.classList.add('nowrap');
+              let checkbox = document.createElement("input");
+              checkbox.type = "checkbox";
+              checkbox.name = noms[i];
+              checkbox.id = id[i];
+              let label = document.createElement('label');
+              label.htmlFor = id[i];
+              label.appendChild(document.createTextNode(noms[i]));
+              item.appendChild(checkbox);
+              item.appendChild(label);
+              document.getElementById("mescouches").appendChild(item);
+
+                // L'evenement pour afficher la nouvelle couche
+                checkbox.addEventListener('change', (e) => {
+                  if(e.target.checked){
+                    if(globe.dataSources[noms[i]] === undefined){
+                      globe.loadDrawing(json[i], noms[i], options);
+                    } else{
+                      globe.dataSources[noms[i]].show = true;
+                      globe.viewer.scene.requestRender();
+                    }
+                  } else{
+                    if(globe.dataSources[noms[i]] !== undefined){
+                      globe.dataSources[noms[i]].show = false;
+                      globe.viewer.scene.requestRender();
+                    }
+                  }
+              });
             });
           }
         }

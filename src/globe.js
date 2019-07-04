@@ -9,7 +9,7 @@ class Globe {
     this.viewer = new Cesium.Viewer(elementId, {
       geocoder: geocoder, // connexion à la base de données d'adresses de l'EMS
       selectionIndicator: false, // enlève le carré vert lorsqu'on clique sur qqch
-      requestRenderMode : true, // amélioration de performance: l'appli calcule uniquement quand on lui demande
+      requestRenderMode : true, // amélioration de performance: l'appli calcule uniquement quand on lui demande (https://cesium.com/blog/2018/01/24/cesium-scene-rendering-performance/)
       maximumRenderTimeChange : Infinity,
       baseLayerPicker: false,
       skyBox : new Cesium.SkyBox({ // définit le ciel bleu
@@ -30,7 +30,7 @@ class Globe {
     // Définit la couleur de fond du globe étant donné qu'on a supprimé le terrain (ici du noir)
     this.viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#AB9B8B').withAlpha(0.4);*/
 
-    // importe la grille de conversion
+    // importe la grille de conversion pour hauteur ellispoïdale vers altitude IGN69
     this.raf09 = undefined;
     new Raf09('../Cesium/data/RAF09.mnt', (raf090) => {
       this.raf09 = raf090;
@@ -75,9 +75,11 @@ class Globe {
 
   /*
   *
-  *  Définit le zoom par défaut à l'ouverture de l'appli et lorsqu'on clique sur le bouton maison
+  *  Contrôle de la caméra/de la vue affichée
   *
   */
+
+  //Définit le zoom par défaut à l'ouverture de l'appli et lorsqu'on clique sur le bouton maison
   setHome(tileset){
     var params = this.getAllUrlParams(window.location.href);
     let X = params.x;
@@ -110,7 +112,6 @@ class Globe {
         }
       });
     }
-
     // Définir ce qu'il se passe lorsqu'on clique sur le bouton "maison" (ici retour à l'écran d'accueil)
     this.viewer.homeButton.viewModel.command.beforeExecute.addEventListener((e) => {
       e.cancel = true;
@@ -125,7 +126,7 @@ class Globe {
     });
   }
 
-  // fonction qui retourne les paramètres présents dans l'URL
+  // fonction qui lit et retourne les paramètres présents dans l'URL
   getAllUrlParams(url) {
     var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
     var obj = {};
@@ -209,8 +210,15 @@ class Globe {
     let pitch = globe.viewer.camera.pitch;
     let roll = globe.viewer.camera.roll;
 
+    // le premier paramètre doit débuter avec un "?" et les autres paramètres doivent être séparés par un "&"
     document.getElementById('nomlink').value = window.location.href+'?X='+X+'&Y='+Y+'&Z='+Z+'&heading='+heading+'&pitch='+pitch+'&roll='+roll;
   }
+
+  /*
+  *
+  * Chargement de données
+  *
+  */
 
   // permet d'enregister le tileset au format 3DTiles
   loadPhotomaillage(link, options = {}){
@@ -220,7 +228,6 @@ class Globe {
       maximumScreenSpaceError : 1,
       maximumNumberOfLoadedTiles : 1000 // Nombre maximum de dalles chargées simultanément
     });
-
     return tileset;
   }
 
@@ -233,11 +240,10 @@ class Globe {
   // permet de charger des 3DTiles en gardant une structure asynchrone (voir fonction show dans la classe UI)
   load3DTiles(link, options = {}){
     let tileset = globe.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
-      url : link, // URL vers le ficher JSON "racine"
+      url : link,
       maximumScreenSpaceError : 1,
-      maximumNumberOfLoadedTiles : 1000 // Nombre maximum de dalle chargées simultanément
+      maximumNumberOfLoadedTiles : 1000
     }));
-
     return tileset.readyPromise;
   }
 
@@ -254,46 +260,43 @@ class Globe {
     let promisse = Cesium.GeoJsonDataSource.load(link, {
       clampToGround: true,
       markerSymbol: symbol, // pour l'affichage en symbole maki https://cesiumjs.org/Cesium/Build/Apps/Sandcastle/index.html?src=GeoJSON%20simplestyle.html&label=All
-      markerColor: couleur
+      markerColor: couleur // choisir la couleur de l'épingle
     });
-    this.viewer.scene.globe.depthTestAgainstTerrain = true;
-    this.viewer.scene.logarithmicDepthBuffer = false;
-    this.showLoader();
-    promisse.then((dataSource) => {
+    this.viewer.scene.globe.depthTestAgainstTerrain = true; // test pour voir si les json arrête de baver
+    this.viewer.scene.logarithmicDepthBuffer = false; // idem
+    this.showLoader(); // fonction qui affiche un symbole de chargement sur la page
 
+    promisse.then((dataSource) => {
       this.viewer.dataSources.add(dataSource);
       this.dataSources[name] = dataSource;
       this.hideLoader();
 
+      // permet de classifier les json
       if(options.classification && options.classificationField !== undefined){
         // Get the array of entities
         let entities = dataSource.entities.values;
-
         if(options.colors != undefined){
           Object.keys(options.colors).forEach(function(c){
             options.colors[c] = Cesium.Color.fromCssColorString(options.colors[c]);
             options.colors[c].alpha = options.alpha || 0.8;
           })
         }
-
         let colors = options.colors || {};
 
         for (let i = 0; i < entities.length; i++) {
           let entity = entities[i];
-
           if (Cesium.defined(entity.polygon)) {
             let color = colors[entity.properties[options.classificationField]];
             if(!color){
               color = Cesium.Color.fromRandom({ alpha : options.alpha || 0.8 });
               colors[entity.properties[options.classificationField]] = color;
             }
-
             entity.polygon.material = color;
             entity.polygon.classificationType = Cesium.ClassificationType.CESIUM_3D_TILE;
           }
         }
       }
-
+      // créé un billboard pour chaque entité ponctuelle (en précisant l'image à utiliser dans les paramètres)
       if(choice === 'point') {
         for(let i=0;i<this.dataSources[name]._entityCollection._entities._array.length;i++) {
           var X = (this.dataSources[name]._entityCollection._entities._array[i]._position._value.x);
@@ -303,26 +306,60 @@ class Globe {
           billboard.push(this.createBillboard(position, image, true));
         }
       }
-
     });
-
     return promisse;
   }
 
-  // Fonctions pour controler le loader
-  showLoader(){
-    document.querySelector('#loadingIndicator').classList.remove('hidden');
-  }
-  hideLoader(){
-    document.querySelector('#loadingIndicator').classList.add('hidden');
+  loadDrawing(link, name, options = {}){
+    let promisse = Cesium.GeoJsonDataSource.load(link, {
+      clampToGround: true
+    });
+    this.showLoader(); // fonction qui affiche un symbole de chargement sur la page
+
+    promisse.then((dataSource) => {
+      this.viewer.dataSources.add(dataSource);
+      this.dataSources[name] = dataSource;
+      this.hideLoader();
+
+      // Get the array of entities
+      var entities = dataSource.entities.values;
+      for (let i = 0; i < entities.length; i++) {
+        let entity = entities[i];
+        if (Cesium.defined(entity.polygon)) {
+          /*let rouge = parseFloat(entity.properties.color.red);
+          let vert = parseFloat(entity.properties.color.green);
+          let bleu = parseFloat(entity.properties.color.blue);
+          let alpha = parseFloat(entity.properties.color.alpha);
+          let couleur = new Cesium.Color(rouge, vert, bleu, alpha);*/
+          let couleur = new Cesium.Color(0, 1, 0.5, 0.5);
+          //let couleur = new Cesium.Color(Number(entity.properties.color.red), Number(entity.properties.color.green), Number(entity.properties.color.blue), Number(entity.properties.color.alpha));
+          entity.polygon.material = couleur;
+          entity.polygon.outline = false;
+          entity.polygon.extrudedHeight = entity.properties.extrudedHeight;
+          entity.polygon.classificationType = Cesium.ClassificationType.CESIUM_3D_TILE;
+
+        } else if(Cesium.defined(entity.polyline)) {
+          /*let rouge = parseFloat(entity.properties.color.red);
+          let vert = parseFloat(entity.properties.color.green);
+          let bleu = parseFloat(entity.properties.color.blue);
+          let alpha = parseFloat(entity.properties.color.alpha);
+          let couleur = new Cesium.Color(rouge, vert, bleu, alpha);*/
+          let couleur = new Cesium.Color(0, 1, 0.5, 0.5);
+          let largeur = entity.properties.width;
+
+          entity.polyline.material = couleur;
+          entity.polyline.width = largeur;
+          entity.polyline.classificationType = Cesium.ClassificationType.CESIUM_3D_TILE;
+        }
+      }
+    });
+    return promisse;
   }
 
   /*
   * Afficher ou masquer la source de données "name" en fonction de la valeur de "show"
   * Si elle n'a pas enore été affiché, la fonction va télécharger les données avec le lien "link" passé en parametre
-  * Elle utilise la fonction "loader" passé en paramètre pour télécharger les données et les ajouter au globe
-  * "Options" est un paramètre optionel (un objet) qui sera passé en deuxième paramètre de la fonction "loader"
-  marche pour les 3DTiles et KML
+  * Enlève/Affiche les entités billboard pour les points
   */
   showJson(show, name, link, symbol, couleur, image, choice, billboard, options = {}){
     if(show){
@@ -335,7 +372,7 @@ class Globe {
             billboard[i].show = true;
           }
         }
-        this.viewer.scene.requestRender();
+        this.viewer.scene.requestRender(); // dit à Cesium de recalculer la page
       }
     } else{
       if(this.dataSources[name] !== undefined){
@@ -350,6 +387,7 @@ class Globe {
     }
   }
 
+// idem pour les 3Dtiles
   show3DTiles(show, name, link, options = {}){
     if(show){
       if(this.dataSources[name] === undefined){
@@ -370,10 +408,19 @@ class Globe {
     }
   }
 
-  // Fonction pour afficher les ombres
-  shadow(enabled){
-    this.handler.globe = this;
+  // Fonctions pour controler le loader, ie l'icône qui s'affiche pendant le chargement des données
+  showLoader(){
+    document.querySelector('#loadingIndicator').classList.remove('hidden');
+  }
+  hideLoader(){
+    document.querySelector('#loadingIndicator').classList.add('hidden');
+  }
 
+  /*
+  * Fonction pour afficher les ombres
+  */
+  shadow(enabled){
+    this.handler.globe = this; // pour les problèmes de scope
     this.viewer.shadows = enabled;
     if(enabled) {
       document.addEventListener("mousemove", function() {
@@ -384,6 +431,9 @@ class Globe {
     }
   }
 
+  /*
+  * Coordonnées
+  */
   // récupérer lat/lon/hauteur à chaque clic gauche
   setCoordsCallback(callback){
     let scene = this.viewer.scene;
@@ -393,8 +443,8 @@ class Globe {
       let cartesian = scene.pickPosition(event.position);
 
       if (Cesium.defined(cartesian)) {
-        let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-        let longitudeString = Cesium.Math.toDegrees(cartographic.longitude).toFixed(7);
+        let cartographic = Cesium.Cartographic.fromCartesian(cartesian); // cartesian = coords géometriques de l'écran
+        let longitudeString = Cesium.Math.toDegrees(cartographic.longitude).toFixed(7); // en degrés décimaux
         let latitudeString = Cesium.Math.toDegrees(cartographic.latitude).toFixed(7);
         let heightString = cartographic.height.toFixed(3);
         callback(longitudeString, latitudeString, heightString);
@@ -421,15 +471,18 @@ class Globe {
     }
   }
 
-  // ajouter le plan de coupe horizontal
-  addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, planeEntities, clippingPlanes) {
+  /*
+  * Plan de coupe horizontal
+  */
 
+  // ajouter le plan de coupe horizontal: les paramètres de la fonction vont être lus dans le formulaire avant de cliquer sur 'ajouter'
+  addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, planeEntities, clippingPlanes) {
+    // on n'associe pas les clippingPlanes au tileset: c'est pour ça qu'ils ne coupent pas le tileset mais passent à travers
     var clippingPlanes = new Cesium.ClippingPlaneCollection({
       planes : [
-        new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 0, -1), 0.0)
+        new Cesium.ClippingPlane(new Cesium.Cartesian3(0.0, 0, -1), 0.0) // donne l'orientation du clippingPlanes
       ]
     });
-
 
     for (var i = 0; i < clippingPlanes.length; i=+1) {
       var coords = proj4('EPSG:3948','EPSG:4326', [Number(X), Number(Y)]);
@@ -457,7 +510,6 @@ class Globe {
 
   // Récupérer les coordonnées au clic et les afficher dans le formulaire du plan de coupe horizontal
   coordCoupe(){
-
     let scene = this.viewer.scene;
     this.handler.globe = this;
 
@@ -477,6 +529,7 @@ class Globe {
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
   }
 
+// enlève le dernier plan de coupe ajouté
   annulCoupe(entity, clippingPlanes){
     document.querySelector("#annulercoupe").addEventListener('click', (e) => {
       var annul = entity.length-1;
@@ -487,6 +540,7 @@ class Globe {
     });
   }
 
+// supprime tous les plans de coupe
   supprCoupe(entity, clippingPlanes){
     document.querySelector("#supprimercoupe").addEventListener('click', (e) => {
       //this.viewer.entities.remove(planeEntity);
@@ -500,7 +554,6 @@ class Globe {
 
   // Fonction qui permet de gérer les mouvements du plan de coupe
   planeUpdate(plane, couleurCoupe) {
-
     var targetY = 0.0;
     var selectedPlane;
     var scene = this.viewer.scene;
@@ -534,7 +587,7 @@ class Globe {
         var deltaY = movement.startPosition.y - movement.endPosition.y;
         targetY += deltaY;
       }
-      globe.altitude.innerHTML = targetY;
+      globe.altitude.innerHTML = targetY; // affiche la différence entre l'altitude actuelle et l'altitude de départ (pas métrique)
       globe.viewer.scene.requestRender();
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
@@ -544,19 +597,28 @@ class Globe {
     };
   }
 
-  //outils dessin
+  /*
+  *
+  *
+  *  Outils de dessin
+  *
+  *
+  */
+
+  // pour créer un point: entité uniquement technique qui sert à afficher les autres figures (ici chaque point est affiché transparent)
   createPoint(worldPosition) {
     var point = this.viewer.entities.add({
       position : worldPosition,
       point : {
         color : Cesium.Color.TRANSPARENT,
         pixelSize : 1,
-        heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
+        heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND // plaque au 3dtiles
       }
     });
     return point;
   }
 
+  // Ajoute une image à une position spécifiée
   createBillboard(worldPosition, image, size) {
     var symbol = this.viewer.entities.add({
       position : worldPosition,
@@ -564,12 +626,13 @@ class Globe {
         image : image,
         heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
         verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-        sizeInMeters: size
+        sizeInMeters: size // true si on veut la taille en mètre, false si on veut la taille en pixels
       }
     });
     return symbol;
   }
 
+  // ajoute une polyligne
   drawLine(positionData, largeur, couleur, transparence, clamp) {
     var shape = this.viewer.entities.add({
       polyline : {
@@ -582,6 +645,7 @@ class Globe {
     return shape;
   }
 
+  // polyligne avec une flèche au bout
   drawArrowLine(positionData, largeur, couleur, transparence, clamp) {
     var shape = this.viewer.entities.add({
       polyline : {
@@ -594,6 +658,7 @@ class Globe {
     return shape;
   }
 
+  // polyligne en pointillés
   drawDashLine(positionData, largeur, couleur, transparence, clamp) {
     var shape = this.viewer.entities.add({
       polyline : {
@@ -608,6 +673,7 @@ class Globe {
     return shape;
   }
 
+  // dessine une surface
   drawPolygon(positionData, couleur, transparence) {
     var shape = this.viewer.entities.add({
       polygon: {
@@ -619,6 +685,7 @@ class Globe {
     return shape;
   }
 
+  // dessine une surface extrudée, ie une boîte pour laquelle on précise la hauteur
   drawVolume(positionData, couleur, transparence, hauteurVol) {
     var shape = this.viewer.entities.add({
       polygon: {
@@ -632,8 +699,13 @@ class Globe {
     return shape;
   }
 
-  // on met tous les tableaux d'entités en paramètres de la fonction car ils seront définis dans la classe ui
-  // pour garder une trace des entités et permettre leur annulation/exportation
+  /* LA fonction qui permet de tout dessiner
+  * le paramètre choice designe si on mesure (dessins temporaires) ou si on dessine (dessins qui restent après fermeture de la fonction de dessin)
+  * le paramètre choice désigne le type de dessin (line, surface, volume etc)
+  * On met tous les tableaux d'entités en paramètres de la fonction car ils seront définis dans la classe ui
+  * pour garder une trace des entités et permettre leur annulation/exportation
+  * Le reste des paramètres correspondent aux paramètres de personnalisation définis par l'utilisateur dans les formulaires
+  */
   updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface) {
     var activeShapePoints = [];
     var activeShape;
@@ -641,7 +713,7 @@ class Globe {
     var z;
 
     var scene = this.viewer.scene;
-    this.handler.globe = this;
+    this.handler.globe = this; // problème de scope à l'intérieur du this.handler
 
     this.handler.setInputAction(function(event) {
       var earthPosition = scene.pickPosition(event.position);
@@ -668,15 +740,13 @@ class Globe {
             activeShape = globe.drawVolume(dynamicPositions, couleur, transparence, z);
           } else if(choice === 'line') {
             if(choice2 === 'mesure') {
-              activeShape = globe.drawLine(dynamicPositions, largeur, couleur, transparence, false);
+              activeShape = globe.drawLine(dynamicPositions, largeur, couleur, transparence, false); // 1ère ligne non collée au sol pour la distance inclinée
               largeur = parseFloat(largeur);
-              activeShape = globe.drawLine(dynamicPositions, largeur, '#000000', '0.5', true);
-            } else if(choice2 === 'construction') {
+              activeShape = globe.drawLine(dynamicPositions, largeur, '#000000', '0.5', true); // 2ème collée au sol pour distance horizontale
+            } else if(choice2 === 'dessin') {
               couleur = couleur.toString();
-              // clamp to ground ou pas
-              if($('#clampligne').val() === 'colle') {
-                // style normal
-                if($('#styleligne').val() === 'simple') {
+              if($('#clampligne').val() === 'colle') { // clamp to ground ou pas
+                if($('#styleligne').val() === 'simple') { // style normal
                   activeShape = globe.drawLine(dynamicPositions, largeur, couleur, transparence, true);
                 } else if($('#styleligne').val() === 'pointille') { // style pointillé
                   activeShape = globe.drawDashLine(dynamicPositions, largeur, couleur, transparence, true);
@@ -705,7 +775,7 @@ class Globe {
         }
       }
       if(choice === 'polygon'&& choice2 === 'mesure') {
-        globe.measureSurface(activeShapePoints);
+        globe.measureSurface(activeShapePoints); // mesure l'aire du polygone à chaque clic gauche
       }
       globe.viewer.scene.requestRender();
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
@@ -720,7 +790,7 @@ class Globe {
         }
       }
       if(choice === 'line' && choice2 === 'mesure') {
-        globe.measureDistance(activeShapePoints);
+        globe.measureDistance(activeShapePoints); // mesure la distance à chaque mouvement de souris
       }
       globe.viewer.scene.requestRender();
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
@@ -731,7 +801,8 @@ class Globe {
       // on supprime le dernier point flottant
       activeShapePoints.pop();
 
-      if(choice2 === 'construction'){
+      // on ajoute les entités dans le taleau d'entités correspondant
+      if(choice2 === 'dessin'){
         if(choice === 'point') {
           point.push(globe.createPoint(activeShapePoints));
           billboard.push(globe.createBillboard(activeShapePoints, 'src/img/interface.png', false));
@@ -771,35 +842,20 @@ class Globe {
       globe.viewer.entities.remove(activeShape);
       floatingPoint = undefined;
       activeShape = undefined;
-      if(choice2 === 'construction'){
+      if(choice2 === 'dessin'){
         // garder les activeShapePoints définis permet l'affichage des mesures
         activeShapePoints = [];
       }
       globe.viewer.scene.requestRender();
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
+    // les 2 boutons "nouvelle mesure" pour la distance et surface: l'utilisateur est obligé d'appuyer dessus pour effectuer une nouvelle mesure
     $('.nouv').click(function(e) {
       activeShapePoints = [];
     });
-
-    // on supprime les éléments des mesures lorsqu'on ferme l'onglet
-    document.querySelector("#ligne").addEventListener('click', (e) => {
-      activeShapePoints = [];
-      for(var i = 0; i < point.length; i++){
-        this.viewer.entities.remove(dline[i]);
-        this.viewer.entities.remove(dline2[i]);
-      }
-      this.viewer.scene.requestRender();
-    });
-    document.querySelector("#surface").addEventListener('click', (e) => {
-      activeShapePoints = [];
-      for(var i = 0; i < point.length; i++){
-        this.viewer.entities.remove(dsurface[i]);
-      }
-      this.viewer.scene.requestRender();
-    });
   }
 
+  // Enlève la dernière figure par catégorie (tableau lignes, surfaces etc)
   annulFigure(element, figure) {
     document.querySelector(element).addEventListener('click', (e) => {
       var lastLine = figure.pop();
@@ -808,6 +864,7 @@ class Globe {
     });
   }
 
+  // Supprime toutes les figures par catégorie
   supprFigure(element, figure) {
     document.querySelector(element).addEventListener('click', (e) => {
       for(var i = 0; i < figure.length+1; i++){
@@ -816,9 +873,9 @@ class Globe {
       figure = [];
       this.viewer.scene.requestRender();
     });
-
   }
 
+  // mesure de distance
   measureDistance(activeShapePoints)  {
     var coordsX = [];
     var coordsY = [];
@@ -833,38 +890,40 @@ class Globe {
     this.distanceInclineeC.innerHTML = 0;
 
     for (let i=0; i < activeShapePoints.length; i+=1) {
+      // convertit les coordonnées cartésiennes en lat/lon, puis en CC48
       var cartesian = new Cesium.Cartesian3(activeShapePoints[i].x, activeShapePoints[i].y, activeShapePoints[i].z);
-
       let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
       let longitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(7);
       let latitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(7);
       let height = cartographic.height.toFixed(3);
 
       var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
+      // on stocke chque coordonnée dans un tableau séparé pour faliciter le calcul
       coordsX.push(coords[0]);
       coordsY.push(coords[1]);
       var z = (Number(height) - Number(this.raf09.getGeoide(latitude, longitude)));
       coordsZ.push(z);
-
     }
 
     for (let i=0; i < coordsX.length-1; i+=1) {
+      // calcul de distances et différences d'alti
       var a = (coordsX[i+1]-coordsX[i])*(coordsX[i+1]-coordsX[i]);
       var b = (coordsY[i+1]-coordsY[i])*(coordsY[i+1]-coordsY[i]);
       var c = (coordsZ[i+1]-coordsZ[i])*(coordsZ[i+1]-coordsZ[i]);
+
       distance = Number(Math.sqrt(a+b).toFixed(3));
       distanceIncl = Number(Math.sqrt(a+b+c).toFixed(3));
       difference = Number(coordsZ[i+1]-coordsZ[i]).toFixed(3);
 
-      this.distanceCumulee.innerHTML = (Number(this.distanceCumulee.innerHTML) + distance).toFixed(3);
-      this.distanceInclineeC.innerHTML = (Number(this.distanceInclineeC.innerHTML) + distanceIncl).toFixed(3);
+      this.distanceCumulee.innerHTML = (Number(this.distanceCumulee.innerHTML) + distance).toFixed(2);
+      this.distanceInclineeC.innerHTML = (Number(this.distanceInclineeC.innerHTML) + distanceIncl).toFixed(2);
     }
-    this.distance.innerHTML = distance.toFixed(3);
-    this.distanceInclinee.innerHTML = distanceIncl.toFixed(3);
+    this.distance.innerHTML = distance.toFixed(2);
+    this.distanceInclinee.innerHTML = distanceIncl.toFixed(2);
     this.hauteur.innerHTML = difference;
-
   }
 
+  // mesure d'aire
   measureSurface(activeShapePoints) {
     var coordsX = [];
     var coordsY = [];
@@ -872,8 +931,8 @@ class Globe {
     this.aire.innerHTML = 0;
 
     for (let i=0; i < activeShapePoints.length-1; i+=1) {
+      // convertit les coordonnées cartésiennes en lat/lon, puis en CC48
       var cartesian = new Cesium.Cartesian3(activeShapePoints[i].x, activeShapePoints[i].y, activeShapePoints[i].z);
-
       let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
       let longitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(7);
       let latitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(7);
@@ -883,6 +942,7 @@ class Globe {
       coordsY.push(coords[1]);
     }
 
+    // dès qu'on a au moins 3 sommets
     if(coordsX.length > 2){
       for (let i=0; i < coordsX.length; i+=1) {
         // le % est un modulo qui permet de faire une boucle des sommets (ie sommet n+1 = sommet 1)
@@ -893,9 +953,9 @@ class Globe {
       }
     }
     this.aire.innerHTML = Math.abs(aire);
-
   }
 
+  // Récupère la hauteur d'un point en coords cartésiennes et la transforme en hauteur ellipsoïdale (pour le dessin de volumes)
   getHauteur(activeShapePoints, hauteurVol){
     var cartesian = new Cesium.Cartesian3(activeShapePoints[0].x, activeShapePoints[0].y, activeShapePoints[0].z);
     let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
@@ -903,9 +963,15 @@ class Globe {
 
     var z = (Number(hauteurVol) + Number(alti));
     return z;
-
   }
 
+  /*
+  *
+  * Découpe dans le photomaillage
+  *
+  */
+
+  // ajoute les points et coupe aux positions définies
   createHole(viewModel) {
     var dig_point = [];
     var hole_pts = [];
@@ -926,7 +992,7 @@ class Globe {
       coordsX.push(coords[0]);
       coordsY.push(coords[1]);
 
-      // on ajoute visuellement des points pour la découpe qu'on supprime au clic droit
+      // on ajoute visuellement des points pour la découpe qu'on supprimera au clic droit
       points.add({
         position : earthPosition,
         color : Cesium.Color.WHITE
@@ -959,18 +1025,17 @@ class Globe {
       globe.viewer.scene.requestRender();
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
+    // définit les actions sur les 2 options du formulaire (afficher ou inverser la découpe)
     Cesium.knockout.getObservable(viewModel, 'affich').subscribe(function(value) {
       tileset.clippingPlanes.enabled = value;
     });
-
     Cesium.knockout.getObservable(viewModel, 'trou').subscribe(function(value) {
       globe.holePlanes(viewModel, hole_pts);
     });
-
   }
 
+  // ajoute les plans de coupe
   holePlanes(viewModel, hole_pts) {
-
     var pointsLength = hole_pts.length;
     var clippingPlanes = [];
 
@@ -989,7 +1054,6 @@ class Globe {
       var plane = new Cesium.Plane.fromPointNormal(midpoint, normal);
       var clippingPlane = new Cesium.ClippingPlane.fromPlane(plane);
       clippingPlanes.push(clippingPlane);
-
     }
 
     // pour couper le globe
@@ -1006,18 +1070,13 @@ class Globe {
     unionClippingRegions: viewModel.trou, //si true: coupe tout ce qui est à l'extérieur de la zone cliquée
     enabled: viewModel.affich,
     edgeColor: Cesium.Color.WHITE,
-    modelMatrix: Cesium.Matrix4.inverse(tileset._initialClippingPlanesOriginMatrix, new Cesium.Matrix4())
+    modelMatrix: Cesium.Matrix4.inverse(tileset._initialClippingPlanesOriginMatrix, new Cesium.Matrix4()) // ligne importante: on est obligés de passer par cette transfo de matrice car notre tileset n'a pas de matrice de transfo à la base
   });
-
 }
 
-supprSouris(){
-  this.handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
-  this.handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-  this.handler.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK);
-}
-
-// fonction qui permet de cliquer les attributs sur le 3DTiles
+/*
+* fonction qui permet de cliquer les attributs sur le 3DTiles
+*/
 handleBatimentClick(enabled, tileset){
   var scene = this.viewer.scene;
   this.handler.globe = this;
@@ -1077,6 +1136,13 @@ handleBatimentClick(enabled, tileset){
       return;
     }
   }
+}
+
+// supprime toutes les actions liées à la souris
+supprSouris(){
+  this.handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
+  this.handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+  this.handler.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 }
 
 
