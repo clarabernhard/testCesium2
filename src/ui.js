@@ -33,6 +33,7 @@ class Menu {
     *  Div qui contiennent les formulaires de personnalisation (affichés à gauche)
     */
     // mesures
+    this.coordsList = document.querySelector('#coordsList');
     this.distanceList = document.querySelector('#distanceList');
     this.aireList = document.querySelector('#aireList');
     // dessin
@@ -115,45 +116,86 @@ class Menu {
     /*
     * MESURES
     */
-    document.querySelector('#ligne').addEventListener('change', (e) => {
+
+    document.querySelector('#neutre').addEventListener('click', (e) => {
+      globe.supprSouris();
+      this.coordsList.classList.add('hidden');
+      this.distanceList.classList.add('hidden');
+      this.aideCheckbox.classList.add('hidden');
+      for(var i = 0; i < dline.length; i++){
+        globe.viewer.entities.remove(dline[i]);
+        globe.viewer.entities.remove(dline2[i]);
+      }
+      this.aireList.classList.add('hidden');
+      this.aideCheckbox.classList.add('hidden');
+      for(var i = 0; i < dsurface.length; i++){
+        globe.viewer.entities.remove(dsurface[i]);
+      }
+      globe.viewer.scene.requestRender();
+    });
+
+    document.querySelector('#point').addEventListener('click', (e) => {
+      globe.supprSouris();
+      this.distanceList.classList.add('hidden');
+      this.aideCheckbox.classList.add('hidden');
+      for(var i = 0; i < dline.length; i++){
+        globe.viewer.entities.remove(dline[i]);
+        globe.viewer.entities.remove(dline2[i]);
+      }
+      this.aireList.classList.add('hidden');
+      this.aideCheckbox.classList.add('hidden');
+      for(var i = 0; i < dsurface.length; i++){
+        globe.viewer.entities.remove(dsurface[i]);
+      }
+
+      this.coordsList.classList.remove('hidden');
+      globe.showCoords();
+      globe.viewer.scene.requestRender();
+
+    });
+
+    document.querySelector('#ligne').addEventListener('click', (e) => {
+      globe.supprSouris();
+      this.coordsList.classList.add('hidden');
+      globe.setCoordsCallback(undefined);
+      this.aireList.classList.add('hidden');
+      this.aideCheckbox.classList.add('hidden');
+      for(var i = 0; i < point.length; i++){
+        globe.viewer.entities.remove(dsurface[i]);
+      }
+
       var choice = 'line';
       var choice2 = 'mesure';
       var hauteurVol;
+      var url;
+      globe.updateShape(choice, choice2, 3, '#FF0000', 1, hauteurVol, url, point, billboard, line, surface, volume, dline, dline2, dsurface);
+      this.distanceList.classList.remove('hidden');
+      this.aideCheckbox.classList.remove('hidden');
 
-      if(e.target.checked){
-        globe.updateShape(choice, choice2, 3, '#FF0000', 1, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
-        this.distanceList.classList.remove('hidden');
-        this.aideCheckbox.classList.remove('hidden');
-      } else{
-        this.distanceList.classList.add('hidden');
-        this.aideCheckbox.classList.add('hidden');
-        for(var i = 0; i < point.length; i++){
-          globe.viewer.entities.remove(dline[i]);
-          globe.viewer.entities.remove(dline2[i]);
-        }
-        globe.viewer.scene.requestRender();
-        globe.supprSouris();
-      }
+      globe.viewer.scene.requestRender();
     });
 
-    document.querySelector('#surface').addEventListener('change', (e) => {
+    document.querySelector('#surface').addEventListener('click', (e) => {
+      globe.supprSouris();
+      this.coordsList.classList.add('hidden');
+      globe.setCoordsCallback(undefined);
+      this.distanceList.classList.add('hidden');
+      this.aideCheckbox.classList.add('hidden');
+      for(var i = 0; i < point.length; i++){
+        globe.viewer.entities.remove(dline[i]);
+        globe.viewer.entities.remove(dline2[i]);
+      }
+
       var choice = 'polygon';
       var choice2 = 'mesure';
       var hauteurVol;
+      var url;
+      globe.updateShape(choice, choice2, 3, '#1ABFD0', 0.4, hauteurVol, url, point, billboard, line, surface, volume, dline, dline2, dsurface);
+      this.aireList.classList.remove('hidden');
+      this.aideCheckbox.classList.remove('hidden');
 
-      if(e.target.checked){
-        globe.updateShape(choice, choice2, 3, '#1ABFD0', 0.4, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
-        this.aireList.classList.remove('hidden');
-        this.aideCheckbox.classList.remove('hidden');
-      } else{
-        this.aireList.classList.add('hidden');
-        this.aideCheckbox.classList.add('hidden');
-        for(var i = 0; i < point.length; i++){
-          globe.viewer.entities.remove(dsurface[i]);
-        }
-        globe.viewer.scene.requestRender();
-        globe.supprSouris();
-      }
+      globe.viewer.scene.requestRender();
+
     });
 
     /*
@@ -167,40 +209,45 @@ class Menu {
       var choice = 'point';
       var choice2 = 'dessin';
       var transparence;
-      var couleur;
+      var couleur = $('#couleurpoint').val();
       var largeur;
       var hauteurVol;
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
+      var url = 'Assets/Textures/maki/' + $('#makisymbol').val() + '.png';
+      console.log(url);
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dline2, dsurface);
     });
 
     document.querySelector("#envoyerligne").addEventListener('click', (e) => {
       var choice = 'line';
       var choice2 = 'dessin';
       var hauteurVol;
+      var url;
       var largeur = $('#largeur').val();
       var couleur = $('#couleur').val();
       var transparence = $('#transparence').val();
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dline2, dsurface);
     });
 
     document.querySelector("#envoyersurf").addEventListener('click', (e) => {
       var choice = 'polygon';
       var choice2 = 'dessin';
       var hauteurVol;
+      var url;
       var largeur = 3;
       var couleur = $('#couleursurf').val();
       var transparence = $('#transparencesurf').val();
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dline2, dsurface);
     });
 
     document.querySelector("#envoyervol").addEventListener('click', (e) => {
       var choice = 'volume';
       var choice2 = 'dessin';
       var largeur = 3;
+      var url;
       var hauteurVol = $('#hauteurvol').val();
       var couleur = $('#couleurvol').val();
       var transparence = $('#transparencevol').val();
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface);
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dline2, dsurface);
     });
 
     document.querySelector("#envoyercoupe").addEventListener('click', (e) => {
@@ -263,7 +310,6 @@ class Menu {
         }
         let nom = line[i].id;
         type["properties"].name = nom;
-        console.log(line[i]);
 
         let rouge = line[i].polyline.material.color._value.red;
         let vert =  line[i].polyline.material.color._value.green;
@@ -281,6 +327,32 @@ class Menu {
         type["geometry"].coordinates = coordLine;
         features.push(type);
         i++;
+      }
+
+      for (let i = 0; i < billboard.length; i++) {
+        let j = 0;
+        console.log(billboard);
+
+        var typePoint = {"type" : "Feature", "properties" : {}, "geometry" : {}};
+        typePoint["geometry"] = {"type" : "Point", "coordinates" : {}};
+        let cartesian = new Cesium.Cartesian3(billboard[i].position._value.x, billboard[i].position._value.y, billboard[i].position._value.z);
+        let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+        let longitude = Cesium.Math.toDegrees(cartographic.longitude);
+        let latitude = Cesium.Math.toDegrees(cartographic.latitude);
+        let z = cartographic.height;
+        let coordXYZ = [Number(longitude), Number(latitude), Number(z)];
+
+        let nom = billboard[i].id;
+        typePoint["properties"].name = nom;
+
+        let hauteur = billboard[i].billboard.height._value;
+        typePoint["properties"].height = hauteur;
+
+        let image = 'http://3d.strasbourg.eu/TEST/Cesium2/' + billboard[i].billboard.image._value;
+        typePoint["properties"].image = image;
+
+        typePoint["geometry"].coordinates = coordXYZ;
+        features.push(typePoint);
       }
 
       for (let i = 0; i < surface.length; i++) {
@@ -320,8 +392,6 @@ class Menu {
         typeSurf["properties"]["color"].green = vert;
         typeSurf["properties"]["color"].blue = bleu;
         typeSurf["properties"]["color"].alpha = transpa;
-
-        console.log(surface);
 
         // il faut une accolade de plus pour les coordonnées des polygon pour que Cesium arrive à lire le JSON
         arraySurf.push(coordSurf);
@@ -381,23 +451,6 @@ class Menu {
       let element = document.querySelector('#exportDessin');
       element.setAttribute('href', 'data:json,' + encodeURIComponent(download));
       element.setAttribute('download', 'drawing.json');
-
-      /*console.log(line[0].polyline.positions._value[0].x); // .x .y .z
-      console.log(line[0].polyline.width._value);
-      console.log(line[0].polyline.material.color._value); */ // .red .green .blue .alpha
-
-      /*console.log(surface[0].polygon.hierarchy._value[0]); // positions des sommets
-      console.log(surface[0].polygon.material.color._value);
-
-      console.log(volume[0].polygon.hierarchy._value);
-      console.log(volume[0].polygon.material.color._value);
-      console.log(volume[0].polygon.extrudedHeight._value);
-
-      console.log(billboard[0].position._value);
-      console.log(billboard[0].billboard.image._value);*/
-
-
-
 
     });
 
@@ -531,52 +584,56 @@ class Menu {
     /*
     * Boite à outils
     */
-    //mesures
-    document.querySelector('#point').addEventListener('change', (e) => {
-      globe.showCoords(e.target.checked);
-    });
+
 
     // Dessins
-    document.querySelector('#cpoint').addEventListener('change', (e) => {
-      if(e.target.checked){
-        this.pointList.classList.remove('hidden');
-      } else{
-        this.pointList.classList.add('hidden');
-        globe.supprSouris();
-      }
+    document.querySelector('#cneutre').addEventListener('click', (e) => {
+      globe.supprSouris();
+      this.aideCheckbox.classList.add('hidden');
+      this.pointList.classList.add('hidden');
+      this.ligneList.classList.add('hidden');
+      this.surfaceList.classList.add('hidden');
+      this.volumeList.classList.add('hidden');
     });
 
-    document.querySelector('#cligne').addEventListener('change', (e) => {
-      if(e.target.checked){
-        this.ligneList.classList.remove('hidden');
-        this.aideCheckbox.classList.remove('hidden');
-      } else{
-        this.ligneList.classList.add('hidden');
-        this.aideCheckbox.classList.add('hidden');
-        globe.supprSouris();
-      }
+    document.querySelector('#cpoint').addEventListener('click', (e) => {
+      globe.supprSouris();
+      this.aideCheckbox.classList.add('hidden');
+      this.ligneList.classList.add('hidden');
+      this.surfaceList.classList.add('hidden');
+      this.volumeList.classList.add('hidden');
+
+      this.pointList.classList.remove('hidden');
     });
 
-    document.querySelector('#csurface').addEventListener('change', (e) => {
-      if(e.target.checked){
-        this.surfaceList.classList.remove('hidden');
-        this.aideCheckbox.classList.remove('hidden');
-      } else{
-        this.surfaceList.classList.add('hidden');
-        this.aideCheckbox.classList.add('hidden');
-        globe.supprSouris();
-      }
+    document.querySelector('#cligne').addEventListener('click', (e) => {
+      globe.supprSouris();
+      this.pointList.classList.add('hidden');
+      this.surfaceList.classList.add('hidden');
+      this.volumeList.classList.add('hidden');
+
+      this.ligneList.classList.remove('hidden');
+      this.aideCheckbox.classList.remove('hidden');
     });
 
-    document.querySelector('#volume').addEventListener('change', (e) => {
-      if(e.target.checked){
-        this.volumeList.classList.remove('hidden');
-        this.aideCheckbox.classList.remove('hidden');
-      } else{
-        this.volumeList.classList.add('hidden');
-        this.aideCheckbox.classList.add('hidden');
-        globe.supprSouris();
-      }
+    document.querySelector('#csurface').addEventListener('click', (e) => {
+      globe.supprSouris();
+      this.pointList.classList.add('hidden');
+      this.ligneList.classList.add('hidden');
+      this.volumeList.classList.add('hidden');
+
+      this.surfaceList.classList.remove('hidden');
+      this.aideCheckbox.classList.remove('hidden');
+    });
+
+    document.querySelector('#volume').addEventListener('click', (e) => {
+      globe.supprSouris();
+      this.pointList.classList.add('hidden');
+      this.ligneList.classList.add('hidden');
+      this.surfaceList.classList.add('hidden');
+
+      this.volumeList.classList.remove('hidden');
+      this.aideCheckbox.classList.remove('hidden');
     });
 
     // découpes

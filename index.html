@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
 
   <title>Cesium2</title>
-  <link rel="stylesheet" href="../Cesium/lib/jQuery/jquery-ui.min.css" />
+  <link rel="stylesheet" href="lib/jQuery/jquery-ui.min.css" />
   <link rel="stylesheet" href="src/index.css" media="screen" />
-  <script src="../Cesium/lib/Cesium/Cesium.js"></script>
+  <script src="lib/Cesium/Cesium.js"></script>
   <script src="lib/cesium-navigation-development/dist/standalone/viewerCesiumNavigationMixin.js"></script>
 </head>
 <body>
@@ -45,6 +45,32 @@
 
     <div class="backdrop hidden" id="pointList">
       <h2>Ajout de point</h2>
+      <p><span> Couleur : </span> <input type="color" id="couleurpoint" value="#FF0000"></p>
+      <p>Symbole :
+        <select id="makisymbol">
+          <option value="marker-stroked">Neutre</option>
+          <option value="restaurant">Restaurant</option>
+          <option value="bicycle">Vélo</option>
+          <option value="bus">Bus</option>
+          <option value="rail-light">Tram</option>
+          <option value="camera">Photo</option>
+          <option value="car">Voiture</option>
+          <option value="college">Etudiant</option>
+          <option value="chemist">Science</option>
+          <option value="disability">Handicap</option>
+          <option value="dog-park">Canisite</option>
+          <option value="grocery">Magasin</option>
+          <option value="park">Parc</option>
+          <option value="garden">Jardin/espace vert</option>
+          <option value="college">Etudiant</option>
+          <option value="parking">Parking</option>
+          <option value="playground">Aire de jeux</option>
+          <option value="school">Ecole</option>
+          <option value="hospital">Hopital</option>
+          <option value="toilets">Toilettes</option>
+          <option value="building">Maison</option>
+          <option value="industrial">Usine</option>
+        </select></p>
       <button id="envoyerpoint">Ajouter</button>
       <button id="annulerpoint">Annuler</button>
       <button id="supprimerpoint">Supprimer</button>
@@ -445,17 +471,22 @@
         <div class="menuClic-content" id="mesures-content">
 
           <div class="nowrap">
-            <input id="point" type="checkbox"/>
+            <input name ="mesure" id="neutre" type="radio" checked/>
+            <label for="neutre">Aucune mesure</label>
+          </div>
+
+          <div class="nowrap">
+            <input name ="mesure" id="point" type="radio"/>
             <label for="point">Point (coordonnées)</label>
           </div>
 
           <div class="nowrap">
-            <input id="ligne" type="checkbox"/>
+            <input name ="mesure" id="ligne" type="radio"/>
             <label for="ligne">Distance</label>
           </div>
 
           <div class="nowrap">
-            <input id="surface" type="checkbox"/>
+            <input name ="mesure" id="surface" type="radio"/>
             <label for="surface">Surface</label>
           </div>
 
@@ -471,22 +502,27 @@
           <span style="font-size:small;"> Exporter les dessins </span>
 
           <div class="nowrap">
-            <input id="cpoint" type="checkbox"/>
+            <input name ="dessin" id="cneutre" type="radio" checked/>
+            <label for="cneutre">Aucun dessin</label>
+          </div>
+
+          <div class="nowrap">
+            <input name ="dessin" id="cpoint" type="radio"/>
             <label for="cpoint">Dessin point</label>
           </div>
 
           <div class="nowrap">
-            <input id="cligne" type="checkbox"/>
+            <input name ="dessin" id="cligne" type="radio"/>
             <label for="cligne">Dessin ligne</label>
           </div>
 
           <div class="nowrap">
-            <input id="csurface" type="checkbox"/>
+            <input name ="dessin" id="csurface" type="radio"/>
             <label for="csurface">Dessin surface</label>
           </div>
 
           <div class="nowrap">
-            <input id="volume" type="checkbox"/>
+            <input name ="dessin" id="volume" type="radio"/>
             <label for="volume">Dessin boîte</label>
           </div>
 
@@ -567,9 +603,9 @@
       </div>
 
       <!-- Our app code. -->
-      <script src="../Cesium/lib/jQuery/jquery-3.3.1.min.js"></script>
-      <script src="../Cesium/lib/jQuery/jquery-ui.min.js"></script>
-      <script src="../Cesium/lib/proj4.js"></script>
+      <script src="lib/jQuery/jquery-3.3.1.min.js"></script>
+      <script src="lib/jQuery/jquery-ui.min.js"></script>
+      <script src="lib/proj4.js"></script>
 
       <script src="src/config.js"></script>
       <script src="src/globe.js"></script>

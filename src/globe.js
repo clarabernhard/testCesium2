@@ -49,6 +49,9 @@ class Globe {
     // variable qui stocke les évenements liés à la souris
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
 
+    // Construction de pin pour les billboard
+    this.pinBuilder = new Cesium.PinBuilder();
+
     /*
     * Div pour les affichage de coordonnées et mesures
     */
@@ -56,7 +59,7 @@ class Globe {
     this.coordX = document.querySelector('#coordX');
     this.coordY = document.querySelector('#coordY');
     this.coordZ = document.querySelector('#coordZ');
-    this.coordsList = document.querySelector('#coordsList');
+
     // mesures de distance
     this.distance = document.querySelector('#distance');
     this.distanceCumulee = document.querySelector('#distancecumulee');
@@ -325,31 +328,34 @@ class Globe {
       var entities = dataSource.entities.values;
       for (let i = 0; i < entities.length; i++) {
         let entity = entities[i];
-        if (Cesium.defined(entity.polygon)) {
-          /*let rouge = parseFloat(entity.properties.color.red);
-          let vert = parseFloat(entity.properties.color.green);
-          let bleu = parseFloat(entity.properties.color.blue);
-          let alpha = parseFloat(entity.properties.color.alpha);
-          let couleur = new Cesium.Color(rouge, vert, bleu, alpha);*/
-          let couleur = new Cesium.Color(0, 1, 0.5, 0.5);
-          //let couleur = new Cesium.Color(Number(entity.properties.color.red), Number(entity.properties.color.green), Number(entity.properties.color.blue), Number(entity.properties.color.alpha));
-          entity.polygon.material = couleur;
+        if(Cesium.defined(entity.billboard)) {
+          entity.billboard.height = entity.properties.height;
+          entity.billboard.verticalOrigin = Cesium.VerticalOrigin.BOTTOM;
+          entity.billboard.image = entity.properties.image;
+
+        } else if (Cesium.defined(entity.polygon)) {
+          let rouge = entity.properties.color._value.red;
+          let vert = entity.properties.color._value.green;
+          let bleu = entity.properties.color._value.blue;
+          let alpha = entity.properties.color._value.alpha;
+          let couleur = new Cesium.Color(rouge, vert, bleu, alpha);
+
+          entity.polygon.material =  couleur;
           entity.polygon.outline = false;
           entity.polygon.extrudedHeight = entity.properties.extrudedHeight;
           entity.polygon.classificationType = Cesium.ClassificationType.CESIUM_3D_TILE;
 
         } else if(Cesium.defined(entity.polyline)) {
-          /*let rouge = parseFloat(entity.properties.color.red);
-          let vert = parseFloat(entity.properties.color.green);
-          let bleu = parseFloat(entity.properties.color.blue);
-          let alpha = parseFloat(entity.properties.color.alpha);
-          let couleur = new Cesium.Color(rouge, vert, bleu, alpha);*/
-          let couleur = new Cesium.Color(0, 1, 0.5, 0.5);
-          let largeur = entity.properties.width;
+          let rouge = entity.properties.color._value.red;
+          let vert = entity.properties.color._value.green;
+          let bleu = entity.properties.color._value.blue;
+          let alpha = entity.properties.color._value.alpha;
+          let couleur = new Cesium.Color(rouge, vert, bleu, alpha);
 
           entity.polyline.material = couleur;
-          entity.polyline.width = largeur;
+          entity.polyline.width = entity.properties.width;
           entity.polyline.classificationType = Cesium.ClassificationType.CESIUM_3D_TILE;
+
         }
       }
     });
@@ -449,26 +455,17 @@ class Globe {
         let heightString = cartographic.height.toFixed(3);
         callback(longitudeString, latitudeString, heightString);
       }
-      this.viewer.scene.requestRender();
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
   }
 
   // Convertit les lat/lon/hauteur en CC48 / IGN69 et les affiche
-  showCoords(show){
+  showCoords(){
     this.setCoordsCallback((longitude, latitude, hauteur) => { // Fonction éxécutée à chaque clic
-
       var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
       this.coordX.innerHTML = coords[0].toFixed(2);
       this.coordY.innerHTML = coords[1].toFixed(2);
       this.coordZ.innerHTML = (Number(hauteur) - Number(this.raf09.getGeoide(latitude, longitude))).toFixed(2);
-
     });
-    if(show){
-      this.coordsList.classList.remove('hidden');
-    } else{
-      this.coordsList.classList.add('hidden');
-      this.setCoordsCallback(undefined);
-    }
   }
 
   /*
@@ -619,18 +616,21 @@ class Globe {
   }
 
   // Ajoute une image à une position spécifiée
-  createBillboard(worldPosition, image, size) {
-    var symbol = this.viewer.entities.add({
-      position : worldPosition,
-      billboard : {
-        image : image,
-        heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
-        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-        sizeInMeters: size // true si on veut la taille en mètre, false si on veut la taille en pixels
-      }
-    });
-    return symbol;
-  }
+  createBillboard(worldPosition, url, couleur, size) {
+    this.handler.globe = this;
+    var url = Cesium.buildModuleUrl(url);
+    Cesium.when(globe.pinBuilder.fromUrl(url, Cesium.Color.fromCssColorString(couleur), 48), function(canvas) {
+      return globe.viewer.entities.add({
+          position : worldPosition,
+          billboard : {
+            image : canvas.toDataURL(),
+            height: 48,
+            verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+            sizeInMeters: size // true si on veut la taille en mètre, false si on veut la taille en pixels
+          }
+        });
+      });
+    }
 
   // ajoute une polyligne
   drawLine(positionData, largeur, couleur, transparence, clamp) {
@@ -706,7 +706,7 @@ class Globe {
   * pour garder une trace des entités et permettre leur annulation/exportation
   * Le reste des paramètres correspondent aux paramètres de personnalisation définis par l'utilisateur dans les formulaires
   */
-  updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, point, billboard, line, surface, volume, dline, dline2, dsurface) {
+  updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dline2, dsurface) {
     var activeShapePoints = [];
     var activeShape;
     var floatingPoint;
@@ -730,9 +730,9 @@ class Globe {
           largeur = parseFloat(largeur);
           transparence = parseFloat(transparence);
           if(choice === 'point') {
-            floatingPoint = globe.createBillboard(earthPosition, 'src/img/interface.png', false);
+            floatingPoint = globe.createBillboard(earthPosition, url, couleur, false);
             activeShape = globe.createPoint(dynamicPositions);
-            activeShape = globe.createBillboard(dynamicPositions, 'src/img/interface.png', false);
+            activeShape = globe.createBillboard(dynamicPositions, url, couleur, false);
           } else if(choice === 'polygon') {
             activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence);
           } else if(choice === 'volume') {
@@ -768,7 +768,7 @@ class Globe {
           activeShapePoints.push(earthPosition);
           if(choice === 'point'){
             point.push(globe.createPoint(earthPosition));
-            billboard.push(globe.createBillboard(earthPosition, 'src/img/interface.png', false));
+            billboard.push(globe.createBillboard(earthPosition, url, couleur, false));
           } else {
             point.push(globe.createPoint(earthPosition));
           }
@@ -805,7 +805,7 @@ class Globe {
       if(choice2 === 'dessin'){
         if(choice === 'point') {
           point.push(globe.createPoint(activeShapePoints));
-          billboard.push(globe.createBillboard(activeShapePoints, 'src/img/interface.png', false));
+          billboard.push(globe.createBillboard(activeShapePoints, url, couleur, false));
         } else if(choice === 'line') {
           if($('#clampligne').val() === 'colle') {
             if($('#styleligne').val() === 'simple') {
@@ -847,6 +847,7 @@ class Globe {
         activeShapePoints = [];
       }
       globe.viewer.scene.requestRender();
+      billboard.pop(); // quand on clique droit avec le billboard Cesium ajoute un billboard à la position (0,0,0)
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
     // les 2 boutons "nouvelle mesure" pour la distance et surface: l'utilisateur est obligé d'appuyer dessus pour effectuer une nouvelle mesure

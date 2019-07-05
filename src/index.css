@@ -1,4 +1,4 @@
-@import url(../../Cesium/lib/Cesium/Widgets/widgets.css);
+@import url(../lib/Cesium/Widgets/widgets.css);
 
 * {
   box-sizing: border-box;
