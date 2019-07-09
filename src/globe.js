@@ -4,6 +4,8 @@
 class Globe {
 
   constructor(elementId, geocoder){
+    // Activer cette ligne pour avoir accès aux différents fonds de plan dispo - accès vers mon compte Cesium
+    //Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNDA3NDMwNi0zZGZmLTQ1MzEtOWZjOC1mNzE5YWM2MDkxNjkiLCJpZCI6ODEzNCwic2NvcGVzIjpbImFzciIsImdjIl0sImlhdCI6MTU1MTI4MTk1NH0.bj-9TqaOHDBD8sMBIeIWTH6-YVl-1Zp6fxjjgP3OXEg';
 
     // Créer le globe dans la div HTML qui a l'id cesiumContainer
     this.viewer = new Cesium.Viewer(elementId, {
@@ -11,7 +13,7 @@ class Globe {
       selectionIndicator: false, // enlève le carré vert lorsqu'on clique sur qqch
       requestRenderMode : true, // amélioration de performance: l'appli calcule uniquement quand on lui demande (https://cesium.com/blog/2018/01/24/cesium-scene-rendering-performance/)
       maximumRenderTimeChange : Infinity,
-      baseLayerPicker: false,
+      baseLayerPicker: false, // enlève le bouton qui permet de choisir le fond de plan
       skyBox : new Cesium.SkyBox({ // définit le ciel bleu
         sources : {
           positiveX : 'src/img/Sky.jpg',
@@ -632,6 +634,17 @@ class Globe {
       });
     }
 
+    createBlankBillboard(worldPosition, image) {
+    var symbol = this.viewer.entities.add({
+      position : worldPosition,
+      billboard : {
+        image : image,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM
+      }
+    });
+    return symbol;
+  }
+
   // ajoute une polyligne
   drawLine(positionData, largeur, couleur, transparence, clamp) {
     var shape = this.viewer.entities.add({
@@ -806,6 +819,7 @@ class Globe {
         if(choice === 'point') {
           point.push(globe.createPoint(activeShapePoints));
           billboard.push(globe.createBillboard(activeShapePoints, url, couleur, false));
+          console.log(billboard);
         } else if(choice === 'line') {
           if($('#clampligne').val() === 'colle') {
             if($('#styleligne').val() === 'simple') {
