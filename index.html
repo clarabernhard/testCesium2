@@ -8,7 +8,7 @@
   <title>Cesium2</title>
   <link rel="stylesheet" href="lib/jQuery/jquery-ui.min.css" />
   <link rel="stylesheet" href="src/index.css" media="screen" />
-  <script src="lib/Cesium/Cesium.js"></script>
+  <script src="lib/Cesium/Build/Cesium/Cesium.js"></script>
   <script src="lib/cesium-navigation-development/dist/standalone/viewerCesiumNavigationMixin.js"></script>
 </head>
 <body>
@@ -46,6 +46,13 @@
     <div class="backdrop hidden" id="pointList">
       <h2>Ajout de point</h2>
       <p><span> Couleur : </span> <input type="color" id="couleurpoint" value="#FF0000"></p>
+
+      <p>Taille : 
+        <select id="taille">
+          <option value="metre">mètres</option>
+          <option value="pixel">pixels</option>
+        </select></p>
+        <p>Valeur : <input id="hauteurpoint" type="text" size="6" value="48"/> </p>
       <p>Symbole :
         <select id="makisymbol">
           <option value="marker-stroked">Neutre</option>

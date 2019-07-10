@@ -27,10 +27,10 @@ class Globe {
     });
     this.viewer.extend(Cesium.viewerCesiumNavigationMixin, {}); // pour ajouter la flèche nord
 
-    /*// Supprime le terrain par défaut sur le globe
+    // Supprime le terrain par défaut sur le globe
     this.viewer.scene.imageryLayers.removeAll();
-    // Définit la couleur de fond du globe étant donné qu'on a supprimé le terrain (ici du noir)
-    this.viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#AB9B8B').withAlpha(0.4);*/
+    // Définit la couleur de fond du globe étant donné qu'on a supprimé le terrain
+    this.viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#AB9B8B').withAlpha(0.4);
 
     // importe la grille de conversion pour hauteur ellispoïdale vers altitude IGN69
     this.raf09 = undefined;
@@ -618,28 +618,31 @@ class Globe {
   }
 
   // Ajoute une image à une position spécifiée
-  createBillboard(worldPosition, url, couleur, size) {
+  createPinBillboard(billboard, worldPosition, url, couleur, height, size) {
     this.handler.globe = this;
     var url = Cesium.buildModuleUrl(url);
-    Cesium.when(globe.pinBuilder.fromUrl(url, Cesium.Color.fromCssColorString(couleur), 48), function(canvas) {
-      return globe.viewer.entities.add({
+    Cesium.when(globe.pinBuilder.fromUrl(url, Cesium.Color.fromCssColorString(couleur), height), function(canvas) {
+      var shape = globe.viewer.entities.add({
           position : worldPosition,
           billboard : {
             image : canvas.toDataURL(),
-            height: 48,
+            height: height,
             verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-            sizeInMeters: size // true si on veut la taille en mètre, false si on veut la taille en pixels
+            sizeInMeters: size
           }
         });
+        billboard.push(shape);
+        return shape;
       });
     }
 
-    createBlankBillboard(worldPosition, image) {
+    createBillboard(worldPosition, url, size) {
     var symbol = this.viewer.entities.add({
       position : worldPosition,
       billboard : {
-        image : image,
-        verticalOrigin: Cesium.VerticalOrigin.BOTTOM
+        image : url,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+        sizeInMeters: size // true si on veut la taille en mètre, false si on veut la taille en pixels
       }
     });
     return symbol;
@@ -743,9 +746,16 @@ class Globe {
           largeur = parseFloat(largeur);
           transparence = parseFloat(transparence);
           if(choice === 'point') {
-            floatingPoint = globe.createBillboard(earthPosition, url, couleur, false);
             activeShape = globe.createPoint(dynamicPositions);
-            activeShape = globe.createBillboard(dynamicPositions, url, couleur, false);
+            if($('#taille').val() === 'metre') {
+              floatingPoint = globe.createPinBillboard(billboard, earthPosition, url, couleur, hauteurVol, true);
+              activeShape = globe.createPinBillboard(billboard, dynamicPositions, url, couleur, hauteurVol, true);
+              billboard.pop();
+              billboard.pop();
+            } else if($('#taille').val() === 'pixel') {
+              floatingPoint = globe.createPinBillboard(billboard, earthPosition, url, couleur, hauteurVol, false);
+              activeShape = globe.createPinBillboard(billboard, dynamicPositions, url, couleur, hauteurVol, false);
+            }
           } else if(choice === 'polygon') {
             activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence);
           } else if(choice === 'volume') {
@@ -777,14 +787,21 @@ class Globe {
               }
             }
           }
+          console.log(billboard);
         } else {
           activeShapePoints.push(earthPosition);
           if(choice === 'point'){
             point.push(globe.createPoint(earthPosition));
-            billboard.push(globe.createBillboard(earthPosition, url, couleur, false));
+            if($('#taille').val() === 'metre') {
+              globe.createPinBillboard(billboard, earthPosition, url, couleur, hauteurVol, true);
+            } else if($('#taille').val() === 'pixel') {
+              globe.createPinBillboard(billboard, earthPosition, url, couleur, hauteurVol, false);
+            }
+            billboard.pop();
           } else {
             point.push(globe.createPoint(earthPosition));
           }
+          console.log(billboard);
         }
       }
       if(choice === 'polygon'&& choice2 === 'mesure') {
@@ -818,7 +835,11 @@ class Globe {
       if(choice2 === 'dessin'){
         if(choice === 'point') {
           point.push(globe.createPoint(activeShapePoints));
-          billboard.push(globe.createBillboard(activeShapePoints, url, couleur, false));
+          if($('#taille').val() === 'metre') {
+            globe.createPinBillboard(billboard, activeShapePoints, url, couleur, hauteurVol, true);
+          } else if($('#taille').val() === 'pixel') {
+            globe.createPinBillboard(billboard, activeShapePoints, url, couleur, hauteurVol, false);
+          }
           console.log(billboard);
         } else if(choice === 'line') {
           if($('#clampligne').val() === 'colle') {

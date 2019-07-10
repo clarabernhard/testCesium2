@@ -122,9 +122,11 @@ class Menu {
       this.coordsList.classList.add('hidden');
       this.distanceList.classList.add('hidden');
       this.aideCheckbox.classList.add('hidden');
-      for(var i = 0; i < dline.length; i++){
+      for(var i = 0; i < dline.length+1; i++){
         globe.viewer.entities.remove(dline[i]);
         globe.viewer.entities.remove(dline2[i]);
+        dline = [];
+        dline2 = [];
       }
       this.aireList.classList.add('hidden');
       this.aideCheckbox.classList.add('hidden');
@@ -211,9 +213,8 @@ class Menu {
       var transparence;
       var couleur = $('#couleurpoint').val();
       var largeur;
-      var hauteurVol;
+      var hauteurVol = $('#hauteurpoint').val();
       var url = 'Assets/Textures/maki/' + $('#makisymbol').val() + '.png';
-      console.log(url);
       globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dline2, dsurface);
     });
 
@@ -335,24 +336,25 @@ class Menu {
 
         var typePoint = {"type" : "Feature", "properties" : {}, "geometry" : {}};
         typePoint["geometry"] = {"type" : "Point", "coordinates" : {}};
-        let cartesian = new Cesium.Cartesian3(billboard[i].position._value.x, billboard[i].position._value.y, billboard[i].position._value.z);
-        let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-        let longitude = Cesium.Math.toDegrees(cartographic.longitude);
-        let latitude = Cesium.Math.toDegrees(cartographic.latitude);
-        let z = cartographic.height;
-        let coordXYZ = [Number(longitude), Number(latitude), Number(z)];
+        if(Cesium.defined(billboard[i].position._value)) {
+          let cartesian = new Cesium.Cartesian3(billboard[i].position._value.x, billboard[i].position._value.y, billboard[i].position._value.z);
+          let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+          let longitude = Cesium.Math.toDegrees(cartographic.longitude);
+          let latitude = Cesium.Math.toDegrees(cartographic.latitude);
+          let z = cartographic.height;
+          let coordXYZ = [Number(longitude), Number(latitude), Number(z)];
 
-        let nom = billboard[i].id;
-        typePoint["properties"].name = nom;
+          let nom = billboard[i].id;
+          typePoint["properties"].name = nom;
 
-        let hauteur = billboard[i].billboard.height._value;
-        typePoint["properties"].height = hauteur;
+          let hauteur = billboard[i].billboard.height._value;
+          typePoint["properties"].height = hauteur;
 
-        let image = 'http://3d.strasbourg.eu/TEST/Cesium2/' + billboard[i].billboard.image._value;
-        typePoint["properties"].image = image;
+          typePoint["properties"].image = 'src/img/interface.png';
 
-        typePoint["geometry"].coordinates = coordXYZ;
-        features.push(typePoint);
+          typePoint["geometry"].coordinates = coordXYZ;
+          features.push(typePoint);
+        }
       }
 
       for (let i = 0; i < surface.length; i++) {
