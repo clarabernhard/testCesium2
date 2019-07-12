@@ -185,7 +185,9 @@ class Menu {
       this.aideCheckbox.classList.add('hidden');
       for(var i = 0; i < point.length; i++){
         globe.viewer.entities.remove(dline[i]);
-        globe.viewer.entities.remove(dline2[i]);
+      }
+      for(var j = 0; j < point.length; j++){
+        globe.viewer.entities.remove(dline2[j]);
       }
 
       var choice = 'polygon';
@@ -599,7 +601,7 @@ class Menu {
     });
 
     document.querySelector('#cpoint').addEventListener('click', (e) => {
-      globe.supprSouris();
+      //globe.supprSouris();
       this.aideCheckbox.classList.add('hidden');
       this.ligneList.classList.add('hidden');
       this.surfaceList.classList.add('hidden');
@@ -609,7 +611,7 @@ class Menu {
     });
 
     document.querySelector('#cligne').addEventListener('click', (e) => {
-      globe.supprSouris();
+      //globe.supprSouris();
       this.pointList.classList.add('hidden');
       this.surfaceList.classList.add('hidden');
       this.volumeList.classList.add('hidden');
@@ -619,7 +621,7 @@ class Menu {
     });
 
     document.querySelector('#csurface').addEventListener('click', (e) => {
-      globe.supprSouris();
+      //globe.supprSouris();
       this.pointList.classList.add('hidden');
       this.ligneList.classList.add('hidden');
       this.volumeList.classList.add('hidden');
@@ -629,7 +631,7 @@ class Menu {
     });
 
     document.querySelector('#volume').addEventListener('click', (e) => {
-      globe.supprSouris();
+      //globe.supprSouris();
       this.pointList.classList.add('hidden');
       this.ligneList.classList.add('hidden');
       this.surfaceList.classList.add('hidden');
@@ -719,7 +721,7 @@ class Menu {
         this.legendManager.removeLegend('ER');
       }
 
-      globe.showJson(e.target.checked, 'ER', 'data/geojson/empl_reserve.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'ER', 'data/geojson/empl_reserve.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'type_prescription',
         colors: colors,
@@ -741,7 +743,7 @@ class Menu {
         this.legendManager.removeLegend('margeRecul');
       }
 
-      globe.showJson(e.target.checked, 'margeRecul', 'data/geojson/marge_surf.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'margeRecul', 'data/geojson/marge_surf.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'sous_type',
         colors: colors,
@@ -760,7 +762,7 @@ class Menu {
         this.legendManager.removeLegend('ensPaysager');
       }
 
-      globe.showJson(e.target.checked, 'ens_paysager', 'data/geojson/ens_paysager.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'ens_paysager', 'data/geojson/ens_paysager.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'sous_type',
         colors: color,
@@ -779,7 +781,7 @@ class Menu {
         this.legendManager.removeLegend('batimentsInteressant'); // Suppression de la légende qui a l'ID 'batiments'
       }
 
-      globe.showJson(e.target.checked, 'bati_interessant', 'data/geojson/bati_interessant.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'bati_interessant', 'data/geojson/bati_interessant.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'sous_type',
         colors: colors,
@@ -798,7 +800,7 @@ class Menu {
         this.legendManager.removeLegend('batimentsExceptionnel');
       }
 
-      globe.showJson(e.target.checked, 'bati_exceptionnel', 'data/geojson/bati_exceptionnel.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'bati_exceptionnel', 'data/geojson/bati_exceptionnel.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'sous_type',
         colors: colors,
@@ -817,7 +819,7 @@ class Menu {
         this.legendManager.removeLegend('continuite');
       }
 
-      globe.showJson(e.target.checked, 'continuite_eco', 'data/geojson/cont_ecologique.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'continuite_eco', 'data/geojson/cont_ecologique.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'sous_type',
         colors: color,
@@ -836,7 +838,7 @@ class Menu {
         this.legendManager.removeLegend('plante');
       }
 
-      globe.showJson(e.target.checked, 'espaces_plantes', 'data/geojson/esp_plante.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'espaces_plantes', 'data/geojson/esp_plante.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'sous_type',
         colors: color,
@@ -855,7 +857,7 @@ class Menu {
         this.legendManager.removeLegend('jardin');
       }
 
-      globe.showJson(e.target.checked, 'jardin', 'data/geojson/jardin_surf.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'jardin', 'data/geojson/jardin_surf.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'name',
         colors: color,
@@ -874,7 +876,7 @@ class Menu {
         this.legendManager.removeLegend('aligne');
       }
 
-      globe.showJson(e.target.checked, 'alignement', 'data/geojson/alignement_surf.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'alignement', 'data/geojson/alignement_surf.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'sous_type',
         colors: color,
@@ -910,7 +912,7 @@ class Menu {
         this.legendManager.removeLegend('zh_averees');
       }
 
-      globe.showJson(e.target.checked, 'zones_humides', 'data/geojson/zh_averees.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'zones_humides', 'data/geojson/zh_averees.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'name',
         colors: color,
@@ -929,7 +931,7 @@ class Menu {
         this.legendManager.removeLegend('sol_pollue');
       }
 
-      globe.showJson(e.target.checked, 'solpollue', 'data/geojson/sol_pollue.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'solpollue', 'data/geojson/sol_pollue.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'sous_type',
         colors: color,
@@ -948,7 +950,7 @@ class Menu {
         this.legendManager.removeLegend('risquetechno');
       }
 
-      globe.showJson(e.target.checked, 'risque_techno', 'data/geojson/risque_techno.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'risque_techno', 'data/geojson/risque_techno.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'sous_type',
         colors: color,
@@ -982,7 +984,7 @@ class Menu {
         this.legendManager.removeLegend('trame');
       }
 
-      globe.showJson(e.target.checked, 'trame_verte_bleue', 'data/geojson/tvb.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'trame_verte_bleue', 'data/geojson/tvb.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'name',
         colors: color,
@@ -1001,7 +1003,7 @@ class Menu {
         this.legendManager.removeLegend('trameReservoir');
       }
 
-      globe.showJson(e.target.checked, 'trameReservoir', 'data/geojson/tvb_reservoir.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'trameReservoir', 'data/geojson/tvb_reservoir.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'name',
         colors: color,
@@ -1021,7 +1023,7 @@ class Menu {
         this.legendManager.removeLegend('nappe');
       }
 
-      globe.showJson(e.target.checked, 'nappe', 'data/geojson/ppri_nappe.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'nappe', 'data/geojson/ppri_nappe.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'classe',
         colors: color,
@@ -1041,7 +1043,7 @@ class Menu {
         this.legendManager.removeLegend('remont');
       }
 
-      globe.showJson(e.target.checked, 'remontee', 'data/geojson/ppri_innond_remontee.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'remontee', 'data/geojson/ppri_innond_remontee.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'nom',
         colors: colors,
@@ -1067,7 +1069,7 @@ class Menu {
         this.legendManager.removeLegend('submersion');
       }
 
-      globe.showJson(e.target.checked, 'submersion', 'data/geojson/ppri_innond_debord.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'submersion', 'data/geojson/ppri_innond_debord.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'nom',
         colors: colors,
@@ -1086,7 +1088,7 @@ class Menu {
         this.legendManager.removeLegend('reservoirA');
       }
 
-      globe.showJson(e.target.checked, 'tnu_reservoirA', 'data/geojson/tnu_reserv_arbore.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'tnu_reservoirA', 'data/geojson/tnu_reserv_arbore.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'name',
         colors: color,
@@ -1105,7 +1107,7 @@ class Menu {
         this.legendManager.removeLegend('reservoirH');
       }
 
-      globe.showJson(e.target.checked, 'tnu_reservoirH', 'data/geojson/tnu_reservoir_herbace.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'tnu_reservoirH', 'data/geojson/tnu_reservoir_herbace.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'name',
         colors: color,
@@ -1124,7 +1126,7 @@ class Menu {
         this.legendManager.removeLegend('corridorH');
       }
 
-      globe.showJson(e.target.checked, 'tnu_corridorH', 'data/geojson/tnu_corridor_herbace.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'tnu_corridorH', 'data/geojson/tnu_corridor_herbace.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'name',
         colors: color,
@@ -1143,7 +1145,7 @@ class Menu {
         this.legendManager.removeLegend('corridorA');
       }
 
-      globe.showJson(e.target.checked, 'tnu_corridorA', 'data/geojson/tnu_corridor_arbore.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'tnu_corridorA', 'data/geojson/tnu_corridor_arbore.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'name',
         colors: color,
@@ -1164,7 +1166,7 @@ class Menu {
         this.legendManager.removeLegend('monuments_historiques');
       }
 
-      globe.showJson(e.target.checked, 'monuments_historiques', 'data/geojson/monument_histo.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'monuments_historiques', 'data/geojson/monument_histo.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'type_entite',
         colors: colors,
@@ -1182,7 +1184,7 @@ class Menu {
         '1': '#DEA11F'
       }
 
-      globe.showJson(e.target.checked, 'velo', 'data/geojson/trajet_velo.json', '', '#FFFFFF', '', '', undefined, {
+      globe.showJson(e.target.checked, 'velo', 'data/geojson/trajet_velo.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'id',
         colors: colors,
@@ -1201,7 +1203,7 @@ class Menu {
         this.legendManager.removeLegend('velosurf');
       }
 
-      globe.showJson(e.target.checked, 'velosurf', 'data/geojson/velo_surf.json', '', '#FFFFFF', '', '', undefined, {
+      globe.showJson(e.target.checked, 'velosurf', 'data/geojson/velo_surf.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'id',
         colors: colors,
@@ -1245,7 +1247,7 @@ class Menu {
         this.legendManager.removeLegend('administratif');
       }
 
-      globe.showJson(e.target.checked, 'administratif', 'data/geojson/batipublic_administratif.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'administratif', 'data/geojson/batipublic_administratif.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'categorie',
         colors: colors,
@@ -1264,7 +1266,7 @@ class Menu {
         this.legendManager.removeLegend('religieux');
       }
 
-      globe.showJson(e.target.checked, 'religieux', 'data/geojson/batipublic_religieux.json', '', '#FFFFFF' , '', '', undefined, {
+      globe.showJson(e.target.checked, 'religieux', 'data/geojson/batipublic_religieux.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'categorie',
         colors: colors,
@@ -1283,7 +1285,7 @@ class Menu {
         this.legendManager.removeLegend('culturel');
       }
 
-      globe.showJson(e.target.checked, 'culturel', 'data/geojson/batipublic_culturel.json', '', '#FFFFFF', '', '', undefined, {
+      globe.showJson(e.target.checked, 'culturel', 'data/geojson/batipublic_culturel.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'categorie',
         colors: colors,
@@ -1302,7 +1304,7 @@ class Menu {
         this.legendManager.removeLegend('social');
       }
 
-      globe.showJson(e.target.checked, 'social', 'data/geojson/batipublic_social.json', '', '#FFFFFF', '', '', undefined, {
+      globe.showJson(e.target.checked, 'social', 'data/geojson/batipublic_social.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'categorie',
         colors: colors,
@@ -1321,7 +1323,7 @@ class Menu {
         this.legendManager.removeLegend('historique');
       }
 
-      globe.showJson(e.target.checked, 'historique', 'data/geojson/batipublic_historique.json', '', '#FFFFFF', '', '', undefined, {
+      globe.showJson(e.target.checked, 'historique', 'data/geojson/batipublic_historique.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'categorie',
         colors: colors,
@@ -1340,7 +1342,7 @@ class Menu {
         this.legendManager.removeLegend('sante');
       }
 
-      globe.showJson(e.target.checked, 'sante', 'data/geojson/batipublic_sante.json', '', '#FFFFFF', '', '', undefined, {
+      globe.showJson(e.target.checked, 'sante', 'data/geojson/batipublic_sante.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'categorie',
         colors: colors,
@@ -1359,7 +1361,7 @@ class Menu {
         this.legendManager.removeLegend('sportif');
       }
 
-      globe.showJson(e.target.checked, 'sportif', 'data/geojson/batipublic_sportif.json', '', '#FFFFFF', '', '', undefined, {
+      globe.showJson(e.target.checked, 'sportif', 'data/geojson/batipublic_sportif.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'categorie',
         colors: colors,
@@ -1378,7 +1380,7 @@ class Menu {
         this.legendManager.removeLegend('enseignement');
       }
 
-      globe.showJson(e.target.checked, 'enseignement', 'data/geojson/batipublic_enseignement.json', '', '#FFFFFF', '', '', undefined, {
+      globe.showJson(e.target.checked, 'enseignement', 'data/geojson/batipublic_enseignement.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'categorie',
         colors: colors,
@@ -1400,7 +1402,7 @@ class Menu {
         this.legendManager.removeLegend('autre');
       }
 
-      globe.showJson(e.target.checked, 'autre', 'data/geojson/batipublic_autre.json', '', '#FFFFFF', '', '', undefined, {
+      globe.showJson(e.target.checked, 'autre', 'data/geojson/batipublic_autre.json', undefined, undefined , undefined, undefined, undefined, {
         classification: true,
         classificationField: 'categorie',
         colors: colors,

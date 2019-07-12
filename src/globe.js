@@ -749,12 +749,9 @@ class Globe {
             activeShape = globe.createPoint(dynamicPositions);
             if($('#taille').val() === 'metre') {
               floatingPoint = globe.createPinBillboard(billboard, earthPosition, url, couleur, hauteurVol, true);
-              activeShape = globe.createPinBillboard(billboard, dynamicPositions, url, couleur, hauteurVol, true);
-              billboard.pop();
               billboard.pop();
             } else if($('#taille').val() === 'pixel') {
               floatingPoint = globe.createPinBillboard(billboard, earthPosition, url, couleur, hauteurVol, false);
-              activeShape = globe.createPinBillboard(billboard, dynamicPositions, url, couleur, hauteurVol, false);
             }
           } else if(choice === 'polygon') {
             activeShape = globe.drawPolygon(dynamicPositions, couleur, transparence);
@@ -787,7 +784,6 @@ class Globe {
               }
             }
           }
-          console.log(billboard);
         } else {
           activeShapePoints.push(earthPosition);
           if(choice === 'point'){
@@ -797,11 +793,9 @@ class Globe {
             } else if($('#taille').val() === 'pixel') {
               globe.createPinBillboard(billboard, earthPosition, url, couleur, hauteurVol, false);
             }
-            billboard.pop();
           } else {
             point.push(globe.createPoint(earthPosition));
           }
-          console.log(billboard);
         }
       }
       if(choice === 'polygon'&& choice2 === 'mesure') {
@@ -883,6 +877,10 @@ class Globe {
       }
       globe.viewer.scene.requestRender();
       billboard.pop(); // quand on clique droit avec le billboard Cesium ajoute un billboard à la position (0,0,0)
+      console.log(billboard);
+      console.log(line);
+      console.log(surface);
+      console.log(volume);
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
     // les 2 boutons "nouvelle mesure" pour la distance et surface: l'utilisateur est obligé d'appuyer dessus pour effectuer une nouvelle mesure
@@ -897,17 +895,20 @@ class Globe {
       var lastLine = figure.pop();
       this.viewer.entities.remove(lastLine);
       this.viewer.scene.requestRender();
+      console.log(figure);
     });
   }
 
   // Supprime toutes les figures par catégorie
   supprFigure(element, figure) {
     document.querySelector(element).addEventListener('click', (e) => {
-      for(var i = 0; i < figure.length+1; i++){
+      for(var i = 0; i < figure.length; i++){
         this.viewer.entities.remove(figure[i]);
+        figure.pop();
       }
       figure = [];
       this.viewer.scene.requestRender();
+      console.log(figure);
     });
   }
 
