@@ -47,7 +47,7 @@ html, body {
   left: 0;
 }
 
-/* Style de la légende des coordonnées */
+/* Style de la partie à droite du menu contenant toutes les légendes et formulaires */
 #left-pane{
   position: absolute;
   top: 00px;
@@ -375,29 +375,29 @@ i {
 /* les boutons bougent à l'ouverture du menu */
 #mesures.menu-open {
   left:540px;
-  transition: left 0.5s, right 0.5s;
+  transition: left 0.5s;
 }
 #construction.menu-open {
   left:580px;
-  transition: left 0.5s, right 0.5s;
+  transition: left 0.5s;
 }
 #coupe.menu-open {
   left:620px;
-  transition: left 0.5s, right 0.5s;
+  transition: left 0.5s;
 }
 #time.menu-open {
   left:660px;
-  transition: left 0.5s, right 0.5s;
+  transition: left 0.5s;
 }
 
 #camera.menu-open {
   left:700px;
-  transition: left 0.5s, right 0.5s;
+  transition: left 0.5s;
 }
 
 #link.menu-open {
   left:740px;
-  transition: left 0.5s, right 0.5s;
+  transition: left 0.5s;
 }
 
 .aide {
@@ -405,57 +405,6 @@ i {
   background-color: #FFFFFF;
   font-size: small;
 }
-
-/*#mesures:hover #annotationM {
-display: block;
-width: 120px;
-position: relative;
-top: -10px;
-left: 10px;
-z-index: 2;
-}
-#construction:hover #annotationD {
-display: block;
-width: 110px;
-position: relative;
-top: -10px;
-left: 10px;
-z-index: 2;
-}
-#coupe:hover #annotationC {
-display: block;
-width: 105px;
-position: relative;
-top: -10px;
-left: 10px;
-z-index: 2;
-}
-#time:hover #annotationT {
-display: block;
-width: auto;
-position: relative;
-top: -10px;
-left: 10px;
-z-index: 2;
-}
-
-#camera:hover #annotationcamera {
-display: block;
-width: 100px;
-position: relative;
-top: -10px;
-left: 10px;
-z-index: 2;
-}
-
-#link:hover #annotationlink {
-display: block;
-width: 100px;
-position: relative;
-top: -10px;
-left: 10px;
-z-index: 2;
-}*/
 
 .menuClic {
   display: block;

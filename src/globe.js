@@ -252,15 +252,6 @@ class Globe {
     return tileset.readyPromise;
   }
 
-  loadKml(link, options = {clampToGround : true}){
-    // Chargement du fichier KML (les points avec leurs descriptions)
-    let promisse = Cesium.KmlDataSource.load(link);
-    promisse.then((dataSource) => {
-      this.viewer.dataSources.add(dataSource);
-    });
-    return promisse;
-  }
-
   loadGeoJson(link, name, symbol, couleur, image, choice, billboard, options = {}){
     let promisse = Cesium.GeoJsonDataSource.load(link, {
       clampToGround: true,
@@ -834,7 +825,6 @@ class Globe {
           } else if($('#taille').val() === 'pixel') {
             globe.createPinBillboard(billboard, activeShapePoints, url, couleur, hauteurVol, false);
           }
-          console.log(billboard);
         } else if(choice === 'line') {
           if($('#clampligne').val() === 'colle') {
             if($('#styleligne').val() === 'simple') {
@@ -877,10 +867,6 @@ class Globe {
       }
       globe.viewer.scene.requestRender();
       billboard.pop(); // quand on clique droit avec le billboard Cesium ajoute un billboard à la position (0,0,0)
-      console.log(billboard);
-      console.log(line);
-      console.log(surface);
-      console.log(volume);
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
     // les 2 boutons "nouvelle mesure" pour la distance et surface: l'utilisateur est obligé d'appuyer dessus pour effectuer une nouvelle mesure
@@ -895,7 +881,6 @@ class Globe {
       var lastLine = figure.pop();
       this.viewer.entities.remove(lastLine);
       this.viewer.scene.requestRender();
-      console.log(figure);
     });
   }
 
@@ -904,11 +889,11 @@ class Globe {
     document.querySelector(element).addEventListener('click', (e) => {
       for(var i = 0; i < figure.length; i++){
         this.viewer.entities.remove(figure[i]);
+      }
+      for(var j = 0; j <= figure.length+1; j++){
         figure.pop();
       }
-      figure = [];
       this.viewer.scene.requestRender();
-      console.log(figure);
     });
   }
 

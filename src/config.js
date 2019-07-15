@@ -33,8 +33,46 @@ this.batipublicDiv = document.querySelector('#batipublicDiv');
 this.veloDiv = document.querySelector('#veloDiv');
 this.velosurfDiv = document.querySelector('#velosurfDiv');
 
+/*
+*
+* Fonctions de configuration
+*
+*/
+
+// Bouton configuration par défaut
+function showElements() {
+  // PLU
+  this.ERDiv.classList.remove('hidden');
+  this.margeDiv.classList.remove('hidden');
+  this.ensPaysagerDiv.classList.remove('hidden');
+  this.batiInteressantDiv.classList.remove('hidden');
+  this.batiExceptionnelDiv.classList.remove('hidden');
+  this.planteDiv.classList.remove('hidden');
+  this.continuiteDiv.classList.remove('hidden');
+  this.jardinDiv.classList.remove('hidden');
+  this.alignementDiv.classList.remove('hidden');
+  this.arbreDiv.classList.remove('hidden');
+  // Ecologie
+  this.trameDiv.classList.remove('hidden');
+  this.zhAvereesDiv.classList.remove('hidden');
+  this.solPollueDiv.classList.remove('hidden');
+  this.risqueTechnoDiv.classList.remove('hidden');
+  this.arbresRemDiv.classList.remove('hidden');
+  this.ppriDiv.classList.remove('hidden');
+  this.tnuDiv.classList.remove('hidden');
+  //Reglementaire
+  this.monumentDiv.classList.remove('hidden');
+  //Divers
+  this.danubeDiv.classList.remove('hidden');
+  this.velumDiv.classList.remove('hidden');
+  this.batipublicDiv.classList.remove('hidden');
+  this.veloDiv.classList.remove('hidden');
+  this.velosurfDiv.classList.remove('hidden');
+}
+
 
 // cacher les éléments ligne par ligne
+// Fonction appelée lors du clic sur le bouton réinitialisation
 function hideElements() {
   // PLU
   this.ERDiv.classList.add('hidden');
@@ -68,36 +106,7 @@ function hideElements() {
   this.velosurfDiv.classList.add('hidden');
 }
 
-function showElements() {
-  // PLU
-  this.ERDiv.classList.remove('hidden');
-  this.margeDiv.classList.remove('hidden');
-  this.ensPaysagerDiv.classList.remove('hidden');
-  this.batiInteressantDiv.classList.remove('hidden');
-  this.batiExceptionnelDiv.classList.remove('hidden');
-  this.planteDiv.classList.remove('hidden');
-  this.continuiteDiv.classList.remove('hidden');
-  this.jardinDiv.classList.remove('hidden');
-  this.alignementDiv.classList.remove('hidden');
-  this.arbreDiv.classList.remove('hidden');
-  // Ecologie
-  this.trameDiv.classList.remove('hidden');
-  this.zhAvereesDiv.classList.remove('hidden');
-  this.solPollueDiv.classList.remove('hidden');
-  this.risqueTechnoDiv.classList.remove('hidden');
-  this.arbresRemDiv.classList.remove('hidden');
-  this.ppriDiv.classList.remove('hidden');
-  this.tnuDiv.classList.remove('hidden');
-  //Reglementaire
-  this.monumentDiv.classList.remove('hidden');
-  //Divers
-  this.danubeDiv.classList.remove('hidden');
-  this.velumDiv.classList.remove('hidden');
-  this.batipublicDiv.classList.remove('hidden');
-  this.veloDiv.classList.remove('hidden');
-  this.velosurfDiv.classList.remove('hidden');
-}
-
+// Configuration PLU
 function initPLU() {
   // PLU
   this.ERDiv.classList.remove('hidden');
@@ -128,7 +137,7 @@ function initPLU() {
   this.velosurfDiv.classList.add('hidden');
 }
 
-
+// Configuration Ecologie du territoire
 function initEco() {
   // PLU
   this.ERDiv.classList.add('hidden');

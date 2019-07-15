@@ -1,13 +1,18 @@
 "use strict";
 
-/* Classe permettant de gérer les légendes
-* Prend un paramètre : l'élément HTML dans lequel mettre les légendes */
+/*
+* Classe permettant de gérer les légendes
+* Prend un paramètre : l'élément HTML dans lequel mettre les légendes, ici le left-pane
+*/
 class LegendManager {
 
   constructor(legendContainer){
     this.legendContainer = legendContainer;
   }
 
+/*
+* Permet d'ajouter une légende
+*/
   addLegend(id, values, choice, symbol){
     let legend = document.createElement('div');
     legend.id = id;

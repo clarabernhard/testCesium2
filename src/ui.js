@@ -122,33 +122,38 @@ class Menu {
       this.coordsList.classList.add('hidden');
       this.distanceList.classList.add('hidden');
       this.aideCheckbox.classList.add('hidden');
-      for(var i = 0; i < dline.length+1; i++){
+
+      for(var i = 0; i < dline.length; i++){
         globe.viewer.entities.remove(dline[i]);
-        globe.viewer.entities.remove(dline2[i]);
-        dline = [];
-        dline2 = [];
       }
+      for(var j = 0; j <= dline.length+1; j++){
+        dline.pop();
+      }
+      for(var i = 0; i < dline2.length; i++){
+        globe.viewer.entities.remove(dline2[i]);
+      }
+      for(var j = 0; j <= dline2.length+1; j++){
+        dline2.pop();
+      }
+
       this.aireList.classList.add('hidden');
       this.aideCheckbox.classList.add('hidden');
       for(var i = 0; i < dsurface.length; i++){
         globe.viewer.entities.remove(dsurface[i]);
       }
+      for(var j = 0; j <= dsurface.length+1; j++){
+        dsurface.pop();
+      }
       globe.viewer.scene.requestRender();
+
     });
 
     document.querySelector('#point').addEventListener('click', (e) => {
       globe.supprSouris();
       this.distanceList.classList.add('hidden');
       this.aideCheckbox.classList.add('hidden');
-      for(var i = 0; i < dline.length; i++){
-        globe.viewer.entities.remove(dline[i]);
-        globe.viewer.entities.remove(dline2[i]);
-      }
       this.aireList.classList.add('hidden');
       this.aideCheckbox.classList.add('hidden');
-      for(var i = 0; i < dsurface.length; i++){
-        globe.viewer.entities.remove(dsurface[i]);
-      }
 
       this.coordsList.classList.remove('hidden');
       globe.showCoords();
@@ -159,12 +164,8 @@ class Menu {
     document.querySelector('#ligne').addEventListener('click', (e) => {
       globe.supprSouris();
       this.coordsList.classList.add('hidden');
-      globe.setCoordsCallback(undefined);
       this.aireList.classList.add('hidden');
       this.aideCheckbox.classList.add('hidden');
-      for(var i = 0; i < point.length; i++){
-        globe.viewer.entities.remove(dsurface[i]);
-      }
 
       var choice = 'line';
       var choice2 = 'mesure';
@@ -180,15 +181,8 @@ class Menu {
     document.querySelector('#surface').addEventListener('click', (e) => {
       globe.supprSouris();
       this.coordsList.classList.add('hidden');
-      globe.setCoordsCallback(undefined);
       this.distanceList.classList.add('hidden');
       this.aideCheckbox.classList.add('hidden');
-      for(var i = 0; i < point.length; i++){
-        globe.viewer.entities.remove(dline[i]);
-      }
-      for(var j = 0; j < point.length; j++){
-        globe.viewer.entities.remove(dline2[j]);
-      }
 
       var choice = 'polygon';
       var choice2 = 'mesure';
@@ -287,7 +281,7 @@ class Menu {
     /*
     *
     *  Export des dessins
-    *
+    * On déclare l'évenement dans le constructeur pour avoir accès aux tableaux d'entités
     */
     document.querySelector("#exportDessin").addEventListener('click', (e) => {
       let jsonGlob = {};
@@ -459,7 +453,9 @@ class Menu {
     });
 
     /*
+    *
     * Outil de découpe dans le photomaillage
+    *
     */
     this.viewModel = {
       affich : true,
@@ -512,8 +508,15 @@ class Menu {
 
   }
 
+  /*
+  *
+  * Fin du constructeur
+  *
+  *
+  */
+
+  // Evenement pour les div déroulantes à l'intérieur du menu de gauche
   menuDeroulant(element){
-    // Evenement pour les div déroulantes à l'intérieur du menu de gauche
     var i;
     for (i = 0; i < element.length; i++) {
       element[i].addEventListener('click', function() {
@@ -1492,19 +1495,12 @@ class Menu {
     var valeurClassif = []; // champ de texte utlisé pour la classification
     var couleurClassif = []; // couleur associée
 
-    // variables neutres qui servent lors de l'appel de la fonction showJson
-    var symbol;
-    var couleur = 'FFFFFF';
-    var options;
-
     document.querySelector('#affichercouche').addEventListener('click', function() {
       document.querySelector('#affichercouche').classList.add('hidden'); // on ne peut afficher qu'un seul contenu de dossier par session
       localStorage.setItem('identifiant', $('#idEMS').val()); // on enregistre l'identifiant dans la mémoire du navigateur (cookie)
       var identifiant = localStorage.getItem('identifiant'); // et on le récupère
 
       var filePath = 'http://127.1.0.0:8000/' + identifiant + '/json/'; // donne le chemin d'accès au dossier
-
-      var divClone = $("#classifList").clone(); // on garde en mémoire l'état d'origine pour le remettre une fois une couche ajoutée
 
       var xmlhttp = new XMLHttpRequest();
       this.xmlhttp = this;
@@ -1528,8 +1524,23 @@ class Menu {
 
             // Lorsqu'on clique sur un des boutons, ouvre un menu de classification et créé une checkbox dans l'onglet "mes couches"
             couche.addEventListener('click', (e) => {
+              var divClone = $("#classifList").clone(); // on garde en mémoire l'état d'origine pour le remettre une fois une couche ajoutée
               document.querySelector('#fileList').classList.add('hidden');
               document.querySelector('#classifList').classList.remove('hidden');
+
+              document.querySelector('#ajoutertype').addEventListener('click', function() {
+                if($('#typeclassif').val() === 'ponctuelle') {
+                  document.querySelector('#ponctuelleDiv').classList.remove('hidden');
+                  document.querySelector('#ajouterclassif').classList.remove('hidden');
+                  document.querySelector('#ajoutertype').classList.add('hidden');
+                  document.querySelector('#choixDiv').classList.add('hidden');
+                } else if($('#typeclassif').val() === 'surfacique') {
+                  document.querySelector('#surfaciqueDiv').classList.remove('hidden');
+                  document.querySelector('#ajouterclassif').classList.remove('hidden');
+                  document.querySelector('#ajoutertype').classList.add('hidden');
+                  document.querySelector('#choixDiv').classList.add('hidden');
+                }
+              });
 
               // A chaque clic, ajoute les 2 div pour classifier
               document.querySelector('#addclassif').addEventListener('click', function() {
@@ -1574,6 +1585,7 @@ class Menu {
                 item.appendChild(label);
                 document.getElementById("mescouches").appendChild(item);
 
+                // données surfaciques
                 var champ = $('#classif').val();
                 var transparence = $('#classiftransparence').val();
                 valeurClassif = $('.valeurclassif').map(function() {
@@ -1587,12 +1599,17 @@ class Menu {
                 for(let j=0; j<valeurClassif.length; j++) {
                   colors[valeurClassif[j]] = couleurClassif[j];
                 }
+
+                // données ponctuelles
+                var couleur = $('#classifpoint').val();
+                var url = $('#makiclassif').val();
+
                 document.querySelector('#classifList').classList.add('hidden');
                 $("#classifList").replaceWith(divClone); // pour avoir une div vierge lors de l'ajout de la prochaine couche
 
                 // L'evenement pour afficher la nouvelle couche
                 checkbox.addEventListener('change', (e) => {
-                  globe.showJson(e.target.checked, noms[i], json[i], undefined, Cesium.Color.fromCssColorString('#05A197'), '', '', undefined, {
+                  globe.showJson(e.target.checked, noms[i], json[i], url, Cesium.Color.fromCssColorString(couleur), undefined, undefined, undefined, {
                     classification: true,
                     classificationField: champ,
                     colors: colors,
@@ -1608,6 +1625,8 @@ class Menu {
       xmlhttp.send();
     });
   }
+
+
 
   // La même fonction qui récupère les données dans le dossier 3dtiles et affiche la couche
   // pas de classification simple pour les 3dtiles
@@ -1679,6 +1698,13 @@ class Menu {
     });
   }
 
+
+  /*
+  *
+  * Et une 3ème fois la même fonction pour récupérer le contenu du dossier drawings et l'afficher
+  *
+  */
+
   getDrawing() {
     var result = []; // tableau pour stocker les éléments du dossier
     var noms = []; // stocke les noms des couches
@@ -1747,21 +1773,21 @@ class Menu {
               item.appendChild(label);
               document.getElementById("mescouches").appendChild(item);
 
-                // L'evenement pour afficher la nouvelle couche
-                checkbox.addEventListener('change', (e) => {
-                  if(e.target.checked){
-                    if(globe.dataSources[noms[i]] === undefined){
-                      globe.loadDrawing(json[i], noms[i], options);
-                    } else{
-                      globe.dataSources[noms[i]].show = true;
-                      globe.viewer.scene.requestRender();
-                    }
+              // L'evenement pour afficher la nouvelle couche
+              checkbox.addEventListener('change', (e) => {
+                if(e.target.checked){
+                  if(globe.dataSources[noms[i]] === undefined){
+                    globe.loadDrawing(json[i], noms[i], options);
                   } else{
-                    if(globe.dataSources[noms[i]] !== undefined){
-                      globe.dataSources[noms[i]].show = false;
-                      globe.viewer.scene.requestRender();
-                    }
+                    globe.dataSources[noms[i]].show = true;
+                    globe.viewer.scene.requestRender();
                   }
+                } else{
+                  if(globe.dataSources[noms[i]] !== undefined){
+                    globe.dataSources[noms[i]].show = false;
+                    globe.viewer.scene.requestRender();
+                  }
+                }
               });
             });
           }
@@ -1772,5 +1798,34 @@ class Menu {
     });
   }
 
+  /*document.querySelector('#ponctuelle').addEventListener('click', function() {
+  document.querySelector('#choixList').classList.add('hidden');
+  document.querySelector('#classifPointList').classList.remove('hidden');
+
+  document.querySelector('#ajouterpoint').addEventListener('click', function() {
+  let item = document.createElement('div');
+  item.classList.add('nowrap');
+  let checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.name = noms[i];
+  checkbox.id = id[i];
+
+  let label = document.createElement('label');
+  label.htmlFor = id[i];
+  label.appendChild(document.createTextNode(noms[i]));
+  item.appendChild(checkbox);
+  item.appendChild(label);
+  document.getElementById("mescouches").appendChild(item);
+
+  var couleur = $('#classifpoint').val();
+  var url = $('#makiclassif').val();
+  document.querySelector('#classifPointList').classList.add('hidden');
+  checkbox.addEventListener('change', (e) => {
+  globe.showJson(e.target.checked, noms[i], json[i], url, Cesium.Color.fromCssColorString(couleur), undefined, undefined, undefined, {
+
+});
+});
+});
+});*/
 
 }
