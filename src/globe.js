@@ -14,6 +14,7 @@ class Globe {
       requestRenderMode : true, // amélioration de performance: l'appli calcule uniquement quand on lui demande (https://cesium.com/blog/2018/01/24/cesium-scene-rendering-performance/)
       maximumRenderTimeChange : Infinity,
       baseLayerPicker: false, // enlève le bouton qui permet de choisir le fond de plan
+      scene3DOnly : true, // enlève le bouton permettant de basculer la vue en 2D
       skyBox : new Cesium.SkyBox({ // définit le ciel bleu
         sources : {
           positiveX : 'src/img/Sky.jpg',
