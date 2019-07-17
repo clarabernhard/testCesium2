@@ -171,12 +171,15 @@ class Menu {
     });
     document.querySelector("#configDefaut").addEventListener('click', (e) => {
       showElements();
+      this.configList.classList.add('hidden');
     });
     document.querySelector("#configPLU").addEventListener('click', (e) => {
       initPLU();
+      this.configList.classList.add('hidden');
     });
     document.querySelector("#configEco").addEventListener('click', (e) => {
       initEco();
+      this.configList.classList.add('hidden');
     });
 
     // afficher les 2 photomaillages
@@ -453,19 +456,14 @@ class Menu {
         }
 
         // On récupère la valeur rgba de la couleur
-        let rouge = line[i].polyline.material.color._value.red;
-        let vert =  line[i].polyline.material.color._value.green;
-        let bleu =  line[i].polyline.material.color._value.blue;
-        let transpa = line[i].polyline.material.color._value.alpha;
         type["properties"].color = {};
-        type["properties"]["color"].red = rouge;
-        type["properties"]["color"].green = vert;
-        type["properties"]["color"].blue = bleu;
-        type["properties"]["color"].alpha = transpa;
+        type["properties"]["color"].red = line[i].polyline.material.color._value.red;
+        type["properties"]["color"].green = line[i].polyline.material.color._value.green;
+        type["properties"]["color"].blue = line[i].polyline.material.color._value.blue;
+        type["properties"]["color"].alpha = line[i].polyline.material.color._value.alpha;
 
         // la valeur de la largeur de la ligne
-        let largeur =  line[i].polyline.width._value;
-        type["properties"].width = largeur;
+        type["properties"].width = line[i].polyline.width._value;
 
         // On met les coordonées dans le tableau
         type["geometry"].coordinates = coordLine;
@@ -528,15 +526,11 @@ class Menu {
         let coordXY = [Number(longitude), Number(latitude)];
         coordSurf.push(coordXY);
 
-        let rouge = surface[i].polygon.material.color._value.red;
-        let vert =  surface[i].polygon.material.color._value.green;
-        let bleu =  surface[i].polygon.material.color._value.blue;
-        let transpa =  surface[i].polygon.material.color._value.alpha;
         typeSurf["properties"].color = {};
-        typeSurf["properties"]["color"].red = rouge;
-        typeSurf["properties"]["color"].green = vert;
-        typeSurf["properties"]["color"].blue = bleu;
-        typeSurf["properties"]["color"].alpha = transpa;
+        typeSurf["properties"]["color"].red = surface[i].polygon.material.color._value.red;
+        typeSurf["properties"]["color"].green = surface[i].polygon.material.color._value.green;
+        typeSurf["properties"]["color"].blue = surface[i].polygon.material.color._value.blue;
+        typeSurf["properties"]["color"].alpha = surface[i].polygon.material.color._value.alpha;
 
         // il faut une array de plus pour les coordonnées des polygon pour que Cesium arrive à lire le JSON
         arraySurf.push(coordSurf);
@@ -570,15 +564,11 @@ class Menu {
         let coordXY = [Number(longitude), Number(latitude)];
         coordVol.push(coordXY);
 
-        let rouge = volume[i].polygon.material.color._value.red;
-        let vert =  volume[i].polygon.material.color._value.green;
-        let bleu =  volume[i].polygon.material.color._value.blue;
-        let transpa =  volume[i].polygon.material.color._value.alpha;
         typeVol["properties"].color = {};
-        typeVol["properties"]["color"].red = rouge;
-        typeVol["properties"]["color"].green = vert;
-        typeVol["properties"]["color"].blue = bleu;
-        typeVol["properties"]["color"].alpha = transpa;
+        typeVol["properties"]["color"].red = volume[i].polygon.material.color._value.red;
+        typeVol["properties"]["color"].green = volume[i].polygon.material.color._value.green;
+        typeVol["properties"]["color"].blue = volume[i].polygon.material.color._value.blue;
+        typeVol["properties"]["color"].alpha = volume[i].polygon.material.color._value.alpha;
 
         typeVol["properties"].extrudedHeight = volume[i].polygon.extrudedHeight._value;
 
@@ -1809,34 +1799,8 @@ class Menu {
     });
   }
 
-  /*document.querySelector('#ponctuelle').addEventListener('click', function() {
-  document.querySelector('#choixList').classList.add('hidden');
-  document.querySelector('#classifPointList').classList.remove('hidden');
-
-  document.querySelector('#ajouterpoint').addEventListener('click', function() {
-  let item = document.createElement('div');
-  item.classList.add('nowrap');
-  let checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.name = noms[i];
-  checkbox.id = id[i];
-
-  let label = document.createElement('label');
-  label.htmlFor = id[i];
-  label.appendChild(document.createTextNode(noms[i]));
-  item.appendChild(checkbox);
-  item.appendChild(label);
-  document.getElementById("mescouches").appendChild(item);
-
-  var couleur = $('#classifpoint').val();
-  var url = $('#makiclassif').val();
-  document.querySelector('#classifPointList').classList.add('hidden');
-  checkbox.addEventListener('change', (e) => {
-  globe.showJson(e.target.checked, noms[i], json[i], url, Cesium.Color.fromCssColorString(couleur), undefined, undefined, undefined, {
-
-});
-});
-});
-});*/
+/*
+* Fin de la classe Menu
+*/
 
 }
