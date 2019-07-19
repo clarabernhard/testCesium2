@@ -2,17 +2,26 @@
 
 /*
 * Classe permettant de gérer les légendes
-* Prend un paramètre : l'élément HTML dans lequel mettre les légendes, ici le left-pane
 */
 class LegendManager {
 
+  /**
+  * Le constructeur de la classe Legend qui créé le contenant pour les légendes
+  *
+  * @param  {DivHTML} legendContainer l'élément HTML dans lequel mettre les légendes, ici le left-pane
+  */
   constructor(legendContainer){
     this.legendContainer = legendContainer;
   }
 
-/*
-* Permet d'ajouter une légende
-*/
+  /**
+  * Permet d'ajouter une légende
+  *
+  * @param  {String} id Le nom qu'on donne à la légende
+  * @param  {Map} values la variable map qui contient les couleurs et leur valeur associée
+  * @param  {String} choice prend la valeur point, line ou polygon, permet de différencier l'affichage des légendes
+  * @param  {String} symbol le symbole à utiliser pour les légendes ponctuelles
+  */
   addLegend(id, values, choice, symbol){
     let legend = document.createElement('div');
     legend.id = id;
@@ -26,15 +35,35 @@ class LegendManager {
     this.legendContainer.appendChild(legend);
   }
 
+  /**
+  * Permet de supprimer une légende
+  *
+  * @param  {String} id Le nom de la légende à retirer
+  */
   removeLegend(id){
     let legend = this.legendContainer.querySelector('#' + id);
     legend.parentElement.removeChild(legend);
   }
 
+  /**
+  * Permet de vérifier si une légende existe
+  *
+  * @param  {String} id Le nom de la légende à tester
+  * @return {Boolean} true si la légende existe, false sinon
+  */
   hasLegend(id){
     return this.legendContainer.querySelectorAll('#' + id).length != 0;
   }
 
+  /**
+  * Créé les éléments HTML pour l'affichage de la légende
+  *
+  * @param  {String} label le texte à mettre dans la légende
+  * @param  {String} color la couleur à mettre dans légende
+  * @param  {String} choice prend la valeur point, line ou polygon, permet de différencier l'affichage des légendes
+  * @param  {String} symbol le symbole à utiliser pour les légendes ponctuelles
+  * @return {Object} l'objet HTML dans lequel la légende est créée
+  */
   makeLegendItem(label, color, choice, symbol){
     let legendColor = document.createElement('span');
     if(choice === 'line'){

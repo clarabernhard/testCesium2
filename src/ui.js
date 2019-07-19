@@ -3,6 +3,11 @@
 // Gérer les interactions avec l'utilisateur (évènement sur le menu)
 class Menu {
 
+  /**
+  * Le constructeur de la classe menu qui déclare toutes les variables utiles aux évènements
+  *
+  * @param  {Object} globe L'objet globe défini dans la classe Globe
+  */
   constructor(globe){
     this.globe = globe;
     this.terrain = terrain; // format entités
@@ -77,7 +82,11 @@ class Menu {
   * Fin du constructeur
   */
 
-  // Evenement pour les div déroulantes à l'intérieur du menu de gauche
+  /**
+  * Evenement pour les div déroulantes à l'intérieur du menu de gauche
+  *
+  * @param  {BoutonHTML} element Le bouton HTML sur lequel ajouter l'évènement
+  */
   menuDeroulant(element){
     var i;
     for (i = 0; i < element.length; i++) {
@@ -92,14 +101,25 @@ class Menu {
       });
     }
   }
-  // Affichage des divs dans la boîte à outils
+
+  /**
+  * Affichage des divs dans la boîte à outils
+  *
+  * @param  {BoutonHTML} bouton Le bouton HTML sur lequel ajouter l'évènement
+  * @param  {DivHTML} element La div HTML qui va s'afficher au déclenchement de l'évènement
+  */
   menuClic(bouton, element) {
     document.querySelector(bouton).addEventListener('click', (e) => {
       $(element).show();
     });
   }
 
-  // Permet de fermer les divs de la boîte à outils lorsqu'on clique ailleurs
+  /**
+  * Permet de fermer les divs de la boîte à outils lorsqu'on clique ailleurs
+  *
+  * @param  {BoutonHTML} bouton Le bouton HTML sur lequel ajouter l'évènement
+  * @param  {DivHTML} element La div HTML qui va s'afficher au déclenchement de l'évènement
+  */
   windowClic(bouton, element) {
     window.addEventListener('click', function(event){
       var $trigger = $(bouton);
@@ -109,13 +129,14 @@ class Menu {
     });
   }
 
-  /*
+  /**
   *
   *
   * Evenements sur toutes les checkbox, boutons dans le menu et toute la boîte à outils
   *
   *
   */
+
   evenementsCouches(){
     /*
     * Evenements d'ouverture des menus
@@ -206,7 +227,6 @@ class Menu {
     var volume = [];
     // mesures
     var dline = [];
-    var dline2 = [];
     var dsurface = [];
     // plan de coupe horizontal
     var planeEntities = [];
@@ -227,12 +247,6 @@ class Menu {
       }
       for(var j = 0; j <= dline.length+1; j++){
         dline.pop();
-      }
-      for(var i = 0; i < dline2.length; i++){
-        globe.viewer.entities.remove(dline2[i]);
-      }
-      for(var j = 0; j <= dline2.length+1; j++){
-        dline2.pop();
       }
 
       this.aireList.classList.add('hidden');
@@ -270,7 +284,7 @@ class Menu {
       var choice2 = 'mesure';
       var hauteurVol;
       var url;
-      globe.updateShape(choice, choice2, 3, '#FF0000', 1, hauteurVol, url, point, billboard, line, surface, volume, dline, dline2, dsurface);
+      globe.updateShape(choice, choice2, 3, '#FF0000', 1, hauteurVol, url, point, billboard, line, surface, volume, dline, dsurface);
       this.distanceList.classList.remove('hidden');
       this.aideCheckbox.classList.remove('hidden');
 
@@ -287,7 +301,7 @@ class Menu {
       var choice2 = 'mesure';
       var hauteurVol;
       var url;
-      globe.updateShape(choice, choice2, 3, '#1ABFD0', 0.4, hauteurVol, url, point, billboard, line, surface, volume, dline, dline2, dsurface);
+      globe.updateShape(choice, choice2, 3, '#1ABFD0', 0.4, hauteurVol, url, point, billboard, line, surface, volume, dline, dsurface);
       this.aireList.classList.remove('hidden');
       this.aideCheckbox.classList.remove('hidden');
 
@@ -310,7 +324,7 @@ class Menu {
       var largeur;
       var hauteurVol = $('#hauteurpoint').val();
       var url = 'Assets/Textures/maki/' + $('#makisymbol').val() + '.png';
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dline2, dsurface);
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dsurface);
     });
 
     document.querySelector("#envoyerligne").addEventListener('click', (e) => {
@@ -321,7 +335,7 @@ class Menu {
       var largeur = $('#largeur').val();
       var couleur = $('#couleur').val();
       var transparence = $('#transparence').val();
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dline2, dsurface);
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dsurface);
     });
 
     document.querySelector("#envoyersurf").addEventListener('click', (e) => {
@@ -332,7 +346,7 @@ class Menu {
       var largeur = 3;
       var couleur = $('#couleursurf').val();
       var transparence = $('#transparencesurf').val();
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dline2, dsurface);
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dsurface);
     });
 
     document.querySelector("#envoyervol").addEventListener('click', (e) => {
@@ -343,7 +357,7 @@ class Menu {
       var hauteurVol = $('#hauteurvol').val();
       var couleur = $('#couleurvol').val();
       var transparence = $('#transparencevol').val();
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dline2, dsurface);
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dsurface);
     });
 
     //Evenements pour la suppression / anunulation des dessins
@@ -615,8 +629,22 @@ class Menu {
       }
     });
     // Suppression/ annulation des plans de coupe
-    globe.annulCoupe(planeEntities, clippingPlanes);
-    globe.supprCoupe(planeEntities, clippingPlanes);
+    document.querySelector("#annulercoupe").addEventListener('click', (e) => {
+      var annul = planeEntities.length-1;
+      this.viewer.entities.remove(planeEntities[annul]);
+      planeEntities.pop();
+      clippingPlanes = [];
+      this.viewer.scene.requestRender();
+    });
+    document.querySelector("#supprimercoupe").addEventListener('click', (e) => {
+      //this.viewer.entities.remove(planeEntity);
+      for(var i = 0; i < planeEntities.length; i++){
+        this.viewer.entities.remove(planeEntities[i]);
+      }
+      clippingPlanes = [];
+      this.viewer.scene.requestRender();
+    });
+
 
     // Decoupe dans le photomaillage
     var toolbar = document.getElementById('toolbar');
@@ -1421,12 +1449,21 @@ class Menu {
   * Fin de la fonction evenementsCouches
   */
 
-  // Ajoute une source de données à la liste en donnant son nom "name" et la datasource "value"
+  /**
+  * Ajoute une source de données à la liste en donnant son nom "name" et la datasource "value"
+  *
+  * @param  {String} name Le nom qu'on souhaite donner à la datasource
+  * @param  {Object} value La valeur qu'on donne à la dataSource
+  */
   addDataSource(name, value){
     this.dataSources[name] = value;
   }
 
-  // Mise a jour de la timeline lorsque l'utilisateur choisit une date dans le calendrier
+  /**
+  * Mise a jour de la timeline lorsque l'utilisateur choisit une date dans le calendrier
+  *
+  * @param  {Object} value La valeur de la date rentrée dans le calendrier
+  */
   onDateChanged(value){
     let date = value.split('/');
 
@@ -1440,8 +1477,11 @@ class Menu {
     this.globe.viewer.timeline.zoomTo(startTime, stopTime); // Définit la portion visible de la timeline
   }
 
-  /*
+
+  /**
   * Classification du 3Dtiles velum en fonction de la valeur de l'attribut 'classif'
+  *
+  * @param  {String} show le paramètre qui spécifie quand l'affichage doit être actif - prend la valeur e.target.checked ou non
   */
   couleurVelum(show){
     if(this.dataSources.velum === undefined || this.dataSources.velum.show == false){
@@ -1474,11 +1514,15 @@ class Menu {
     });
   }
 
-  /* Ajout de couches interactif
+  /**
+  * Ajout de couches interactif
   * Principe: on a un serveur web qui permet d'avoir les fichiers au format http (Cesium n'accepte pas les fichiers stockés en
   * local pour des raisons de crossOrigin), on veut récupérer une liste de tous les fichiers présents dans un dossier spécifique.
   * On envoie la requête sur le serveur qui nous donne la liste au format texte, on récupère tous les noms de fichiers et
   * on s'en sert pour créer les liens d'accès jusqu'aux json
+  *
+  * @return {Object} la liste des fichiers sur le serveur web
+  *
   */
   getJson() {
     var result = []; // tableau pour stocker les éléments du dossier
@@ -1627,10 +1671,12 @@ class Menu {
     });
   }
 
-
-
-  // La même fonction qui récupère les données dans le dossier 3dtiles et affiche la couche
-  // pas de classification simple pour les 3dtiles
+  /**
+  * Ajout de couches interactif
+  * La même fonction qui récupère les données dans le dossier 3dtiles et affiche la couche
+  * pas de classification simple pour les 3dtiles
+  *
+  */
   get3DTiles() {
     var result = [];
     var noms = [];
@@ -1699,13 +1745,11 @@ class Menu {
     });
   }
 
-
-  /*
-  *
+  /**
+  * Ajout de couches interactif
   * Et une 3ème fois la même fonction pour récupérer le contenu du dossier drawings et l'afficher
   *
   */
-
   getDrawing() {
     var result = []; // tableau pour stocker les éléments du dossier
     var noms = []; // stocke les noms des couches
@@ -1799,8 +1843,8 @@ class Menu {
     });
   }
 
-/*
-* Fin de la classe Menu
-*/
+  /*
+  * Fin de la classe Menu
+  */
 
 }

@@ -1,8 +1,8 @@
-/*
-* Endroit où déclarer les nouvelles fonctions qui correspondent aux fichiers de configurations
-* Créer ensuite un nouveau bouton dans la div des config qui va appeler cette fonction au clic
-* Principe: jouer sur l'attribut 'hidden' des couches qu'on veut voir ou ne pas voir en fonction de la configuration
-*/
+/**
+ * Endroit où déclarer les nouvelles fonctions qui correspondent aux fichiers de configurations
+ * Créer ensuite un nouveau bouton dans la div des config qui va appeler cette fonction au clic
+ * Principe: jouer sur l'attribut 'hidden' des couches qu'on veut voir ou ne pas voir en fonction de la configuration
+ */
 
 //Déclaration de toutes les div contenant les checkbox
 // PLU

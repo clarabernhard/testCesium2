@@ -13,11 +13,13 @@ proj4.defs([
 ]);
 
 
-// Créer le globe --> appele le constucteur globe créé dans la classe correspondante
+// Créer le globe ; appelle le constucteur globe créé dans la classe correspondante
 let globe = new Globe('cesiumContainer', new Geocoder("http://adict.strasbourg.eu/addok/search"));
 
-// Charger le photo mailage --> appelle la fonction créée dans la classe globe
-let tileset = globe.loadPhotomaillage('data/Photomaillage/Cesium_1.json');
+// Charger le photomailage 2018 ; appelle la fonction créée dans la classe globe
+// On le charge d'abord au format tileset
+let tileset = globe.loadPhotomaillage('data/Photomaillage2018/Cesium_1.json');
+// Avant de l'ajouter au projet sous forme d'entités
 var terrain = globe.addPhotomaillage(tileset);
 
 

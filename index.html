@@ -15,9 +15,12 @@
   <!-- Conteneur pour le globe cesium -->
   <div id="cesiumContainer"></div>
 
+  <!-- Partie à gauche de l'écran collée au menu, qui accueille les légendes et les formulaires
+      Zone morte sur laquelle on ne peut pas naviguer avec la souris  -->
   <div id=left-pane>
     <div id="toggle-menu" class="hamburger-icon">Menu</div>
 
+    <!-- Formulaires de la boîte à outils -->
     <div class="backdrop hidden" id="coordsList">
       <h2>Coordonnées <br/> (CC48 / IGN69)</h2>
       <p>X (m): <span id="coordX"></span></p>
@@ -184,6 +187,7 @@
           <p><button id="addlink">Créer</button> </p>
         </div>
 
+        <!-- Ajout de couches -->
         <div class="backdrop hidden" id="fileList">
           <h2>Ajouter une couche</h2>
           <form>
@@ -257,6 +261,7 @@
 
       </div>
 
+      <!-- En bas à droite de l'écran -->
       <div id=right-pane>
         <div class="annotation hidden">
           <h4>Tracé des figures géométriques</h4>
@@ -265,6 +270,7 @@
         </div>
       </div>
 
+      <!-- Menu latéral déroulant -->
       <div id="menu">
         <div class="panel">
           <div id="menu-content"> MENU </div>
@@ -517,6 +523,7 @@
         </div>
       </div>
 
+      <!-- Boutons de la boîte à outils -->
       <div class= "menuClic" id="mesures">
         <button class="button" id="boutonmesures"><img src="src/img/icons8-length-filled-50.png"></button>
         <div class="menuClic-content" id="mesures-content">

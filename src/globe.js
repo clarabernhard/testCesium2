@@ -3,6 +3,13 @@
 // Créé un object globe qui pertmet de manipuler cesium plus simplement
 class Globe {
 
+  /**
+  * Le constructeur de la classe globe, qui créé le viewer Cesium, ajoute la flèche nord
+  *
+  * @param  {String} elementId Le nom du contenant html dans lequel on l'ajoute
+  * @param  {Object} geocoder Le Geocoder à associer
+  */
+
   constructor(elementId, geocoder){
     // Activer cette ligne pour avoir accès aux différents fonds de plan dispo - accès vers mon compte Cesium
     //Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNDA3NDMwNi0zZGZmLTQ1MzEtOWZjOC1mNzE5YWM2MDkxNjkiLCJpZCI6ODEzNCwic2NvcGVzIjpbImFzciIsImdjIl0sImlhdCI6MTU1MTI4MTk1NH0.bj-9TqaOHDBD8sMBIeIWTH6-YVl-1Zp6fxjjgP3OXEg';
@@ -35,7 +42,7 @@ class Globe {
 
     // importe la grille de conversion pour hauteur ellispoïdale vers altitude IGN69
     this.raf09 = undefined;
-    new Raf09('../Cesium/data/RAF09.mnt', (raf090) => {
+    new Raf09('data/RAF09.mnt', (raf090) => {
       this.raf09 = raf090;
     });
 
@@ -85,7 +92,12 @@ class Globe {
   *
   */
 
-  //Définit le zoom par défaut à l'ouverture de l'appli et lorsqu'on clique sur le bouton maison
+  /**
+  * Définit le zoom par défaut à l'ouverture de l'appli et lorsqu'on clique sur le bouton maison
+  * Si on accède à l'appli avec un autre zoom que la cathédrale, le bouton maison renverra sur cette vue
+  *
+  * @param  {tileset} tileset le 3dtiles sur lequel on souhaite zoomer
+  */
   setHome(tileset){
     var params = this.getAllUrlParams(window.location.href);
     let X = params.x;
@@ -132,7 +144,12 @@ class Globe {
     });
   }
 
-  // fonction qui lit et retourne les paramètres présents dans l'URL
+  /**
+  * lit et retourne les paramètres présents dans l'URL
+  *
+  * @param  {String} url L'url à analyser
+  * @return  {Object} obj Un objet contenant les paramètres de l'url
+  */
   getAllUrlParams(url) {
     var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
     var obj = {};
@@ -174,17 +191,14 @@ class Globe {
     return obj;
   }
 
-  getOrientation() {
-    this.handler.setInputAction(function(event) {
-      console.log(globe.viewer.camera.heading);
-      console.log(globe.viewer.camera.pitch);
-      console.log(globe.viewer.camera.roll);
-      console.log(globe.viewer.camera.positionWC);
-    }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-  }
-
-  // Fonction pour définir le point de vue de caméra en fonction de la position (Cartesian3)
-  // et des 3 paramètres d'orientation de la caméra
+  /**
+  * Définit le point de vue de caméra en fonction de la position (Cartesian3) et des 3 paramètres d'orientation de la caméra
+  *
+  * @param  {Cartesian3} position La position de la caméra
+  * @param  {Number} lacet Le paramètre lacet d'orientation de la caméra
+  * @param  {Number} tangage Le paramètre tangage d'orientation de la caméra
+  * @param  {Number} roulis Le paramètre roulis d'orientation de la caméra
+  */
   fly(position, lacet, tangage, roulis) {
     this.viewer.camera.flyTo({
       destination : position,
@@ -196,7 +210,13 @@ class Globe {
     });
   }
 
-  // Ajoute un bouton HTML qui enregistre un point de vue de caméra
+  /**
+  * Ajoute un bouton HTML qui enregistre un point de vue de caméra
+  *
+  * @param  {String} nom Le nom qu'on souhaite donner au point de vue
+  * @return  {BoutonHTML} viewPoint Le bouton HTML avec le nom saisi
+  */
+
   addViewPoint(nom) {
     var viewPoint = document.createElement("BUTTON");
     viewPoint.innerHTML = nom;
@@ -207,8 +227,12 @@ class Globe {
 
   }
 
-  // Fonction pour créer le lien de partage
+  /**
+  *   Créer le lien de partage qui conserve le niveau de zoom de la scène
+  */
+
   createLink() {
+    // On récupère les paramètres de la caméra
     let X = globe.viewer.camera.positionWC.x;
     let Y = globe.viewer.camera.positionWC.y;
     let Z = globe.viewer.camera.positionWC.z;
@@ -216,6 +240,7 @@ class Globe {
     let pitch = globe.viewer.camera.pitch;
     let roll = globe.viewer.camera.roll;
 
+    // Avant de construire un lien qui contient les paramètres
     // le premier paramètre doit débuter avec un "?" et les autres paramètres doivent être séparés par un "&"
     document.getElementById('nomlink').value = window.location.href+'?X='+X+'&Y='+Y+'&Z='+Z+'&heading='+heading+'&pitch='+pitch+'&roll='+roll;
   }
@@ -226,7 +251,14 @@ class Globe {
   *
   */
 
-  // permet d'enregister le tileset au format 3DTiles
+  /**
+  * Permet de charger et d'enregister le tileset au format 3DTiles
+  *
+  * @param  {String} link Le lien vers le fichier
+  * @param  {Object} options facultatif - Les options pour le chargement
+  * @return  {tileset} tileset Le 3DTileset
+  */
+
   loadPhotomaillage(link, options = {}){
     // Chargement du photo maillage au format 3D tiles
     let tileset = new Cesium.Cesium3DTileset({
@@ -237,13 +269,24 @@ class Globe {
     return tileset;
   }
 
-  // ajoute le tileset sous forme d'entités + structure asynchrone
+  /**
+  * ajoute le tileset sous forme d'entités  et garde une structure asynchrone
+  *
+  * @param  {tileset} tileset Le 3DTileset à ajouter
+  * @return  {tileset} tilesetPrimitive l'entité contenant le tileset
+  */
   addPhotomaillage(tileset) {
     var tilesetPrimitive = this.viewer.scene.primitives.add(tileset);
     return tilesetPrimitive.readyPromise;
   }
 
-  // permet de charger des 3DTiles en gardant une structure asynchrone (voir fonction show dans la classe UI)
+  /**
+  * permet de charger des 3DTiles en gardant une structure asynchrone (voir fonction show3dtiles)
+  *
+  * @param  {String} link Le lien vers le fichier
+  * @param  {Object} options facultatif - Les options pour le chargement
+  * @return  {tileset} tilesetPrimitive l'entité contenant le tileset
+  */
   load3DTiles(link, options = {}){
     let tileset = globe.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
       url : link,
@@ -253,6 +296,19 @@ class Globe {
     return tileset.readyPromise;
   }
 
+  /**
+  * permet de charger des fichiers geojson
+  *
+  * @param  {String} link Le lien vers le fichier
+  * @param  {String} name Le nom qu'on donne au json
+  * @param  {String} symbol Le symbole maki pour les entités ponctuelles
+  * @param  {String} couleur La couleur à affecter au symbole
+  * @param  {String} image L'image à utiliser pour les billboard des entités ponctuelles
+  * @param  {String} choice prend la valeur "point" ou undefined, permet de classifier
+  * @param  {Array} billboard Le tableau d'entités où stocker les billboards
+  * @param  {Object} options facultatif - Les options pour le chargement
+  * @return  {GeoJsonDataSource} le json une fois que tout est chargé
+  */
   loadGeoJson(link, name, symbol, couleur, image, choice, billboard, options = {}){
     let promisse = Cesium.GeoJsonDataSource.load(link, {
       clampToGround: true,
@@ -264,6 +320,7 @@ class Globe {
     this.showLoader(); // fonction qui affiche un symbole de chargement sur la page
 
     promisse.then((dataSource) => {
+      // Ajoute le json dans la liste des dataSource
       this.viewer.dataSources.add(dataSource);
       this.dataSources[name] = dataSource;
       this.hideLoader();
@@ -307,6 +364,14 @@ class Globe {
     return promisse;
   }
 
+  /**
+  * permet de charger les dessins exportés depuis Cesium; va chercher les propriétés dans le json pour garder l'affichage
+  *
+  * @param  {String} link Le lien vers le fichier
+  * @param  {String} name Le nom qu'on donne au json
+  * @param  {Object} options facultatif - Les options pour le chargement
+  * @return  {GeoJsonDataSource} le json une fois que tout est chargé
+  */
   loadDrawing(link, name, options = {}){
     let promisse = Cesium.GeoJsonDataSource.load(link, {
       clampToGround: true
@@ -356,10 +421,21 @@ class Globe {
     return promisse;
   }
 
-  /*
+  /**
+  *
   * Afficher ou masquer la source de données "name" en fonction de la valeur de "show"
   * Si elle n'a pas enore été affiché, la fonction va télécharger les données avec le lien "link" passé en parametre
   * Enlève/Affiche les entités billboard pour les points
+  *
+  * @param  {String} show le paramètre qui spécifie quand l'affichage doit être actif - prend la valeur e.target.checked ou non
+  * @param  {String} link Le lien vers le fichier
+  * @param  {String} name Le nom qu'on donne au json
+  * @param  {String} symbol Le symbole maki pour les entités ponctuelles
+  * @param  {String} couleur La couleur à affecter au symbole
+  * @param  {String} image L'image à utiliser pour les billboard des entités ponctuelles
+  * @param  {String} choice prend la valeur "point" ou undefined, permet de classifier
+  * @param  {Array} billboard Le tableau d'entités où stocker les billboards
+  * @param  {Object} options facultatif - Les options pour le chargement
   */
   showJson(show, name, link, symbol, couleur, image, choice, billboard, options = {}){
     if(show){
@@ -386,8 +462,17 @@ class Globe {
       }
     }
   }
-
-// idem pour les 3Dtiles
+  /**
+  *
+  * Afficher ou masquer la source de données "name" en fonction de la valeur de "show"
+  * Si elle n'a pas enore été affiché, la fonction va télécharger les données avec le lien "link" passé en parametre
+  * Enlève/Affiche les entités billboard pour les points
+  *
+  * @param  {String} show le paramètre qui spécifie quand l'affichage doit être actif - prend la valeur e.target.checked ou non
+  * @param  {String} link Le lien vers le fichier
+  * @param  {String} name Le nom qu'on donne au json
+  * @param  {Object} options facultatif - Les options pour le chargement
+  */
   show3DTiles(show, name, link, options = {}){
     if(show){
       if(this.dataSources[name] === undefined){
@@ -408,16 +493,24 @@ class Globe {
     }
   }
 
-  // Fonctions pour controler le loader, ie l'icône qui s'affiche pendant le chargement des données
+  /**
+  * Affiche une icône de chargement sur l'écran
+  */
   showLoader(){
     document.querySelector('#loadingIndicator').classList.remove('hidden');
   }
+  /**
+  * Retire l'icône de chargement sur l'écran
+  */
   hideLoader(){
     document.querySelector('#loadingIndicator').classList.add('hidden');
   }
 
-  /*
-  * Fonction pour afficher les ombres
+  /**
+  *
+  * Afficher ou masquer les ombres
+  *
+  * @param  {String} enabled le paramètre qui spécifie quand l'affichage doit être actif - prend la valeur e.target.checked ou non
   */
   shadow(enabled){
     this.handler.globe = this; // pour les problèmes de scope
@@ -434,7 +527,13 @@ class Globe {
   /*
   * Coordonnées
   */
-  // récupérer lat/lon/hauteur à chaque clic gauche
+
+  /**
+  *
+  * récupérer lat/lon/hauteur à chaque clic gauche
+  *
+  * @param  {CallbackProperty} callback
+  */
   setCoordsCallback(callback){
     let scene = this.viewer.scene;
 
@@ -452,7 +551,9 @@ class Globe {
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
   }
 
-  // Convertit les lat/lon/hauteur en CC48 / IGN69 et les affiche
+  /**
+  * Convertit les lat/lon/hauteur en CC48 / IGN69 et les affiche
+  */
   showCoords(){
     this.setCoordsCallback((longitude, latitude, hauteur) => { // Fonction éxécutée à chaque clic
       var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
@@ -466,7 +567,20 @@ class Globe {
   * Plan de coupe horizontal
   */
 
-  // ajouter le plan de coupe horizontal: les paramètres de la fonction vont être lus dans le formulaire avant de cliquer sur 'ajouter'
+  /**
+  *
+  * ajouter le plan de coupe horizontal
+  * les paramètres de la fonction vont être lus dans le formulaire avant de cliquer sur 'ajouter'
+  *
+  * @param  {Number} X la coordonnée X du point au centre du plan
+  * @param  {Number} Y la coordonnée Y du point au centre du plan
+  * @param  {Number} hauteurCoupe la coordonnée Z du point au centre du plan
+  * @param  {Number} longueurCoupe la largeur du plan
+  * @param  {Number} largeurCoupe la longueur du plan
+  * @param  {String} couleurCoupe la couleur du plan
+  * @param  {Object} planeEntities les entités de plans
+  * @param  {ClippingPlaneCollection} clippingPlanes la collection de plan (array) dans laquelle stocker les plans
+  */
   addClippingPlanes(X, Y, hauteurCoupe, longueurCoupe, largeurCoupe, couleurCoupe, planeEntities, clippingPlanes) {
     // on n'associe pas les clippingPlanes au tileset: c'est pour ça qu'ils ne coupent pas le tileset mais passent à travers
     var clippingPlanes = new Cesium.ClippingPlaneCollection({
@@ -499,7 +613,9 @@ class Globe {
     this.viewer.scene.requestRender();
   }
 
-  // Récupérer les coordonnées au clic et les afficher dans le formulaire du plan de coupe horizontal
+  /**
+  *  Récupérer les coordonnées au clic et les afficher dans le formulaire du plan de coupe horizontal
+  */
   coordCoupe(){
     let scene = this.viewer.scene;
     this.handler.globe = this;
@@ -520,30 +636,14 @@ class Globe {
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
   }
 
-// enlève le dernier plan de coupe ajouté
-  annulCoupe(entity, clippingPlanes){
-    document.querySelector("#annulercoupe").addEventListener('click', (e) => {
-      var annul = entity.length-1;
-      this.viewer.entities.remove(entity[annul]);
-      entity.pop();
-      clippingPlanes = [];
-      this.viewer.scene.requestRender();
-    });
-  }
-
-// supprime tous les plans de coupe
-  supprCoupe(entity, clippingPlanes){
-    document.querySelector("#supprimercoupe").addEventListener('click', (e) => {
-      //this.viewer.entities.remove(planeEntity);
-      for(var i = 0; i < entity.length; i++){
-        this.viewer.entities.remove(entity[i]);
-      }
-      clippingPlanes = [];
-      this.viewer.scene.requestRender();
-    });
-  }
-
-  // Fonction qui permet de gérer les mouvements du plan de coupe
+  /**
+  *
+  *  permet de gérer les mouvements du plan de coupe avec la souris
+  *
+  * @param  {Object} plane l'entité de plan
+  * @param  {String} couleurCoupe la couleur du plan à chaque évenement de souris
+  * @return {Entity} shape l'entité plan avec les évènements associés
+  */
   planeUpdate(plane, couleurCoupe) {
     var targetY = 0.0;
     var selectedPlane;
@@ -596,7 +696,13 @@ class Globe {
   *
   */
 
-  // pour créer un point: entité uniquement technique qui sert à afficher les autres figures (ici chaque point est affiché transparent)
+  /**
+  *
+  *  pour créer un point: entité uniquement technique qui sert à afficher les autres figures
+  * (ici chaque point est affiché transparent)
+  *
+  * @param  {Cartesian3} worldPosition la position du point
+  */
   createPoint(worldPosition) {
     var point = this.viewer.entities.add({
       position : worldPosition,
@@ -609,38 +715,69 @@ class Globe {
     return point;
   }
 
-  // Ajoute une image à une position spécifiée
+  /**
+  *
+  *  Construit un marqueur maki (pin) à l'aide du symbole (url) et couleur
+  * On ajoute directement les entités dans le tableau dans la fonction ici à cause de la structure asynchrone
+  *
+  * @param  {Array} billboard le tableau où stocker les entités billboard
+  * @param  {Cartesian3} worldPosition la position du point
+  * @param  {String} url le lien vers l'image à utiliser
+  * @param  {String} couleur la couleur du pin
+  * @param  {Number} height la hauteur du pin
+  * @param  {Boolean} size true si on veut la taille en mètre, false si on veut la taille en pixels
+  * @return {Entity} shape l'entité ajoutée au viewer
+  */
   createPinBillboard(billboard, worldPosition, url, couleur, height, size) {
     this.handler.globe = this;
     var url = Cesium.buildModuleUrl(url);
     Cesium.when(globe.pinBuilder.fromUrl(url, Cesium.Color.fromCssColorString(couleur), height), function(canvas) {
       var shape = globe.viewer.entities.add({
-          position : worldPosition,
-          billboard : {
-            image : canvas.toDataURL(),
-            height: height,
-            verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-            sizeInMeters: size
-          }
-        });
-        billboard.push(shape);
-        return shape;
+        position : worldPosition,
+        billboard : {
+          image : canvas.toDataURL(),
+          height: height,
+          verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+          sizeInMeters: size
+        }
       });
-    }
+      billboard.push(shape);
+      return shape;
+    });
+  }
 
-    createBillboard(worldPosition, url, size) {
+  /**
+  *
+  *  Ajoute une image à une position spécifiée (structure synchrone)
+  *
+  * @param  {Cartesian3} worldPosition la position du point
+  * @param  {String} url le lien vers l'image à utiliser
+  * @param  {Boolean} size true si on veut la taille en mètre, false si on veut la taille en pixels
+  * @return {Entity} shape l'entité ajoutée au viewer
+  */
+  createBillboard(worldPosition, url, size) {
     var symbol = this.viewer.entities.add({
       position : worldPosition,
       billboard : {
         image : url,
         verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-        sizeInMeters: size // true si on veut la taille en mètre, false si on veut la taille en pixels
+        sizeInMeters: size
       }
     });
     return symbol;
   }
 
-  // ajoute une polyligne
+  /**
+  *
+  *  Ajoute une polyligne
+  *
+  * @param  {Cartesian3} positionData les coordonnées des sommets de la ligne
+  * @param  {Number} largeur la largeur de la ligne
+  * @param  {String} couleur le couleur de la ligne
+  * @param  {Number} transparence la transparence de la ligne
+  * @param  {Boolean} clamp true si on veut que la ligne soit collée au photomaillage, false si pas collée
+  * @return {Entity} shape l'entité ajoutée au viewer
+  */
   drawLine(positionData, largeur, couleur, transparence, clamp) {
     var shape = this.viewer.entities.add({
       polyline : {
@@ -653,7 +790,17 @@ class Globe {
     return shape;
   }
 
-  // polyligne avec une flèche au bout
+  /**
+  *
+  *  Ajoute une polyligne avec une flèche au bout
+  *
+  * @param  {Cartesian3} positionData les coordonnées des sommets de la ligne
+  * @param  {Number} largeur la largeur de la ligne
+  * @param  {String} couleur le couleur de la ligne
+  * @param  {Number} transparence la transparence de la ligne
+  * @param  {Boolean} clamp true si on veut que la ligne soit collée au photomaillage, false si pas collée
+  * @return {Entity} shape l'entité ajoutée au viewer
+  */
   drawArrowLine(positionData, largeur, couleur, transparence, clamp) {
     var shape = this.viewer.entities.add({
       polyline : {
@@ -666,7 +813,17 @@ class Globe {
     return shape;
   }
 
-  // polyligne en pointillés
+  /**
+  *
+  *  Ajoute une polyligne en pointillés
+  *
+  * @param  {Cartesian3} positionData les coordonnées des sommets de la ligne
+  * @param  {Number} largeur la largeur de la ligne
+  * @param  {String} couleur le couleur de la ligne
+  * @param  {Number} transparence la transparence de la ligne
+  * @param  {Boolean} clamp true si on veut que la ligne soit collée au photomaillage, false si pas collée
+  * @return {Entity} shape l'entité ajoutée au viewer
+  */
   drawDashLine(positionData, largeur, couleur, transparence, clamp) {
     var shape = this.viewer.entities.add({
       polyline : {
@@ -681,7 +838,15 @@ class Globe {
     return shape;
   }
 
-  // dessine une surface
+  /**
+  *
+  *  Ajoute une surface
+  *
+  * @param  {Cartesian3} positionData les coordonnées des sommets de la surface
+  * @param  {String} couleur le couleur de la surface
+  * @param  {Number} transparence la transparence de la surface
+  * @return {Entity} shape l'entité ajoutée au viewer
+  */
   drawPolygon(positionData, couleur, transparence) {
     var shape = this.viewer.entities.add({
       polygon: {
@@ -693,7 +858,16 @@ class Globe {
     return shape;
   }
 
-  // dessine une surface extrudée, ie une boîte pour laquelle on précise la hauteur
+  /**
+  *
+  *  Ajoute une surface extrudée, ie une boîte pour laquelle on précise la hauteur
+  *
+  * @param  {Cartesian3} positionData les coordonnées des sommets de la boîte
+  * @param  {String} couleur le couleur de la boîte
+  * @param  {Number} transparence la transparence de la boîte
+  * @param  {Number} hauteurVol la hauteur de la boîte
+  * @return {Entity} shape l'entité ajoutée au viewer
+  */
   drawVolume(positionData, couleur, transparence, hauteurVol) {
     var shape = this.viewer.entities.add({
       polygon: {
@@ -707,14 +881,31 @@ class Globe {
     return shape;
   }
 
-  /* LA fonction qui permet de tout dessiner
+  /**
+  *
+  *  LA fonction qui permet de tout dessiner
   * le paramètre choice designe si on mesure (dessins temporaires) ou si on dessine (dessins qui restent après fermeture de la fonction de dessin)
-  * le paramètre choice désigne le type de dessin (line, surface, volume etc)
+  * le paramètre choice2 désigne le type de dessin (line, surface, volume etc)
   * On met tous les tableaux d'entités en paramètres de la fonction car ils seront définis dans la classe ui
   * pour garder une trace des entités et permettre leur annulation/exportation
   * Le reste des paramètres correspondent aux paramètres de personnalisation définis par l'utilisateur dans les formulaires
+  *
+  * @param  {String} choice prend la valeur dessin ou mesure
+  * @param  {String} choice2 le type d'entités à dessiner
+  * @param  {Number} largeur la transparence de l'entité
+  * @param  {String} couleur le couleur de l'entité
+  * @param  {Number} transparence la transparence de l'entité
+  * @param  {Number} hauteurVol la hauteur de l'entité
+  * @param  {String} url le lien vers les images pour les entités billboard
+  * @param  {Array} point le tableau où stocker les entités point
+  * @param  {Array} billboard le tableau où stocker les entités billboard
+  * @param  {Array} line le tableau où stocker les entités lignes
+  * @param  {Array} surface le tableau où stocker les entités surface
+  * @param  {Array} volume le tableau où stocker les entités boîte
+  * @param  {Array} dline le tableau où stocker les entités lignes pour les mesures
+  * @param  {Array} dsurface tableau où stocker les entités surface pour les mesures
   */
-  updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dline2, dsurface) {
+  updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dsurface) {
     var activeShapePoints = [];
     var activeShape;
     var floatingPoint;
@@ -853,7 +1044,7 @@ class Globe {
       } else if(choice2 === 'mesure'){
         if(choice === 'line') {
           dline.push(globe.drawLine(activeShapePoints, largeur, couleur, transparence, false));
-          dline2.push(globe.drawLine(activeShapePoints, largeur, '#000000', '0.5', true));
+          dline.push(globe.drawLine(activeShapePoints, largeur, '#000000', '0.5', true));
         } else if( choice === 'polygon') {
           dsurface.push(globe.drawPolygon(activeShapePoints, couleur, transparence));
         }
@@ -876,7 +1067,13 @@ class Globe {
     });
   }
 
-  // Enlève la dernière figure par catégorie (tableau lignes, surfaces etc)
+  /**
+  *
+  *  Enlève la dernière figure par catégorie (tableau lignes, surfaces etc)
+  *
+  * @param  {String} element l'élément HTML sur lequel ajouter l'évènement
+  * @param  {Array} figure le tableau d'entités à impacter
+  */
   annulFigure(element, figure) {
     document.querySelector(element).addEventListener('click', (e) => {
       var lastLine = figure.pop();
@@ -885,7 +1082,13 @@ class Globe {
     });
   }
 
-  // Supprime toutes les figures par catégorie
+  /**
+  *
+  *  Supprime toutes les figures par catégorie
+  *
+  * @param  {String} element l'élément HTML sur lequel ajouter l'évènement
+  * @param  {Array} figure le tableau d'entités à impacter
+  */
   supprFigure(element, figure) {
     document.querySelector(element).addEventListener('click', (e) => {
       for(var i = 0; i < figure.length; i++){
@@ -898,7 +1101,12 @@ class Globe {
     });
   }
 
-  // mesure de distance
+  /**
+  *
+  *  mesure de distance
+  *
+  * @param  {Array} activeShapePoints le tableau de points à partir duquel calculer la distance
+  */
   measureDistance(activeShapePoints)  {
     var coordsX = [];
     var coordsY = [];
@@ -924,7 +1132,7 @@ class Globe {
       // on stocke chque coordonnée dans un tableau séparé pour faliciter le calcul
       coordsX.push(coords[0]);
       coordsY.push(coords[1]);
-      var z = (Number(height) - Number(this.raf09.getGeoide(latitude, longitude)));
+      var z = (Number(height) - Number(this.raf09.getGeoide(latitude, longitude))); // conversion des hauteurs
       coordsZ.push(z);
     }
 
@@ -946,7 +1154,12 @@ class Globe {
     this.hauteur.innerHTML = difference;
   }
 
-  // mesure d'aire
+  /**
+  *
+  *  mesure de d'aire
+  *
+  * @param  {Array} activeShapePoints le tableau de points à partir duquel calculer l'aire
+  */
   measureSurface(activeShapePoints) {
     var coordsX = [];
     var coordsY = [];
@@ -978,7 +1191,13 @@ class Globe {
     this.aire.innerHTML = Math.abs(aire);
   }
 
-  // Récupère la hauteur d'un point en coords cartésiennes et la transforme en hauteur ellipsoïdale (pour le dessin de volumes)
+  /**
+  *
+  *  Récupère la hauteur d'un point en coords cartésiennes et la transforme en hauteur ellipsoïdale (pour le dessin de volumes)
+  *
+  * @param  {Array} activeShapePoints le tableau de points à partir duquel calculer l'aire
+  * @param  {Number} hauteurVol la hauteur de l'entité
+  */
   getHauteur(activeShapePoints, hauteurVol){
     var cartesian = new Cesium.Cartesian3(activeShapePoints[0].x, activeShapePoints[0].y, activeShapePoints[0].z);
     let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
@@ -994,7 +1213,11 @@ class Globe {
   *
   */
 
-  // ajoute les points et coupe aux positions définies
+  /**
+  * Découpe un trou dans le photomaillage - ajoute les points blancs visuellement et coupe selon la forme définie
+  *
+  * @param  {tileset} viewModel le modèle 3D à impacter
+  */
   createHole(viewModel) {
     var dig_point = [];
     var hole_pts = [];
@@ -1057,7 +1280,12 @@ class Globe {
     });
   }
 
-  // ajoute les plans de coupe
+  /**
+  * ajoute les plans de coupe
+  *
+  * @param  {tileset} viewModel le modèle 3D à impacter
+  * @param  {Array} hole_pts les coordonnées de la forme à découper
+  */
   holePlanes(viewModel, hole_pts) {
     var pointsLength = hole_pts.length;
     var clippingPlanes = [];
@@ -1097,8 +1325,11 @@ class Globe {
   });
 }
 
-/*
-* fonction qui permet de cliquer les attributs sur le 3DTiles
+/**
+* permet de cliquer les attributs sur le 3DTiles
+*
+* @param  {String} enabled le paramètre qui spécifie quand l'affichage doit être actif - prend la valeur e.target.checked ou non
+* @param  {tileset} tileset le modèle 3D à impacter
 */
 handleBatimentClick(enabled, tileset){
   var scene = this.viewer.scene;
@@ -1161,7 +1392,9 @@ handleBatimentClick(enabled, tileset){
   }
 }
 
-// supprime toutes les actions liées à la souris
+/**
+* supprime toutes les actions liées à la souris
+*/
 supprSouris(){
   this.handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
   this.handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
