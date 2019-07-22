@@ -31,7 +31,8 @@ let cesiumEvent = new Menu(globe);
 cesiumEvent.evenementsCouches();
 
 
-// Une fois le photo maillage chargé, l'enregister dans la liste des dataSource pour pouvoir interagir avec lui dans les évènements
+// Une fois le photo maillage chargé, l'enregister dans la liste des dataSource
+//pour pouvoir interagir avec lui dans les évènements
 terrain.then(function(dataSource){
   cesiumEvent.addDataSource("photoMaillage", dataSource)
 });

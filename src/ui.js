@@ -172,11 +172,15 @@ class Menu {
     * Ajout de couches
     */
     document.querySelector("#boutonfile").addEventListener('click', (e) => {
+      // Ouvrir le formulaire correspondant
       this.fileList.classList.toggle('hidden');
+      // Garder l'identifiant en mémoire pour éviter de le retaper à chaque fois
       if(localStorage.getItem("identifiant") != undefined) {
         document.getElementById("idEMS").value = localStorage.getItem("identifiant");
       }
     });
+
+    // Appel des fonctions qui lisent les dossiers du serveur web
     this.getJson();
     this.get3DTiles();
     this.getDrawing();
@@ -218,9 +222,9 @@ class Menu {
     *
     */
 
-    //Tableaux pour les dessins/mesures d'entités : on fait un seul tableau pour garder une trace des entités à tout moment
+    //Tableaux pour les dessins/mesures d'entités : on fait un seul tableau dans la fonction
+    // pour garder une trace des entités à tout moment
     // dessin
-    var point = [];
     var billboard = [];
     var line = [];
     var surface = [];
@@ -236,19 +240,21 @@ class Menu {
     * MESURES
     */
     // Boutons radios
+    // Les boutons radios suppriment les éléments liés aux autres boutons avant d'afficher leurs spécificités
     document.querySelector('#neutre').addEventListener('click', (e) => {
+      // Tout effacer
       globe.supprSouris();
       this.coordsList.classList.add('hidden');
       this.distanceList.classList.add('hidden');
       this.aideCheckbox.classList.add('hidden');
-
+      // Enlever les entités
       for(var i = 0; i < dline.length; i++){
         globe.viewer.entities.remove(dline[i]);
       }
+      // Vider le tableau
       for(var j = 0; j <= dline.length+1; j++){
         dline.pop();
       }
-
       this.aireList.classList.add('hidden');
       this.aideCheckbox.classList.add('hidden');
       for(var i = 0; i < dsurface.length; i++){
@@ -258,7 +264,6 @@ class Menu {
         dsurface.pop();
       }
       globe.viewer.scene.requestRender();
-
     });
 
     document.querySelector('#point').addEventListener('click', (e) => {
@@ -269,9 +274,8 @@ class Menu {
       this.aideCheckbox.classList.add('hidden');
 
       this.coordsList.classList.remove('hidden');
-      globe.showCoords();
+      var coords = globe.showCoords();
       globe.viewer.scene.requestRender();
-
     });
 
     document.querySelector('#ligne').addEventListener('click', (e) => {
@@ -284,10 +288,9 @@ class Menu {
       var choice2 = 'mesure';
       var hauteurVol;
       var url;
-      globe.updateShape(choice, choice2, 3, '#FF0000', 1, hauteurVol, url, point, billboard, line, surface, volume, dline, dsurface);
+      globe.updateShape(choice, choice2, 3, '#FF0000', 1, hauteurVol, url, billboard, line, surface, volume, dline, dsurface);
       this.distanceList.classList.remove('hidden');
       this.aideCheckbox.classList.remove('hidden');
-
       globe.viewer.scene.requestRender();
     });
 
@@ -301,12 +304,10 @@ class Menu {
       var choice2 = 'mesure';
       var hauteurVol;
       var url;
-      globe.updateShape(choice, choice2, 3, '#1ABFD0', 0.4, hauteurVol, url, point, billboard, line, surface, volume, dline, dsurface);
+      globe.updateShape(choice, choice2, 3, '#1ABFD0', 0.4, hauteurVol, url, billboard, line, surface, volume, dline, dsurface);
       this.aireList.classList.remove('hidden');
       this.aideCheckbox.classList.remove('hidden');
-
       globe.viewer.scene.requestRender();
-
     });
 
     /*
@@ -314,7 +315,6 @@ class Menu {
     * DESSINS
     *
     */
-
     //Evenements pour l'ajout de l'entité
     document.querySelector("#envoyerpoint").addEventListener('click', (e) => {
       var choice = 'point';
@@ -324,7 +324,7 @@ class Menu {
       var largeur;
       var hauteurVol = $('#hauteurpoint').val();
       var url = 'Assets/Textures/maki/' + $('#makisymbol').val() + '.png';
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dsurface);
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, billboard, line, surface, volume, dline, dsurface);
     });
 
     document.querySelector("#envoyerligne").addEventListener('click', (e) => {
@@ -335,7 +335,7 @@ class Menu {
       var largeur = $('#largeur').val();
       var couleur = $('#couleur').val();
       var transparence = $('#transparence').val();
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dsurface);
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, billboard, line, surface, volume, dline, dsurface);
     });
 
     document.querySelector("#envoyersurf").addEventListener('click', (e) => {
@@ -346,7 +346,7 @@ class Menu {
       var largeur = 3;
       var couleur = $('#couleursurf').val();
       var transparence = $('#transparencesurf').val();
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dsurface);
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, billboard, line, surface, volume, dline, dsurface);
     });
 
     document.querySelector("#envoyervol").addEventListener('click', (e) => {
@@ -357,7 +357,7 @@ class Menu {
       var hauteurVol = $('#hauteurvol').val();
       var couleur = $('#couleurvol').val();
       var transparence = $('#transparencevol').val();
-      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dsurface);
+      globe.updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, billboard, line, surface, volume, dline, dsurface);
     });
 
     //Evenements pour la suppression / anunulation des dessins
@@ -649,6 +649,7 @@ class Menu {
     // Decoupe dans le photomaillage
     var toolbar = document.getElementById('toolbar');
     Cesium.knockout.track(this.viewModel);
+    globe.viewer.scene.requestRender();
     Cesium.knockout.applyBindings(this.viewModel, toolbar);
     globe.viewer.scene.requestRender();
 
@@ -663,6 +664,7 @@ class Menu {
 
     document.querySelector("#envoyerdecoupe").addEventListener('click', (e) => {
       globe.createHole(this.viewModel);
+      globe.viewer.scene.requestRender();
     });
 
     /*

@@ -5,6 +5,8 @@ class Globe {
 
   /**
   * Le constructeur de la classe globe, qui créé le viewer Cesium, ajoute la flèche nord
+  * importe le grille raf09, créé le PinBuilder
+  * déclare toutes les checkbox pour l'affichage dynamique
   *
   * @param  {String} elementId Le nom du contenant html dans lequel on l'ajoute
   * @param  {Object} geocoder Le Geocoder à associer
@@ -95,10 +97,8 @@ class Globe {
   /**
   * Définit le zoom par défaut à l'ouverture de l'appli et lorsqu'on clique sur le bouton maison
   * Si on accède à l'appli avec un autre zoom que la cathédrale, le bouton maison renverra sur cette vue
-  *
-  * @param  {tileset} tileset le 3dtiles sur lequel on souhaite zoomer
   */
-  setHome(tileset){
+  setHome(){
     var params = this.getAllUrlParams(window.location.href);
     let X = params.x;
     let Y = params.y;
@@ -216,7 +216,6 @@ class Globe {
   * @param  {String} nom Le nom qu'on souhaite donner au point de vue
   * @return  {BoutonHTML} viewPoint Le bouton HTML avec le nom saisi
   */
-
   addViewPoint(nom) {
     var viewPoint = document.createElement("BUTTON");
     viewPoint.innerHTML = nom;
@@ -230,7 +229,6 @@ class Globe {
   /**
   *   Créer le lien de partage qui conserve le niveau de zoom de la scène
   */
-
   createLink() {
     // On récupère les paramètres de la caméra
     let X = globe.viewer.camera.positionWC.x;
@@ -258,7 +256,6 @@ class Globe {
   * @param  {Object} options facultatif - Les options pour le chargement
   * @return  {tileset} tileset Le 3DTileset
   */
-
   loadPhotomaillage(link, options = {}){
     // Chargement du photo maillage au format 3D tiles
     let tileset = new Cesium.Cesium3DTileset({
@@ -365,7 +362,8 @@ class Globe {
   }
 
   /**
-  * permet de charger les dessins exportés depuis Cesium; va chercher les propriétés dans le json pour garder l'affichage
+  * permet de charger les dessins exportés depuis Cesium;
+  * va chercher les propriétés dans le json pour garder les propriétés à l'affichage
   *
   * @param  {String} link Le lien vers le fichier
   * @param  {String} name Le nom qu'on donne au json
@@ -466,7 +464,6 @@ class Globe {
   *
   * Afficher ou masquer la source de données "name" en fonction de la valeur de "show"
   * Si elle n'a pas enore été affiché, la fonction va télécharger les données avec le lien "link" passé en parametre
-  * Enlève/Affiche les entités billboard pour les points
   *
   * @param  {String} show le paramètre qui spécifie quand l'affichage doit être actif - prend la valeur e.target.checked ou non
   * @param  {String} link Le lien vers le fichier
@@ -530,37 +527,25 @@ class Globe {
 
   /**
   *
-  * récupérer lat/lon/hauteur à chaque clic gauche
-  *
-  * @param  {CallbackProperty} callback
-  */
-  setCoordsCallback(callback){
-    let scene = this.viewer.scene;
-
-    this.handler.setInputAction(function(event) {
-
-      let cartesian = scene.pickPosition(event.position);
-
-      if (Cesium.defined(cartesian)) {
-        let cartographic = Cesium.Cartographic.fromCartesian(cartesian); // cartesian = coords géometriques de l'écran
-        let longitudeString = Cesium.Math.toDegrees(cartographic.longitude).toFixed(7); // en degrés décimaux
-        let latitudeString = Cesium.Math.toDegrees(cartographic.latitude).toFixed(7);
-        let heightString = cartographic.height.toFixed(3);
-        callback(longitudeString, latitudeString, heightString);
-      }
-    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-  }
-
-  /**
-  * Convertit les lat/lon/hauteur en CC48 / IGN69 et les affiche
+  * récupérer lat/lon/hauteur à chaque clic gauche, les convertit en CC48 / IGN69 et les affiche
   */
   showCoords(){
-    this.setCoordsCallback((longitude, latitude, hauteur) => { // Fonction éxécutée à chaque clic
-      var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
-      this.coordX.innerHTML = coords[0].toFixed(2);
-      this.coordY.innerHTML = coords[1].toFixed(2);
-      this.coordZ.innerHTML = (Number(hauteur) - Number(this.raf09.getGeoide(latitude, longitude))).toFixed(2);
-    });
+    let scene = this.viewer.scene;
+    this.handler.globe = this; // pour les problèmes de scope
+
+    this.handler.setInputAction(function(event) {
+      let cartesian = scene.pickPosition(event.position);
+      if (Cesium.defined(cartesian)) {
+        let cartographic = Cesium.Cartographic.fromCartesian(cartesian); // cartesian = coords géometriques de l'écran
+        let longitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(7); // en degrés décimaux
+        let latitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(7);
+        let height = cartographic.height.toFixed(3);
+        var coords = proj4('EPSG:4326','EPSG:3948', [longitude, latitude]);
+        globe.coordX.innerHTML = coords[0].toFixed(2);
+        globe.coordY.innerHTML = coords[1].toFixed(2);
+        globe.coordZ.innerHTML = (Number(height) - Number(globe.raf09.getGeoide(latitude, longitude))).toFixed(2);
+      }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
   }
 
   /*
@@ -884,7 +869,8 @@ class Globe {
   /**
   *
   *  LA fonction qui permet de tout dessiner
-  * le paramètre choice designe si on mesure (dessins temporaires) ou si on dessine (dessins qui restent après fermeture de la fonction de dessin)
+  * le paramètre choice designe si on mesure (dessins temporaires) ou si on dessine
+  * (dessins qui restent après fermeture de la fonction de dessin)
   * le paramètre choice2 désigne le type de dessin (line, surface, volume etc)
   * On met tous les tableaux d'entités en paramètres de la fonction car ils seront définis dans la classe ui
   * pour garder une trace des entités et permettre leur annulation/exportation
@@ -897,7 +883,6 @@ class Globe {
   * @param  {Number} transparence la transparence de l'entité
   * @param  {Number} hauteurVol la hauteur de l'entité
   * @param  {String} url le lien vers les images pour les entités billboard
-  * @param  {Array} point le tableau où stocker les entités point
   * @param  {Array} billboard le tableau où stocker les entités billboard
   * @param  {Array} line le tableau où stocker les entités lignes
   * @param  {Array} surface le tableau où stocker les entités surface
@@ -905,7 +890,7 @@ class Globe {
   * @param  {Array} dline le tableau où stocker les entités lignes pour les mesures
   * @param  {Array} dsurface tableau où stocker les entités surface pour les mesures
   */
-  updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, point, billboard, line, surface, volume, dline, dsurface) {
+  updateShape(choice, choice2, largeur, couleur, transparence, hauteurVol, url, billboard, line, surface, volume, dline, dsurface) {
     var activeShapePoints = [];
     var activeShape;
     var floatingPoint;
@@ -970,14 +955,14 @@ class Globe {
         } else {
           activeShapePoints.push(earthPosition);
           if(choice === 'point'){
-            point.push(globe.createPoint(earthPosition));
+            globe.createPoint(earthPosition);
             if($('#taille').val() === 'metre') {
               globe.createPinBillboard(billboard, earthPosition, url, couleur, hauteurVol, true);
             } else if($('#taille').val() === 'pixel') {
               globe.createPinBillboard(billboard, earthPosition, url, couleur, hauteurVol, false);
             }
           } else {
-            point.push(globe.createPoint(earthPosition));
+            globe.createPoint(earthPosition);
           }
         }
       }
@@ -1011,7 +996,7 @@ class Globe {
       // on ajoute les entités dans le taleau d'entités correspondant
       if(choice2 === 'dessin'){
         if(choice === 'point') {
-          point.push(globe.createPoint(activeShapePoints));
+          globe.createPoint(activeShapePoints);
           if($('#taille').val() === 'metre') {
             globe.createPinBillboard(billboard, activeShapePoints, url, couleur, hauteurVol, true);
           } else if($('#taille').val() === 'pixel') {
@@ -1105,7 +1090,7 @@ class Globe {
   *
   *  mesure de distance
   *
-  * @param  {Array} activeShapePoints le tableau de points à partir duquel calculer la distance
+  * @param  {Object} activeShapePoints le tableau de coordonnées cartésiennes x y z des points à partir duquel calculer la distance
   */
   measureDistance(activeShapePoints)  {
     var coordsX = [];
@@ -1158,7 +1143,7 @@ class Globe {
   *
   *  mesure de d'aire
   *
-  * @param  {Array} activeShapePoints le tableau de points à partir duquel calculer l'aire
+  * @param  {Array} activeShapePoints le tableau de coordonnées cartésiennes x y z des points à partir duquel calculer l'aire
   */
   measureSurface(activeShapePoints) {
     var coordsX = [];
@@ -1197,6 +1182,7 @@ class Globe {
   *
   * @param  {Array} activeShapePoints le tableau de points à partir duquel calculer l'aire
   * @param  {Number} hauteurVol la hauteur de l'entité
+  * @return {Number} z la hauteur ellipsoïdale du point
   */
   getHauteur(activeShapePoints, hauteurVol){
     var cartesian = new Cesium.Cartesian3(activeShapePoints[0].x, activeShapePoints[0].y, activeShapePoints[0].z);
@@ -1308,8 +1294,8 @@ class Globe {
     }
 
     // pour couper le globe
-    this.viewer.scene.globe.depthTestAgainstTerrain = true;
-    /*this.viewer.scene.globe.clippingPlanes = new Cesium.ClippingPlaneCollection({
+    /*this.viewer.scene.globe.depthTestAgainstTerrain = true;
+    this.viewer.scene.globe.clippingPlanes = new Cesium.ClippingPlaneCollection({
     planes : clippingPlanes,
     unionClippingRegions : union,
     edgeColor: Cesium.Color.WHITE,
@@ -1327,6 +1313,7 @@ class Globe {
 
 /**
 * permet de cliquer les attributs sur le 3DTiles
+* colorise en vert les contours de la zone cliquée
 *
 * @param  {String} enabled le paramètre qui spécifie quand l'affichage doit être actif - prend la valeur e.target.checked ou non
 * @param  {tileset} tileset le modèle 3D à impacter
