@@ -5,6 +5,7 @@ class Menu {
 
   /**
   * Le constructeur de la classe menu qui déclare toutes les variables utiles aux évènements
+  * et créé le LegendManager
   *
   * @param  {Object} globe L'objet globe défini dans la classe Globe
   */
@@ -104,23 +105,15 @@ class Menu {
 
   /**
   * Affichage des divs dans la boîte à outils
+  * et permet de fermer les divs lorsqu'on clique ailleurs
   *
   * @param  {BoutonHTML} bouton Le bouton HTML sur lequel ajouter l'évènement
   * @param  {DivHTML} element La div HTML qui va s'afficher au déclenchement de l'évènement
   */
-  menuClic(bouton, element) {
+  outilClic(bouton, element) {
     document.querySelector(bouton).addEventListener('click', (e) => {
       $(element).show();
     });
-  }
-
-  /**
-  * Permet de fermer les divs de la boîte à outils lorsqu'on clique ailleurs
-  *
-  * @param  {BoutonHTML} bouton Le bouton HTML sur lequel ajouter l'évènement
-  * @param  {DivHTML} element La div HTML qui va s'afficher au déclenchement de l'évènement
-  */
-  windowClic(bouton, element) {
     window.addEventListener('click', function(event){
       var $trigger = $(bouton);
       if($trigger !== event.target && !$trigger.has(event.target).length){
@@ -157,16 +150,11 @@ class Menu {
     // menus déroulants et boite à outils
     this.menuDeroulant(this.dropdown);
     this.menuDeroulant(this.deroulant);
-    this.menuClic("#boutonmesures", "#mesures-content");
-    this.menuClic("#boutonconstruction", "#construction-content");
-    this.menuClic("#boutoncoupe", "#coupe-content");
-    this.menuClic("#boutontime", "#time-content");
-    this.menuClic("#boutoncamera", "#camera-content");
-    this.windowClic("#boutonmesures", "#mesures-content");
-    this.windowClic("#boutonconstruction", "#construction-content");
-    this.windowClic("#boutoncoupe", "#coupe-content");
-    this.windowClic("#boutontime", "#time-content");
-    this.windowClic("#boutoncamera", "#camera-content");
+    this.outilClic("#boutonmesures", "#mesures-content");
+    this.outilClic("#boutonconstruction", "#construction-content");
+    this.outilClic("#boutoncoupe", "#coupe-content");
+    this.outilClic("#boutontime", "#time-content");
+    this.outilClic("#boutoncamera", "#camera-content");
 
     /*
     * Ajout de couches
