@@ -344,6 +344,7 @@ class Globe {
             }
             entity.polygon.material = color;
             entity.polygon.classificationType = Cesium.ClassificationType.CESIUM_3D_TILE;
+            entity.polygon.arcType = Cesium.ArcType.GEODESIC; // la ligne qui empêche le bug d'affichage des json (fuite des json vers la caméra)
           }
         }
       }
