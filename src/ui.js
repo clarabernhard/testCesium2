@@ -67,8 +67,6 @@ class Menu {
     this.velumCouleurCheckbox = document.querySelector('#velumCouleur');
 
     // tableaux pour stocker les billboard des entités ponctuelles
-    this.billboardArbre = [];
-    this.billboardArbreRem = [];
 
     /*
     * Outil de découpe dans le photomaillage
@@ -181,18 +179,39 @@ class Menu {
     });
     document.querySelector("#reset").addEventListener('click', (e) => {
       hideElements();
+      //fermer tous les onglets thématiques
+      document.querySelector('#plu').style.display = "none";
+      document.querySelector('#ecologie').style.display = "none";
+      document.querySelector('#reglementaire').style.display = "none";
+      document.querySelector('#divers').style.display = "none";
     });
     document.querySelector("#configDefaut").addEventListener('click', (e) => {
       showElements();
       this.configList.classList.add('hidden');
+      // ouvrir les onglets thématiques qui contiennent des données
+      document.querySelector('#plu').style.display = "block";
+      document.querySelector('#ecologie').style.display = "block";
+      document.querySelector('#reglementaire').style.display = "block";
+      document.querySelector('#divers').style.display = "block";
     });
     document.querySelector("#configPLU").addEventListener('click', (e) => {
       initPLU();
       this.configList.classList.add('hidden');
+      document.querySelector('#plu').style.display = "block";
+      document.querySelector('#reglementaire').style.display = "block";
     });
     document.querySelector("#configEco").addEventListener('click', (e) => {
       initEco();
       this.configList.classList.add('hidden');
+      document.querySelector('#plu').style.display = "block";
+      document.querySelector('#ecologie').style.display = "block";
+      document.querySelector('#divers').style.display = "block";
+    });
+	document.querySelector("#configSIRENE").addEventListener('click', (e) => {
+      initSIRENE();
+      this.configList.classList.add('hidden');
+      document.querySelector('#ecologie').style.display = "block";
+      document.querySelector('#divers').style.display = "block";
     });
 
     // afficher les 2 photomaillages
@@ -908,16 +927,16 @@ class Menu {
 
     document.querySelector('#arbre').addEventListener('change', (e) => {
       let color = {
-        'Arbre_PLU': '#8AC467',
+        'Arbre_PLU': '#FFFFFF',
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('arbre', color, 'point', "<img src='src/img/icons8-treeblue.png'>");
+        this.legendManager.addLegend('arbre', color, 'point', "<img src='src/img/blue_tree.png'>");
       } else{
         this.legendManager.removeLegend('arbre');
       }
 
-      globe.showJson(e.target.checked, 'arbre', 'data/geojson/arbres.json', undefined, Cesium.Color.fromCssColorString('#05A197').withAlpha(0.1), 'src/img/icons8-treeblue.png', 'point' , this.billboardArbre, {
+      globe.showJson(e.target.checked, 'arbre', 'data/geojson/arbres.json', 'park2', Cesium.Color.fromCssColorString('#05A197'), undefined, undefined, undefined, {
       });
     });
 
@@ -986,12 +1005,12 @@ class Menu {
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('arbreRem', color, 'point', "<img src='src/img/icons8-tree.png'>");
+        this.legendManager.addLegend('arbreRem', color, 'point', "<img src='src/img/green_tree.png'>");
       } else{
         this.legendManager.removeLegend('arbreRem');
       }
 
-      globe.showJson(e.target.checked, 'arbreRem', 'data/geojson/arbres_rem.json', undefined, Cesium.Color.fromCssColorString('#05A119').withAlpha(0.1), 'src/img/icons8-tree.png', 'point', this.billboardArbreRem, {
+      globe.showJson(e.target.checked, 'arbreRem', 'data/geojson/arbres_rem.json', 'park2', Cesium.Color.fromCssColorString('#05A119'), undefined, undefined, undefined, {
       });
     });
 
@@ -1201,35 +1220,18 @@ class Menu {
       globe.show3DTiles(e.target.checked, 'danube', 'data/Danube/tileset.json');
     });
 
-    document.querySelector('#velo').addEventListener('change', (e) => {
-      let colors = {
-        '1': '#DEA11F'
-      }
-
-      globe.showJson(e.target.checked, 'velo', 'data/geojson/trajet_velo.json', undefined, undefined , undefined, undefined, undefined, {
-        classification: true,
-        classificationField: 'id',
-        colors: colors,
-        alpha: 0.6
-      });
-    });
-
-    document.querySelector('#velosurf').addEventListener('change', (e) => {
-      let colors = {
-        'velo': '#DEA11F'
+	document.querySelector('#SIREN_Adient').addEventListener('change', (e) => {
+      let color = {
+        'Point_SIRENE': '#8AC467',
       }
 
       if(e.target.checked){
-        this.legendManager.addLegend('velosurf', colors, 'polygon');
+        this.legendManager.addLegend('SIREN_Adient', color, 'point', "<img src='src/img/point_sirene.png'>");
       } else{
-        this.legendManager.removeLegend('velosurf');
+        this.legendManager.removeLegend('SIREN_Adient');
       }
 
-      globe.showJson(e.target.checked, 'velosurf', 'data/geojson/velo_surf.json', undefined, undefined , undefined, undefined, undefined, {
-        classification: true,
-        classificationField: 'id',
-        colors: colors,
-        alpha: 0.6
+      globe.showJson(e.target.checked, 'SIREN_Adient', 'data/geojson/Sirene_Adient_3D.json', 'industrial', Cesium.Color.fromCssColorString('#8C0A0A'), undefined, undefined , undefined, {
       });
     });
 
@@ -1619,6 +1621,7 @@ class Menu {
                 item.appendChild(checkbox);
                 item.appendChild(label);
                 document.getElementById("mescouches").appendChild(item);
+                document.querySelector('#mescouches').style.display = "block";
 
                 // données surfaciques
                 var champ = $('#classif').val();
@@ -1721,6 +1724,7 @@ class Menu {
               item.appendChild(checkbox);
               item.appendChild(label);
               document.getElementById("mescouches").appendChild(item);
+              document.querySelector('#mescouches').style.display = "block";
 
               checkbox.addEventListener('change', (e) => {
                 globe.show3DTiles(e.target.checked, 'test', json[i]);
@@ -1807,6 +1811,7 @@ class Menu {
               item.appendChild(checkbox);
               item.appendChild(label);
               document.getElementById("mescouches").appendChild(item);
+              document.querySelector('#mescouches').style.display = "block";
 
               // L'evenement pour afficher la nouvelle couche
               checkbox.addEventListener('change', (e) => {

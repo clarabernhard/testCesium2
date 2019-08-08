@@ -257,6 +257,7 @@
           <p><button id="configDefaut">Configuration par défaut</button></p>
           <p><button id="configPLU">Configuration PLU</button></p>
           <p><button id="configEco">Configuration écologie du territoire</button></p>
+		  <p><button id="configSIRENE">Configuration SIRENE</button></p>
         </div>
 
       </div>
@@ -300,7 +301,7 @@
           <button class="panel-title">PLU
             <i class="arrow"></i>
           </button>
-          <div class="panel-content">
+          <div class="panel-content" id="plu">
 
             <div class="nowrap hidden" id="ERDiv">
               <input id="ER" type="checkbox"/>
@@ -357,7 +358,7 @@
           <button class="panel-title">ECOLOGIE
             <i class="arrow"></i>
           </button>
-          <div class="panel-content">
+          <div class="panel-content" id="ecologie">
 
             <div class="nowrap hidden" id="zhavereesDiv">
               <input id="zhaverees" type="checkbox"/>
@@ -439,7 +440,7 @@
           <button class="panel-title">REGLEMENTAIRE
             <i class="arrow"></i>
           </button>
-          <div class="panel-content">
+          <div class="panel-content" id="reglementaire">
             <div class="nowrap hidden" id="monumentDiv">
               <input id="monument" type="checkbox"/>
               <label for="monument">Monuments historiques</label>
@@ -449,19 +450,15 @@
           <button class="panel-title">DIVERS
             <i class="arrow"></i>
           </button>
-          <div class="panel-content">
+          <div class="panel-content" id="divers">
             <div class="nowrap hidden" id="danubeDiv">
               <input id="danube" type="checkbox"/>
               <label for="danube">Ecole Danube</label>
             </div>
 
-            <div class="nowrap hidden" id="veloDiv">
-              <input id="velo" type="checkbox"/>
-              <label for="velo">Trajet vélo</label>
-            </div>
-            <div class="nowrap hidden" id="velosurfDiv">
-              <input id="velosurf" type="checkbox"/>
-              <label for="velosurf">Trajet vélo (surface) </label>
+			<div class="nowrap hidden" id="SIREN_AdientDiv">
+              <input id="SIREN_Adient" type="checkbox"/>
+              <label for="SIREN_Adient">SIREN_Adient</label>
             </div>
 
             <button class="deroulant hidden" id="velumDiv">Velum
