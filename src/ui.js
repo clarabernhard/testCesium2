@@ -638,18 +638,18 @@ class Menu {
     // Suppression/ annulation des plans de coupe
     document.querySelector("#annulercoupe").addEventListener('click', (e) => {
       var annul = planeEntities.length-1;
-      this.viewer.entities.remove(planeEntities[annul]);
+      globe.viewer.entities.remove(planeEntities[annul]);
       planeEntities.pop();
       clippingPlanes = [];
-      this.viewer.scene.requestRender();
+      globe.viewer.scene.requestRender();
     });
     document.querySelector("#supprimercoupe").addEventListener('click', (e) => {
       //this.viewer.entities.remove(planeEntity);
       for(var i = 0; i < planeEntities.length; i++){
-        this.viewer.entities.remove(planeEntities[i]);
+        globe.viewer.entities.remove(planeEntities[i]);
       }
       clippingPlanes = [];
-      this.viewer.scene.requestRender();
+      globe.viewer.scene.requestRender();
     });
 
 
