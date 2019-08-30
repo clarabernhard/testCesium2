@@ -65,8 +65,6 @@ function showElements() {
   this.danubeDiv.classList.remove('hidden');
   this.velumDiv.classList.remove('hidden');
   this.batipublicDiv.classList.remove('hidden');
-  this.veloDiv.classList.remove('hidden');
-  this.velosurfDiv.classList.remove('hidden');
   this.SIRENEDiv.classList.remove('hidden');
 }
 
@@ -102,8 +100,6 @@ function hideElements() {
   this.danubeDiv.classList.add('hidden');
   this.velumDiv.classList.add('hidden');
   this.batipublicDiv.classList.add('hidden');
-  this.veloDiv.classList.add('hidden');
-  this.velosurfDiv.classList.add('hidden');
   this.SIRENEDiv.classList.add('hidden');
 }
 
@@ -134,8 +130,6 @@ function initPLU() {
   this.danubeDiv.classList.add('hidden');
   this.velumDiv.classList.add('hidden');
   this.batipublicDiv.classList.add('hidden');
-  this.veloDiv.classList.add('hidden');
-  this.velosurfDiv.classList.add('hidden');
   this.SIRENEDiv.classList.add('hidden');
 }
 
@@ -166,8 +160,6 @@ function initEco() {
   this.danubeDiv.classList.add('hidden');
   this.velumDiv.classList.add('hidden');
   this.batipublicDiv.classList.remove('hidden');
-  this.veloDiv.classList.remove('hidden');
-  this.velosurfDiv.classList.remove('hidden');
   this.SIRENEDiv.classList.add('hidden');
 }
 
@@ -198,7 +190,5 @@ function initSIRENE() {
   this.danubeDiv.classList.add('hidden');
   this.velumDiv.classList.add('hidden');
   this.batipublicDiv.classList.add('hidden');
-  this.veloDiv.classList.add('hidden');
-  this.velosurfDiv.classList.add('hidden');
   this.SIRENEDiv.classList.remove('hidden');
 }
